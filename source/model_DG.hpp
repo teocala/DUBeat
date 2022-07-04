@@ -494,7 +494,7 @@ void
 ModelDG<basis>::create_mesh()
 {
   std::string mesh_path =
-    "../../../../examples/electrophysiology_dubiner_dg/src/meshes/" +
+    "../meshes/" +
     std::to_string(lifex::dim) + "D_" + std::to_string(prm_n_refinements) +
     ".msh";
   AssertThrow(std::filesystem::exists(mesh_path),

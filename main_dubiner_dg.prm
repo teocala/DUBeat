@@ -1,0 +1,35 @@
+# Listing of Parameters
+# ---------------------
+subsection Mesh and space discretization
+  # Number of global mesh refinement steps applied to initial grid.
+  set Number of refinements = 2
+
+  # Degree of the FE space.
+  set FE space degree       = 1
+end
+
+
+subsection Discontinuous Galerkin
+  # Penalty coefficient in the Discontinuous Galerkin formulation.
+  set Penalty coefficient   = -1
+
+  # Stabilization term in the Discontinuous Galerkin formulation.
+  set Stability coefficient = 10
+end
+
+
+subsection Time solver
+  # Initial time.
+  set Initial time = 0
+
+  # Final time.
+  set Final time   = 0.001
+
+  # Time step.
+  set Time step    = 0.0001
+
+  # BDF order: 1, 2, 3.
+  set BDF order    = 1
+end
+
+
