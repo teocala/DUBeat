@@ -1,0 +1,9 @@
+#This is an example of Torque submission file.
+
+#!/bin/bash
+#PBS -S /bin/bash
+#PBS -l nodes=1:ppn=1,walltime=120:00:00 -q gigatlong
+
+OUTPUT="/scratch/hpc/calafa/"
+cd /u/archive/laureandi/calafa/electrophysiology_dubiner_dg
+./main_dubiner_dg -f main_dubiner_dg.prm -o $OUTPUT >& $OUTPUT/output.txt 2>&1
