@@ -18,5 +18,6 @@ Examples of applications are the problems already supplied in the folder `models
 
 
 ### MAIN INSTRUCTIONS FOR THE USE:
+- To use the code, modify the variable `LIFEX_PATH` in Makefile.inc specifying your local LifeX directory.  
 - Other applications/problems can be easily implemented. Just follow the above problems structure and overridden methods at need. Note that the supplement of a new type of DG matrix needs to be added in the `DG_Assemble` methods. 
 - As for now, simplices meshes can not be built runtime in LifeX. Therefore, some reference meshes are provided in the folder `meshes`. In case you need to use your own mesh files, you need to change the default create_mesh function.
