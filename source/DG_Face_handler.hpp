@@ -24,8 +24,8 @@
  * @author Matteo Calafà <matteo.calafa@mail.polimi.it>.
  */
 
-#ifndef LIFEX_DGFaceHandler_HPP_
-#define LIFEX_DGFaceHandler_HPP_
+#ifndef DGFaceHandler_HPP_
+#define DGFaceHandler_HPP_
 
 #include <deal.II/base/quadrature_lib.h>
 #include <deal.II/base/tensor.h>
@@ -256,4 +256,4 @@ DGFaceHandler<3>::get_measure() const
 }
 
 
-#endif /* LIFEX_DGFaceHandler_HPP_*/
+#endif /* DGFaceHandler_HPP_*/

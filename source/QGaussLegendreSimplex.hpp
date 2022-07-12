@@ -24,8 +24,8 @@
  * @author Matteo Calafà <matteo.calafa@mail.polimi.it>.
  */
 
-#ifndef LIFEX_QGAUSSLEGENDRESIMPLEX_HPP_
-#define LIFEX_QGAUSSLEGENDRESIMPLEX_HPP_
+#ifndef QGAUSSLEGENDRESIMPLEX_HPP_
+#define QGAUSSLEGENDRESIMPLEX_HPP_
 
 #include <deal.II/base/config.h>
 
@@ -34,27 +34,28 @@
 #include <utility>
 #include <vector>
 
-/// This routine computes the n Gauss-Ledendre nodes and weights on a given
+/// This routine computes the n Gauss-Legendre nodes and weights on a given
 /// interval (a,b)
 extern std::pair<std::vector<dealii::Point<1>>, std::vector<double>>
-gauleg(const double a, const double b, const unsigned int n)
+gauleg(const double left_position, const double right_position, const unsigned int n_quadrature_points)
 {
-  AssertThrow(a < b,
+  AssertThrow(left_position < right_position,
               dealii::StandardExceptions::ExcMessage(
                 "(a,b) is an interval, hence a must be lower than b."));
 
-  const double m  = (n + 1.) / 2.;
-  const double xm = 0.5 * (b + a);
-  const double xl = 0.5 * (b - a);
+  // The following lines follow the definition of Gauss-Legendre nodes on an interval.
 
-  std::vector<dealii::Point<1>> x(n);
-  std::vector<double>           w(n);
+  const double middle_point = 0.5 * (right_position + left_position);
+  const double half_length = 0.5 * (right_position - left_position);
+
+  std::vector<dealii::Point<1>> coords(n_quadrature_points);
+  std::vector<double>           weights(n_quadrature_points);
 
   double z, z1, p1, p2, p3, pp = 0.0;
 
-  for (unsigned int i = 1; i <= m; ++i)
+  for (unsigned int i = 1; i <= (n_quadrature_points+1)/2.; ++i)
     {
-      z  = std::cos(M_PI * (i - 0.25) / (n + 0.5));
+      z  = std::cos(M_PI * (i - 0.25) / (n_quadrature_points + 0.5));
       z1 = z + 1.;
 
       while (!(std::abs(z - z1) < 1e-10))
@@ -62,27 +63,27 @@ gauleg(const double a, const double b, const unsigned int n)
           p1 = 1.0;
           p2 = 0.0;
 
-          for (unsigned int j = 1; j <= n; ++j)
+          for (unsigned int j = 1; j <= n_quadrature_points; ++j)
             {
               p3 = p2;
               p2 = p1;
               p1 = ((2 * j - 1) * z * p2 - (j - 1) * p3) / j;
             }
 
-          pp = n * (z * p1 - p2) / (pow(z, 2) - 1);
+          pp = n_quadrature_points * (z * p1 - p2) / (pow(z, 2) - 1);
           z1 = z;
           z  = z1 - p1 / pp;
         }
 
-      const dealii::Point<1> P1(xm - xl * z);
-      const dealii::Point<1> P2(xm + xl * z);
-      x[i - 1] = P1;
-      x[n - i] = P2;
-      w[i - 1] = 2.0 * xl / ((1.0 - z * z) * pp * pp);
-      w[n - i] = w[i - 1];
+      const dealii::Point<1> P1(middle_point - half_length * z);
+      const dealii::Point<1> P2(middle_point + half_length * z);
+      coords[i - 1] = P1;
+      coords[n_quadrature_points - i] = P2;
+      weights[i - 1] = 2.0 * half_length / ((1.0 - z * z) * pp * pp);
+      weights[n_quadrature_points - i] = weights[i - 1];
     }
 
-  return {x, w};
+  return {coords, weights};
 }
 
 
@@ -94,96 +95,88 @@ class QGaussLegendreSimplex : public dealii::Quadrature<dim>
 {
 public:
   /// Constructor.
-  QGaussLegendreSimplex<dim>(const unsigned int n);
+  QGaussLegendreSimplex<dim>(const unsigned int n_quadrature_points);
 };
 
 
-/// To create @f$n@f$ quadrature points and weigths in the segment @f$(0,1)@f$.
+/// To create @f$n@f$ quadrature points and weights in the segment @f$(0,1)@f$.
 template <>
-QGaussLegendreSimplex<1>::QGaussLegendreSimplex(const unsigned int n)
-  : dealii::Quadrature<1>(n)
+QGaussLegendreSimplex<1>::QGaussLegendreSimplex(const unsigned int n_quadrature_points)
+  : dealii::Quadrature<1>(n_quadrature_points)
 {
-  std::vector<dealii::Point<1>> x_1D(n);
-  std::vector<double>           w_1D(n);
-  std::tie(x_1D, w_1D) = gauleg(0, 1, n);
+  std::vector<dealii::Point<1>> coords_1D(n_quadrature_points);
+  std::vector<double>           weights_1D(n_quadrature_points);
+  std::tie(coords_1D, weights_1D) = gauleg(0, 1, n_quadrature_points);
 
-  this->quadrature_points = x_1D;
-  this->weights           = w_1D;
+  this->quadrature_points = coords_1D;
+  this->weights           = weights_1D;
 }
 
 
-/// To create @f$n^2@f$ quadrature points and weights in the triangle @f$(0,0) ,
+/// To create @f$n^2@f$ quadrature points and weights on the triangle @f$(0,0) ,
 /// (0.1) , (1,0)@f$.
 template <>
-QGaussLegendreSimplex<2>::QGaussLegendreSimplex(const unsigned int n)
-  : dealii::Quadrature<2>(n)
+QGaussLegendreSimplex<2>::QGaussLegendreSimplex(const unsigned int n_quadrature_points)
+  : dealii::Quadrature<2>(n_quadrature_points)
 {
-  std::vector<dealii::Point<1>> x_1D(n);
-  std::vector<double>           w_1D(n);
-  std::tie(x_1D, w_1D) = gauleg(0, 1, n);
+  std::vector<dealii::Point<1>> coords_1D(n_quadrature_points);
+  std::vector<double>           weights_1D(n_quadrature_points);
+  std::tie(coords_1D, weights_1D) = gauleg(-1, 1, n_quadrature_points);
 
-  std::vector<dealii::Point<1>> x(n);
-  std::vector<double>           w(n);
-  std::tie(x, w) = gauleg(-1, 1, n);
+  std::vector<dealii::Point<2>> coords_2D;
+  std::vector<double>           weights_2D;
 
-  std::vector<dealii::Point<2>> x_2D;
-  std::vector<double>           w_2D;
-
-  for (unsigned int i = 0; i < n; ++i)
+  for (unsigned int i = 0; i < n_quadrature_points; ++i)
     {
-      for (unsigned int j = 0; j < n; ++j)
+      for (unsigned int j = 0; j < n_quadrature_points; ++j)
         {
-          const dealii::Point<2> P((1 + x[i][0]) / 2,
-                                   (1 - x[i][0]) * (1 + x[j][0]) / 4);
+          const dealii::Point<2> P((1 + coords_1D[i][0]) / 2,
+                                   (1 - coords_1D[i][0]) * (1 + coords_1D[j][0]) / 4);
 
-          x_2D.push_back(P);
-          w_2D.push_back((1 - x[i][0]) * w[i] * w[j] / 8);
+          coords_2D.push_back(P);
+          weights_2D.push_back((1 - coords_1D[i][0]) * weights_1D[i] * weights_1D[j] / 8);
         }
     }
 
-  this->quadrature_points = x_2D;
-  this->weights           = w_2D;
+  this->quadrature_points = coords_2D;
+  this->weights           = weights_2D;
 }
 
 
-/// To create @f$n^3@f$ quadrature points and weights in the tetrahedron
+/// To create @f$n^3@f$ quadrature points and weights on the tetrahedron
 /// @f$(0,0,0) , (1,0,0) , (0,1,0) , (0,0,1)@f$.
 template <>
-QGaussLegendreSimplex<3>::QGaussLegendreSimplex(const unsigned int n)
-  : dealii::Quadrature<3>(n)
+QGaussLegendreSimplex<3>::QGaussLegendreSimplex(const unsigned int n_quadrature_points)
+  : dealii::Quadrature<3>(n_quadrature_points)
 {
-  std::vector<dealii::Point<1>> x_1D(n);
-  std::vector<double>           w_1D(n);
-  std::tie(x_1D, w_1D) = gauleg(0, 1, n);
+  std::vector<dealii::Point<1>> coords_1D(n_quadrature_points);
+  std::vector<double>           weights_1D(n_quadrature_points);
+  std::tie(coords_1D, weights_1D) = gauleg(-1, 1, n_quadrature_points);
 
-  std::vector<dealii::Point<1>> x(n);
-  std::vector<double>           w(n);
-  std::tie(x, w) = gauleg(-1, 1, n);
+  std::vector<dealii::Point<3>> coords_3D;
+  std::vector<double>           weights_3D;
 
-  std::vector<dealii::Point<3>> x_3D;
-  std::vector<double>           w_3D;
-
-  for (unsigned int i = 0; i < n; ++i)
+  for (unsigned int i = 0; i < n_quadrature_points; ++i)
     {
-      for (unsigned int j = 0; j < n; ++j)
+      for (unsigned int j = 0; j < n_quadrature_points; ++j)
         {
-          for (unsigned int k = 0; k < n; ++k)
+          for (unsigned int k = 0; k < n_quadrature_points; ++k)
             {
-              const dealii::Point<3> P((x[i][0] + 1) * (x[j][0] - 1) *
-                                         (x[k][0] - 1) / 8,
-                                       (1 - x[k][0]) * (1 + x[j][0]) / 4,
-                                       (x[k][0] + 1) / 2);
+              const dealii::Point<3> new_coords((coords_1D[i][0] + 1) * (coords_1D[j][0] - 1) *
+                                         (coords_1D[k][0] - 1) / 8,
+                                       (1 - coords_1D[k][0]) * (1 + coords_1D[j][0]) / 4,
+                                       (coords_1D[k][0] + 1) / 2);
 
-              x_3D.push_back(P);
-              w_3D.push_back((1 - x[k][0]) * (1 - x[k][0]) * (1 - x[j][0]) *
-                             w[i] * w[j] * w[k] / 64);
+              coords_3D.push_back(new_coords);
+              weights_3D.push_back((1 - coords_1D[k][0]) * (1 - coords_1D[k][0]) * (1 - coords_1D[j][0]) *
+                             weights_1D[i] * weights_1D[j] * weights_1D[k] / 64);
             }
         }
     }
 
-  this->quadrature_points = x_3D;
-  this->weights           = w_3D;
+  this->quadrature_points = coords_3D;
+  this->weights           = weights_3D;
 }
 
 
-#endif /* LIFEX_QGAUSSLEGENDRESIMPLEX_HPP_*/
+#endif /* QGAUSSLEGENDRESIMPLEX_HPP_*/

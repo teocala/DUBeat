@@ -24,8 +24,8 @@
  * @author Matteo Calafà <matteo.calafa@mail.polimi.it>.
  */
 
-#ifndef LIFEX_DGAssemble_HPP_
-#define LIFEX_DGAssemble_HPP_
+#ifndef DGAssemble_HPP_
+#define DGAssemble_HPP_
 
 
 #include "lifex/core/core_model.hpp"
@@ -752,4 +752,4 @@ DGAssemble<basis>::local_non_linear(const lifex::LinAlg::MPI::Vector &u0,
 }
 
 
-#endif /* LIFEX_DGAssemble_HPP_*/
+#endif /* DGAssemble_HPP_*/

@@ -24,8 +24,8 @@
  * @author Matteo Calafà <matteo.calafa@mail.polimi.it>.
  */
 
-#ifndef LIFEX_DUBValues_HPP_
-#define LIFEX_DUBValues_HPP_
+#ifndef DUBValues_HPP_
+#define DUBValues_HPP_
 
 #include <deal.II/base/quadrature_lib.h>
 #include <deal.II/base/tensor.h>
@@ -54,13 +54,13 @@ protected:
   /// Tolerance used for some operations, default value is @f$10^{-10}@f$.
   const double tol = 1e-10;
 
-  /// Evaluation of Jacobi polynomials (only internal use to evaluate Dubiner
-  /// basis).
+  /// Evaluation of the (n,alpha,beta)-Jacobi polynomial (only internal use to
+  /// evaluate Dubiner basis).
   double
   eval_jacobi_polynomial(const unsigned int n,
                          const unsigned int alpha,
                          const unsigned int beta,
-                         const double       z) const;
+                         const double       eval_point) const;
 
   /// Conversion from the FEM basis taxonomy (@f$1^{st}@f$ basis function,
   /// @f$2^{nd}@f$ basis function ... ) to the Dubiner basis taxonomy (where
@@ -125,7 +125,7 @@ DUBValues<2>::fun_coeff_conversion(const unsigned int n) const
 }
 
 
-/// Specialization in two dimensions, i.e. from an integer @f$n@f$ returns three
+/// Specialization in three dimensions, i.e. from an integer @f$n@f$ returns three
 /// indexes @f$(i,j,k)@f$ such that the @f$n@f$-th Dubiner function corresponds
 /// to the function with indexes @f$(i,j,k)@f$.
 template <>
@@ -166,19 +166,19 @@ double
 DUBValues<dim>::eval_jacobi_polynomial(const unsigned int n,
                                        const unsigned int alpha,
                                        const unsigned int beta,
-                                       const double       z) const
+                                       const double       eval_point) const
 {
   if (n == 0)
     return 1.0;
   else if (n == 1)
-    return static_cast<double>((alpha - beta + (alpha + beta + 2.0) * z) / 2.0);
+    return static_cast<double>((alpha - beta + (alpha + beta + 2.0) * eval_point) / 2.0);
   else
     {
       const double apb    = alpha + beta;
       double       poly   = 0.0;
       double       polyn2 = 1.0;
       double       polyn1 =
-        static_cast<double>((alpha - beta + (alpha + beta + 2.0) * z) / 2.0);
+        static_cast<double>((alpha - beta + (alpha + beta + 2.0) * eval_point) / 2.0);
       double a1, a2, a3, a4;
 
       for (unsigned int k = 2; k <= n; ++k)
@@ -198,7 +198,7 @@ DUBValues<dim>::eval_jacobi_polynomial(const unsigned int n,
           a3 = a3 / a1;
           a4 = a4 / a1;
 
-          poly   = (a2 + a3 * z) * polyn1 - a4 * polyn2;
+          poly   = (a2 + a3 * eval_point) * polyn1 - a4 * polyn2;
           polyn2 = polyn1;
           polyn1 = poly;
         }
@@ -451,4 +451,4 @@ DUBValues<3>::shape_grad(const unsigned int      function_no,
 }
 
 
-#endif /* LIFEX_DUBValues_HPP_*/
+#endif /* DUBValues_HPP_*/

@@ -24,8 +24,8 @@
  * @author Matteo Calafà <matteo.calafa@mail.polimi.it>.
  */
 
-#ifndef LIFEX_HEAT_DG_HPP_
-#define LIFEX_HEAT_DG_HPP_
+#ifndef HEAT_DG_HPP_
+#define HEAT_DG_HPP_
 
 
 #include "lifex/core/core_model.hpp"
@@ -358,4 +358,4 @@ namespace lifex::examples
 } // namespace lifex::examples
 
 
-#endif /* LIFEX_HEAT_DG_HPP_*/
+#endif /* HEAT_DG_HPP_*/

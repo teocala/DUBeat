@@ -24,8 +24,8 @@
  * @author Matteo Calafà <matteo.calafa@mail.polimi.it>.
  */
 
-#ifndef LIFEX_LAPLACE_DG_HPP_
-#define LIFEX_LAPLACE_DG_HPP_
+#ifndef LAPLACE_DG_HPP_
+#define LAPLACE_DG_HPP_
 
 
 #include "lifex/core/core_model.hpp"
@@ -257,4 +257,4 @@ namespace lifex::examples
 } // namespace lifex::examples
 
 
-#endif /* LIFEX_LAPLACE_DG_HPP_*/
+#endif /* LAPLACE_DG_HPP_*/

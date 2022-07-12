@@ -51,8 +51,9 @@ main(int argc, char **argv)
 
   try
     {
-      // basis: Dubiner basis DUBValues<lifex::dim> or FEM basis
-      // dealii::FE_SimplexDGP<lifex::dim>
+      // choose the model from the models folder and the basis from
+      // Dubiner basis:    DUBValues<lifex::dim>
+      // FEM basis:        dealii::FE_SimplexDGP<lifex::dim>
       lifex::examples::Monodomain_DG<DUBValues<lifex::dim>> model;
 
       model.main_run_generate();

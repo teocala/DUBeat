@@ -24,8 +24,8 @@
  * @author Matteo Calafà <matteo.calafa@mail.polimi.it>.
  */
 
-#ifndef LIFEX_DUBFEMHandler_HPP_
-#define LIFEX_DUBFEMHandler_HPP_
+#ifndef DUBFEMHandler_HPP_
+#define DUBFEMHandler_HPP_
 
 #include <deal.II/base/quadrature.h>
 
@@ -163,4 +163,4 @@ DUBFEMHandler<dim>::fem_to_dubiner(
 }
 
 
-#endif /* LIFEX_DUBFEMHandler_HPP_*/
+#endif /* DUBFEMHandler_HPP_*/

@@ -24,8 +24,8 @@
  * @author Matteo Calafà <matteo.calafa@mail.polimi.it>.
  */
 
-#ifndef LIFEX_ModelDG_t_HPP_
-#define LIFEX_ModelDG_t_HPP_
+#ifndef ModelDG_t_HPP_
+#define ModelDG_t_HPP_
 
 
 #include "lifex/core/core_model.hpp"
@@ -376,4 +376,4 @@ ModelDG_t<basis>::run()
 }
 
 
-#endif /* LIFEX_ModelDG_t_HPP_*/
+#endif /* ModelDG_t_HPP_*/

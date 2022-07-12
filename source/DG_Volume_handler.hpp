@@ -24,8 +24,8 @@
  * @author Matteo Calafà <matteo.calafa@mail.polimi.it>.
  */
 
-#ifndef LIFEX_DGVolumeHandler_HPP_
-#define LIFEX_DGVolumeHandler_HPP_
+#ifndef DGVolumeHandler_HPP_
+#define DGVolumeHandler_HPP_
 
 #include <deal.II/base/quadrature_lib.h>
 #include <deal.II/base/tensor.h>
@@ -214,4 +214,4 @@ DGVolumeHandler<dim>::get_n_quad_points() const
 }
 
 
-#endif /* LIFEX_DGVolumeHandler_HPP_*/
+#endif /* DGVolumeHandler_HPP_*/
