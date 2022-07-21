@@ -83,6 +83,11 @@ public:
   /// coefficients.
   lifex::LinAlg::MPI::Vector
   fem_to_dubiner(const lifex::LinAlg::MPI::Vector &fem_solution);
+
+  /// Conversion of an analytical solution to a vector of Dubiner coefficients.
+  lifex::LinAlg::MPI::Vector
+  analytical_to_dubiner(lifex::LinAlg::MPI::Vector dub_solution,
+    const std::shared_ptr<dealii::Function<lifex::dim>> &u_analytical);
 };
 
 
@@ -150,6 +155,42 @@ DUBFEMHandler<dim>::fem_to_dubiner(
                     fem_solution[dof_indices[j]] *
                     fe_dg.shape_value(j, vol_handler.quadrature_ref(q));
                 }
+
+              dub_solution[dof_indices[i]] +=
+                eval_on_quad *
+                this->shape_value(i, vol_handler.quadrature_ref(q)) *
+                vol_handler.quadrature_weight(q);
+            }
+        }
+    }
+
+  return dub_solution;
+}
+
+
+template <unsigned int dim>
+lifex::LinAlg::MPI::Vector
+DUBFEMHandler<dim>::analytical_to_dubiner(
+  lifex::LinAlg::MPI::Vector dub_solution,
+  const std::shared_ptr<dealii::Function<lifex::dim>> &u_analytical)
+{
+  const dealii::FE_SimplexDGP<dim> fe_dg(this->poly_degree);
+  DGVolumeHandler<dim>             vol_handler(this->poly_degree);
+
+  std::vector<unsigned int> dof_indices(this->n_functions);
+  double                    eval_on_quad;
+
+  for (const auto &cell : dof_handler.active_cell_iterators())
+    {
+      cell->get_dof_indices(dof_indices);
+      vol_handler.reinit(cell);
+
+      for (unsigned int i = 0; i < this->n_functions; ++i)
+        {
+          dub_solution[dof_indices[i]] = 0;
+          for (unsigned int q = 0; q < n_quad_points; ++q)
+            {
+              eval_on_quad = u_analytical->value(vol_handler.quadrature_ref(q));
 
               dub_solution[dof_indices[i]] +=
                 eval_on_quad *

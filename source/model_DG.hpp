@@ -110,6 +110,11 @@ protected:
   virtual void
   conversion_to_dub(lifex::LinAlg::MPI::Vector &sol_owned);
 
+  /// Conversion of an analytical solution from FEM to basis coefficients.
+  virtual void
+  discretize_analytical_solution(const std::shared_ptr<dealii::Function<lifex::dim>> &u_analytical,
+                                 lifex::LinAlg::MPI::Vector &sol_owned);
+
   /// Setup of the problem before the resolution.
   virtual void
   setup_system();
@@ -528,7 +533,7 @@ void
 ModelDG<basis>::setup_system()
 {
   fe       = std::make_unique<dealii::FE_SimplexDGP<lifex::dim>>(prm_fe_degree);
-  assemble = std::make_unique<DGAssemble<basis>>(fe->degree);
+  assemble = std::make_unique<DGAssemble<basis>>(prm_fe_degree);
 
   dof_handler.reinit(triangulation.get());
   dof_handler.distribute_dofs(*fe);
@@ -663,6 +668,29 @@ ModelDG<DUBValues<lifex::dim>>::conversion_to_dub(
 {
   DUBFEMHandler<lifex::dim> dub_fem_values(fe->degree, dof_handler);
   sol_owned = dub_fem_values.fem_to_dubiner(sol_owned);
+}
+
+
+/// Conversion of an analytical solution from FEM to basis coefficients.
+/// Specialization for FEM basis.
+template <>
+void
+ModelDG<dealii::FE_SimplexDGP<lifex::dim>>::discretize_analytical_solution(
+  const std::shared_ptr<dealii::Function<lifex::dim>> &u_analytical, lifex::LinAlg::MPI::Vector &sol_owned)
+{
+  dealii::VectorTools::interpolate(dof_handler, *u_analytical, sol_owned);
+}
+
+
+/// Conversion of an analytical solution from FEM to basis coefficients.
+/// Specialization for Dubiner basis.
+template <>
+void
+ModelDG<DUBValues<lifex::dim>>::discretize_analytical_solution(
+  const std::shared_ptr<dealii::Function<lifex::dim>> &u_analytical, lifex::LinAlg::MPI::Vector &sol_owned)
+{
+  DUBFEMHandler<lifex::dim> dub_fem_values(fe->degree, dof_handler);
+  sol_owned = dub_fem_values.analytical_to_dubiner(sol_owned, u_analytical);
 }
 
 

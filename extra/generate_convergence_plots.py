@@ -34,7 +34,7 @@ import pandas as pd
 
 
 
-errors = pd.read_csv("../../../build/PACS_Project/src/errors_Monodomain DUB_2D_w.data", sep='\t')
+errors = pd.read_csv("../errors_Laplace_3D_u.data", sep='\t')
 errors = errors[["l_inf","l_2","h_1","DG"]]
 errors = np.array(errors)
 errors = errors[errors[:,0]!='x',:].astype(float)

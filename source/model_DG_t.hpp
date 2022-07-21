@@ -260,17 +260,16 @@ ModelDG_t<basis>::time_initializaton()
 {
   // Initialize BDF handler.
   this->u_ex->set_time(prm_time_init);
-  lifex::VectorTools::interpolate(this->dof_handler,
-                                  *this->u_ex,
-                                  this->solution_ex_owned);
-  this->solution_ex = this->solution_ex_owned;
-  this->solution = this->solution_owned = this->solution_ex_owned;
+  this->discretize_analytical_solution(this->u_ex, this->solution_owned);
 
-  this->conversion_to_dub(this->solution_owned);
+  this->solution_ex_owned = this->solution_owned;
+  this->conversion_to_fem(this->solution_ex_owned);
+
+  this->solution = this->solution_ex = this->solution_ex_owned;
 
   const std::vector<lifex::LinAlg::MPI::Vector> sol_init(this->prm_bdf_order,
                                                          this->solution_owned);
-
+                                                         
   bdf_handler.initialize(this->prm_bdf_order, sol_init);
 }
 
