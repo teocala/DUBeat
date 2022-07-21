@@ -36,7 +36,6 @@
 #include <string>
 #include <vector>
 
-
 namespace error_parser
 {
   /// Return the today's date.
@@ -51,7 +50,6 @@ namespace error_parser
     strftime(date, 100, "%D %T", &curr_tm);
     return date;
   }
-
 
   /// Create the datafile for the errors.
   void
@@ -79,7 +77,6 @@ namespace error_parser
 
     outdata.close();
   }
-
 
   /// Update the datafile with the new errors.
   void
@@ -143,6 +140,5 @@ namespace error_parser
       }
   }
 } // namespace error_parser
-
 
 #endif /* DG_ERROR_PARSER_HPP_*/

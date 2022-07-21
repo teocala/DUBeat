@@ -55,8 +55,8 @@ protected:
   /// Actual DG cell.
   typename dealii::DoFHandler<dim>::active_cell_iterator cell;
 
-  /// Internal DGFEM basis class. This internal member permits to exploit useful
-  /// already implemented operations.
+  /// Internal DGFEM basis class. This internal member permits to exploit
+  /// useful already implemented operations.
   const std::unique_ptr<dealii::FE_SimplexDGP<dim>> fe_dg;
 
   /// Mapping of the discretized space.
@@ -125,7 +125,6 @@ public:
   virtual ~DGVolumeHandler() = default;
 };
 
-
 template <unsigned int dim>
 void
 DGVolumeHandler<dim>::reinit(
@@ -136,7 +135,6 @@ DGVolumeHandler<dim>::reinit(
 
   initialized = true;
 }
-
 
 template <unsigned int dim>
 dealii::Point<dim>
@@ -151,7 +149,6 @@ DGVolumeHandler<dim>::quadrature_real(const unsigned int q) const
   return fe_values->quadrature_point(q);
 }
 
-
 template <unsigned int dim>
 dealii::Point<dim>
 DGVolumeHandler<dim>::quadrature_ref(const unsigned int q) const
@@ -164,7 +161,6 @@ DGVolumeHandler<dim>::quadrature_ref(const unsigned int q) const
 
   return mapping->transform_real_to_unit_cell(cell, quadrature_real(q));
 }
-
 
 template <unsigned int dim>
 double
@@ -179,7 +175,6 @@ DGVolumeHandler<dim>::quadrature_weight(
 
   return QGLpoints.weight(quadrature_point_no);
 }
-
 
 template <unsigned int dim>
 dealii::Tensor<2, dim>
@@ -203,7 +198,6 @@ DGVolumeHandler<dim>::get_jacobian_inverse() const
   return BJinv;
 }
 
-
 template <unsigned int dim>
 unsigned int
 DGVolumeHandler<dim>::get_n_quad_points() const
@@ -212,6 +206,5 @@ DGVolumeHandler<dim>::get_n_quad_points() const
 
   return fe_values.get_n_quad_points.size();
 }
-
 
 #endif /* DGVolumeHandler_HPP_*/

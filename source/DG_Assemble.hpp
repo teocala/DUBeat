@@ -27,7 +27,6 @@
 #ifndef DGAssemble_HPP_
 #define DGAssemble_HPP_
 
-
 #include "lifex/core/core_model.hpp"
 #include "lifex/core/init.hpp"
 
@@ -55,7 +54,8 @@
 #include "DUB_FEM_handler.hpp"
 
 /**
- * @brief Class for the assembly of the main local matrices for discontinuous Galerkin methods.
+ * @brief Class for the assembly of the main local matrices for discontinuous
+ * Galerkin methods.
  *
  * Definition of the main terms:
  *  - @f$\mathcal{K}@f$ as the volume of a generic element.
@@ -150,7 +150,8 @@ public:
   dealii::FullMatrix<double>
   local_M() const;
 
-  /// Assembly of the local forcing term: @f[F(i)=\int_{\mathcal{K}} f \varphi_i
+  /// Assembly of the local forcing term: @f[F(i)=\int_{\mathcal{K}} f
+  /// \varphi_i
   /// \, dx
   /// @f]
   /// where @f$ f @f$ is the known forcing term of the problem.
@@ -158,17 +159,17 @@ public:
   local_rhs(const std::shared_ptr<dealii::Function<lifex::dim>> &f_ex) const;
 
   /// Assembly of the local matrix associated to non-homogeneous Dirichlet
-  /// boundary conditions: @f[F(i)=\int_{\mathcal{F}} \gamma u \varphi_i^{+} - u
-  /// \nabla \varphi_i^{+}  \cdot n \,ds @f] where @f$\gamma@f$ is the
+  /// boundary conditions: @f[F(i)=\int_{\mathcal{F}} \gamma u \varphi_i^{+} -
+  /// u \nabla \varphi_i^{+}  \cdot n \,ds @f] where @f$\gamma@f$ is the
   /// regularity coeficient and @f$u@f$ the known solution of the problem.
   dealii::Vector<double>
   local_rhs_edge_dirichlet(
     const double stability_coefficient,
     const std::shared_ptr<lifex::utils::FunctionDirichlet> &u_ex) const;
 
-  /// Assembly of the right hand side term associated to non-homogeneous Neumann
-  /// boundary conditions: @f[F(i)=\int_{\mathcal{F}} \varphi_i g \, ds @f]
-  /// where @f$g@f$ is the gradient of the known solution of the problem.
+  /// Assembly of the right hand side term associated to non-homogeneous
+  /// Neumann boundary conditions: @f[F(i)=\int_{\mathcal{F}} \varphi_i g \, ds
+  /// @f] where @f$g@f$ is the gradient of the known solution of the problem.
   dealii::Vector<double>
   local_rhs_edge_neumann(
     const std::shared_ptr<dealii::Function<lifex::dim>> &g) const;
@@ -179,7 +180,8 @@ public:
   dealii::FullMatrix<double>
   local_S(const double stability_coefficient) const;
 
-  /// Assembly of the local matrix S at the interface with the adjacent element:
+  /// Assembly of the local matrix S at the interface with the adjacent
+  /// element:
   /// @f[ SN(i,j)=- \int_{\mathcal{F}} \gamma \varphi_j^{+} \varphi_i^{-} \, ds
   /// @f]
   dealii::FullMatrix<double>
@@ -205,12 +207,12 @@ public:
   std::pair<dealii::FullMatrix<double>, dealii::FullMatrix<double>>
   local_IB(const double theta) const;
 
-  /// Assembly of the local matrix I and its transpose at the interface with the
-  /// adjacent element: @f[\begin{aligned}
-  /// IN(i,j)=& \frac{\theta}{2} \int_{\mathcal{F}} \nabla \varphi_i^{+} \cdot
-  /// n^{+} \varphi_j^{-}  \, ds  \\ IN_T(i,j)=& -\frac{1}{2} \int_{\mathcal{F}}
-  /// \nabla \varphi_j^{+} \cdot n^{+} \varphi_i^{-}  \, ds \end{aligned} @f]
-  /// where @f$\theta@f$ is the penalty coefficient.
+  /// Assembly of the local matrix I and its transpose at the interface with
+  /// the adjacent element: @f[\begin{aligned} IN(i,j)=& \frac{\theta}{2}
+  /// \int_{\mathcal{F}} \nabla \varphi_i^{+} \cdot n^{+} \varphi_j^{-}  \, ds
+  /// \\ IN_T(i,j)=& -\frac{1}{2} \int_{\mathcal{F}} \nabla \varphi_j^{+} \cdot
+  /// n^{+} \varphi_i^{-}  \, ds \end{aligned} @f] where @f$\theta@f$ is the
+  /// penalty coefficient.
   std::pair<dealii::FullMatrix<double>, dealii::FullMatrix<double>>
   local_IN(const double theta) const;
 
@@ -224,7 +226,8 @@ public:
   /// Assembly of the right hand side term associated to the previous time-step
   /// gating variable solution (for monodomain problem):
   /// @f[F(i)=\int_{\mathcal{K}} w^n \varphi_i \, dx @f]
-  /// where @f$w^n@f$ is the gating variable solution at a generic previous step
+  /// where @f$w^n@f$ is the gating variable solution at a generic previous
+  /// step
   /// @f$ n@f$.
   dealii::Vector<double>
   local_w0_M_rhs(const lifex::LinAlg::MPI::Vector &u0) const;
@@ -241,7 +244,6 @@ public:
   /// Destructor.
   virtual ~DGAssemble() = default;
 };
-
 
 template <class basis>
 void
@@ -261,7 +263,6 @@ DGAssemble<basis>::reinit(
     }
 }
 
-
 template <class basis>
 void
 DGAssemble<basis>::reinit(
@@ -270,7 +271,6 @@ DGAssemble<basis>::reinit(
   cell = new_cell;
   vol_handler.reinit(new_cell);
 }
-
 
 template <class basis>
 dealii::FullMatrix<double>
@@ -300,7 +300,6 @@ DGAssemble<basis>::local_V() const
   return V;
 }
 
-
 template <class basis>
 dealii::FullMatrix<double>
 DGAssemble<basis>::local_M() const
@@ -326,7 +325,6 @@ DGAssemble<basis>::local_M() const
 
   return M;
 }
-
 
 template <class basis>
 dealii::Vector<double>
@@ -355,7 +353,6 @@ DGAssemble<basis>::local_rhs(
 
   return cell_rhs;
 }
-
 
 template <class basis>
 dealii::Vector<double>
@@ -401,7 +398,6 @@ DGAssemble<basis>::local_rhs_edge_dirichlet(
   return cell_rhs;
 }
 
-
 template <class basis>
 dealii::Vector<double>
 DGAssemble<basis>::local_rhs_edge_neumann(
@@ -430,7 +426,6 @@ DGAssemble<basis>::local_rhs_edge_neumann(
 
   return cell_rhs;
 }
-
 
 template <class basis>
 dealii::FullMatrix<double>
@@ -463,7 +458,6 @@ DGAssemble<basis>::local_S(const double stability_coefficient) const
 
   return S;
 }
-
 
 template <class basis>
 dealii::FullMatrix<double>
@@ -500,7 +494,6 @@ DGAssemble<basis>::local_SN(const double stability_coefficient) const
 
   return SN;
 }
-
 
 template <class basis>
 std::pair<dealii::FullMatrix<double>, dealii::FullMatrix<double>>
@@ -545,7 +538,6 @@ DGAssemble<basis>::local_I(const double theta) const
   return {I, I_t};
 }
 
-
 template <class basis>
 std::pair<dealii::FullMatrix<double>, dealii::FullMatrix<double>>
 DGAssemble<basis>::local_IB(const double theta) const
@@ -587,7 +579,6 @@ DGAssemble<basis>::local_IB(const double theta) const
 
   return {IB, IB_t};
 }
-
 
 template <class basis>
 std::pair<dealii::FullMatrix<double>, dealii::FullMatrix<double>>
@@ -636,7 +627,6 @@ DGAssemble<basis>::local_IN(const double theta) const
   return {IN, IN_t};
 }
 
-
 template <class basis>
 dealii::Vector<double>
 DGAssemble<basis>::local_u0_M_rhs(const lifex::LinAlg::MPI::Vector &u0) const
@@ -676,7 +666,6 @@ DGAssemble<basis>::local_u0_M_rhs(const lifex::LinAlg::MPI::Vector &u0) const
   return cell_rhs;
 }
 
-
 template <class basis>
 dealii::Vector<double>
 DGAssemble<basis>::local_w0_M_rhs(const lifex::LinAlg::MPI::Vector &u0) const
@@ -705,7 +694,6 @@ DGAssemble<basis>::local_w0_M_rhs(const lifex::LinAlg::MPI::Vector &u0) const
 
   return cell_rhs;
 }
-
 
 template <class basis>
 dealii::FullMatrix<double>
@@ -750,6 +738,5 @@ DGAssemble<basis>::local_non_linear(const lifex::LinAlg::MPI::Vector &u0,
 
   return C;
 }
-
 
 #endif /* DGAssemble_HPP_*/

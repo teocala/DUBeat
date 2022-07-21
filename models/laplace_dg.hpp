@@ -27,7 +27,6 @@
 #ifndef LAPLACE_DG_HPP_
 #define LAPLACE_DG_HPP_
 
-
 #include "lifex/core/core_model.hpp"
 #include "lifex/core/init.hpp"
 
@@ -77,7 +76,6 @@ namespace lifex::examples
       }
     };
 
-
     /**
      * @brief Source term.
      */
@@ -100,7 +98,6 @@ namespace lifex::examples
           return -3 * std::exp(p[0] + p[1] + p[2]);
       }
     };
-
 
     /**
      * @brief Gradient of the exact solution.
@@ -138,9 +135,9 @@ namespace lifex::examples
     };
   } // namespace laplace_DG
 
-
   /**
-   * @brief  Class to solve the Laplace equation using the Discontinuous Galerkin method.
+   * @brief  Class to solve the Laplace equation using the Discontinuous Galerkin
+   * method.
    *
    * @f[
    * \begin{aligned}
@@ -179,7 +176,6 @@ namespace lifex::examples
   {
     this->matrix = 0;
     this->rhs    = 0;
-
 
     const unsigned int dofs_per_cell = this->fe->dofs_per_cell;
 
@@ -255,6 +251,5 @@ namespace lifex::examples
     this->rhs.compress(VectorOperation::add);
   }
 } // namespace lifex::examples
-
 
 #endif /* LAPLACE_DG_HPP_*/

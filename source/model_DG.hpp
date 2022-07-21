@@ -27,7 +27,6 @@
 #ifndef ModelDG_HPP_
 #define ModelDG_HPP_
 
-
 #include "lifex/core/core_model.hpp"
 #include "lifex/core/init.hpp"
 
@@ -58,7 +57,8 @@
 #include "DUB_FEM_handler.hpp"
 
 /**
- * @brief Class representing the resolution of problems using discontinuous Galerkin methods.
+ * @brief Class representing the resolution of problems using discontinuous
+ * Galerkin methods.
  */
 template <class basis>
 class ModelDG : public lifex::CoreModel
@@ -112,8 +112,9 @@ protected:
 
   /// Conversion of an analytical solution from FEM to basis coefficients.
   virtual void
-  discretize_analytical_solution(const std::shared_ptr<dealii::Function<lifex::dim>> &u_analytical,
-                                 lifex::LinAlg::MPI::Vector &sol_owned);
+  discretize_analytical_solution(
+    const std::shared_ptr<dealii::Function<lifex::dim>> &u_analytical,
+    lifex::LinAlg::MPI::Vector &                         sol_owned);
 
   /// Setup of the problem before the resolution.
   virtual void
@@ -191,7 +192,6 @@ protected:
   std::shared_ptr<dealii::Function<lifex::dim>> g_n;
 };
 
-
 template <class basis>
 void
 ModelDG<basis>::declare_parameters(lifex::ParamHandler &params) const
@@ -231,7 +231,6 @@ ModelDG<basis>::declare_parameters(lifex::ParamHandler &params) const
   params.leave_subsection();
 }
 
-
 template <class basis>
 void
 ModelDG<basis>::parse_parameters(lifex::ParamHandler &params)
@@ -261,7 +260,6 @@ ModelDG<basis>::parse_parameters(lifex::ParamHandler &params)
   params.leave_subsection();
 }
 
-
 template <class basis>
 void
 ModelDG<basis>::run()
@@ -285,7 +283,6 @@ ModelDG<basis>::run()
 
   output_results();
 }
-
 
 template <class basis>
 void
@@ -311,7 +308,6 @@ ModelDG<basis>::compute_errors(
 
   std::cout << solution_name << " ERRORS: " << std::endl;
   std::vector<double> errors = {0, 0, 0, 0};
-
 
   // error L+inf
   lifex::LinAlg::MPI::Vector difference = solution_owned;
@@ -493,15 +489,12 @@ ModelDG<basis>::compute_errors(
     lifex::dim, prm_n_refinements, model_name, errors, solution_name);
 }
 
-
 template <class basis>
 void
 ModelDG<basis>::create_mesh()
 {
-  std::string mesh_path =
-    "../meshes/" +
-    std::to_string(lifex::dim) + "D_" + std::to_string(prm_n_refinements) +
-    ".msh";
+  std::string mesh_path = "../meshes/" + std::to_string(lifex::dim) + "D_" +
+                          std::to_string(prm_n_refinements) + ".msh";
   AssertThrow(std::filesystem::exists(mesh_path),
               dealii::StandardExceptions::ExcMessage(
                 "This mesh file/directory does not exist."));
@@ -511,7 +504,6 @@ ModelDG<basis>::create_mesh()
   triangulation.set_element_type(lifex::utils::MeshHandler::ElementType::Tet);
   triangulation.create_mesh();
 }
-
 
 template <class basis>
 void
@@ -526,7 +518,6 @@ ModelDG<basis>::create_mesh(std::string mesh_path)
   triangulation.set_element_type(lifex::utils::MeshHandler::ElementType::Tet);
   triangulation.create_mesh();
 }
-
 
 template <class basis>
 void
@@ -599,7 +590,6 @@ ModelDG<basis>::setup_system()
   solution_ex.reinit(owned_dofs, relevant_dofs, mpi_comm);
 }
 
-
 template <class basis>
 void
 ModelDG<basis>::output_results() const
@@ -616,7 +606,6 @@ ModelDG<basis>::output_results() const
   data_out.clear();
 }
 
-
 template <class basis>
 void
 ModelDG<basis>::solve_system()
@@ -626,7 +615,6 @@ ModelDG<basis>::solve_system()
   solution = solution_owned;
 }
 
-
 /// Conversion of a discretized solution from Dubiner coefficients to FEM
 /// coefficients. Useless if we are not using Dubiner basis functions.
 template <class basis>
@@ -635,7 +623,6 @@ ModelDG<basis>::conversion_to_fem(lifex::LinAlg::MPI::Vector &sol_owned)
 {
   return;
 }
-
 
 /// Conversion of a discretized solution from Dubiner coefficients to FEM
 /// coefficients.
@@ -648,7 +635,6 @@ ModelDG<DUBValues<lifex::dim>>::conversion_to_fem(
   sol_owned = dub_fem_values.dubiner_to_fem(sol_owned);
 }
 
-
 /// Conversion of a discretized solution from FEM coefficients to Dubiner
 /// coefficients. Useless if we are not using Dubiner basis functions.
 template <class basis>
@@ -657,7 +643,6 @@ ModelDG<basis>::conversion_to_dub(lifex::LinAlg::MPI::Vector &sol_owned)
 {
   return;
 }
-
 
 /// Conversion of a discretized solution from FEM coefficients to Dubiner
 /// coefficients.
@@ -670,28 +655,27 @@ ModelDG<DUBValues<lifex::dim>>::conversion_to_dub(
   sol_owned = dub_fem_values.fem_to_dubiner(sol_owned);
 }
 
-
 /// Conversion of an analytical solution from FEM to basis coefficients.
 /// Specialization for FEM basis.
 template <>
 void
 ModelDG<dealii::FE_SimplexDGP<lifex::dim>>::discretize_analytical_solution(
-  const std::shared_ptr<dealii::Function<lifex::dim>> &u_analytical, lifex::LinAlg::MPI::Vector &sol_owned)
+  const std::shared_ptr<dealii::Function<lifex::dim>> &u_analytical,
+  lifex::LinAlg::MPI::Vector &                         sol_owned)
 {
   dealii::VectorTools::interpolate(dof_handler, *u_analytical, sol_owned);
 }
-
 
 /// Conversion of an analytical solution from FEM to basis coefficients.
 /// Specialization for Dubiner basis.
 template <>
 void
 ModelDG<DUBValues<lifex::dim>>::discretize_analytical_solution(
-  const std::shared_ptr<dealii::Function<lifex::dim>> &u_analytical, lifex::LinAlg::MPI::Vector &sol_owned)
+  const std::shared_ptr<dealii::Function<lifex::dim>> &u_analytical,
+  lifex::LinAlg::MPI::Vector &                         sol_owned)
 {
   DUBFEMHandler<lifex::dim> dub_fem_values(fe->degree, dof_handler);
   sol_owned = dub_fem_values.analytical_to_dubiner(sol_owned, u_analytical);
 }
-
 
 #endif /* ModelDG_HPP_*/

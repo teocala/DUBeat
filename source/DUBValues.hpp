@@ -65,8 +65,8 @@ protected:
   /// Conversion from the FEM basis taxonomy (@f$1^{st}@f$ basis function,
   /// @f$2^{nd}@f$ basis function ... ) to the Dubiner basis taxonomy (where
   /// every basis function is indexed by a tuple of indexes @f$(i,j)@f$ in 2D
-  /// and three indexes @f$(i,j,k)@f$ in 3D). It is needed to order sequentially
-  /// all the Dubiner basis functions of a certain element.
+  /// and three indexes @f$(i,j,k)@f$ in 3D). It is needed to order
+  /// sequentially all the Dubiner basis functions of a certain element.
   std::array<unsigned int, dim>
   fun_coeff_conversion(const unsigned int n) const;
 
@@ -124,10 +124,9 @@ DUBValues<2>::fun_coeff_conversion(const unsigned int n) const
   return {{i, j}};
 }
 
-
-/// Specialization in three dimensions, i.e. from an integer @f$n@f$ returns three
-/// indexes @f$(i,j,k)@f$ such that the @f$n@f$-th Dubiner function corresponds
-/// to the function with indexes @f$(i,j,k)@f$.
+/// Specialization in three dimensions, i.e. from an integer @f$n@f$ returns
+/// three indexes @f$(i,j,k)@f$ such that the @f$n@f$-th Dubiner function
+/// corresponds to the function with indexes @f$(i,j,k)@f$.
 template <>
 std::array<unsigned int, 3>
 DUBValues<3>::fun_coeff_conversion(const unsigned int n) const
@@ -171,14 +170,15 @@ DUBValues<dim>::eval_jacobi_polynomial(const unsigned int n,
   if (n == 0)
     return 1.0;
   else if (n == 1)
-    return static_cast<double>((alpha - beta + (alpha + beta + 2.0) * eval_point) / 2.0);
+    return static_cast<double>(
+      (alpha - beta + (alpha + beta + 2.0) * eval_point) / 2.0);
   else
     {
       const double apb    = alpha + beta;
       double       poly   = 0.0;
       double       polyn2 = 1.0;
-      double       polyn1 =
-        static_cast<double>((alpha - beta + (alpha + beta + 2.0) * eval_point) / 2.0);
+      double       polyn1 = static_cast<double>(
+        (alpha - beta + (alpha + beta + 2.0) * eval_point) / 2.0);
       double a1, a2, a3, a4;
 
       for (unsigned int k = 2; k <= n; ++k)
@@ -206,7 +206,6 @@ DUBValues<dim>::eval_jacobi_polynomial(const unsigned int n,
       return poly;
     }
 }
-
 
 /// Evaluation of the function basis in two dimensions.
 template <>
@@ -238,7 +237,6 @@ DUBValues<2>::shape_value(const unsigned int      function_no,
 
   return r * pow(2, i) * pow(1 - eta, i) * pi * pj;
 }
-
 
 /// Evaluation of the function basis in three dimensions.
 template <>
@@ -277,7 +275,6 @@ DUBValues<3>::shape_value(const unsigned int      function_no,
 
   return r * pi * pow((1. - b) / 2., i) * pj * pow((1. - c) / 2., i + j) * pk;
 }
-
 
 /// Evaluation of the gradient of the function basis in two dimensions.
 template <>
@@ -343,7 +340,6 @@ DUBValues<2>::shape_grad(const unsigned int      function_no,
 
   return grad;
 }
-
 
 /// Evaluation of the gradient of the function basis in three dimensions.
 template <>
@@ -449,6 +445,5 @@ DUBValues<3>::shape_grad(const unsigned int      function_no,
 
   return grad;
 }
-
 
 #endif /* DUBValues_HPP_*/

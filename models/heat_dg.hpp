@@ -27,7 +27,6 @@
 #ifndef HEAT_DG_HPP_
 #define HEAT_DG_HPP_
 
-
 #include "lifex/core/core_model.hpp"
 #include "lifex/core/init.hpp"
 
@@ -83,7 +82,6 @@ namespace lifex::examples
       }
     };
 
-
     /**
      * @brief Source term.
      */
@@ -110,7 +108,6 @@ namespace lifex::examples
                  std::exp(-5 * this->get_time()) * (12 * M_PI * M_PI - 5);
       }
     };
-
 
     /**
      * @brief Neumann boundary condition.
@@ -172,7 +169,6 @@ namespace lifex::examples
       }
     };
 
-
     /**
      * @brief Gradient of the exact solution.
      */
@@ -222,9 +218,9 @@ namespace lifex::examples
     };
   } // namespace heat_DG
 
-
   /**
-   * @brief  Class to solve the heat equation using the Discontinuous Galerkin method.
+   * @brief  Class to solve the heat equation using the Discontinuous Galerkin
+   * method.
    *
    * @f[
    * \begin{aligned}
@@ -275,7 +271,6 @@ namespace lifex::examples
   {
     this->matrix = 0;
     this->rhs    = 0;
-
 
     const unsigned int dofs_per_cell = this->fe->dofs_per_cell;
 
@@ -356,6 +351,5 @@ namespace lifex::examples
     this->rhs.compress(VectorOperation::add);
   }
 } // namespace lifex::examples
-
 
 #endif /* HEAT_DG_HPP_*/

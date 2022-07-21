@@ -27,7 +27,6 @@
 #ifndef ModelDG_t_HPP_
 #define ModelDG_t_HPP_
 
-
 #include "lifex/core/core_model.hpp"
 #include "lifex/core/init.hpp"
 
@@ -60,7 +59,8 @@
 #include "model_DG.hpp"
 
 /**
- * @brief Class representing the resolution of time-dependent problems using discontinuous Galerkin methods.
+ * @brief Class representing the resolution of time-dependent problems using
+ * discontinuous Galerkin methods.
  */
 template <class basis>
 class ModelDG_t : public ModelDG<basis>
@@ -134,7 +134,6 @@ protected:
   lifex::LinAlg::MPI::Vector solution_ext;
 };
 
-
 template <class basis>
 void
 ModelDG_t<basis>::declare_parameters(lifex::ParamHandler &params) const
@@ -195,7 +194,6 @@ ModelDG_t<basis>::declare_parameters(lifex::ParamHandler &params) const
   params.leave_subsection();
 }
 
-
 template <class basis>
 void
 ModelDG_t<basis>::parse_parameters(lifex::ParamHandler &params)
@@ -235,7 +233,6 @@ ModelDG_t<basis>::parse_parameters(lifex::ParamHandler &params)
   params.leave_subsection();
 }
 
-
 template <class basis>
 void
 ModelDG_t<basis>::update_time()
@@ -253,7 +250,6 @@ ModelDG_t<basis>::update_time()
                                    this->solution_ex_owned);
 }
 
-
 template <class basis>
 void
 ModelDG_t<basis>::time_initializaton()
@@ -269,10 +265,9 @@ ModelDG_t<basis>::time_initializaton()
 
   const std::vector<lifex::LinAlg::MPI::Vector> sol_init(this->prm_bdf_order,
                                                          this->solution_owned);
-                                                         
+
   bdf_handler.initialize(this->prm_bdf_order, sol_init);
 }
-
 
 template <class basis>
 void
@@ -299,7 +294,6 @@ ModelDG_t<basis>::intermediate_error_print(
   pcerr << solution_name << ":"
         << "\tL-inf error norm: " << error_owned.linfty_norm() << std::endl;
 }
-
 
 /// Specialized version for Dubiner basis.
 template <>
@@ -330,7 +324,6 @@ ModelDG_t<DUBValues<lifex::dim>>::intermediate_error_print(
   pcerr << solution_name << ":"
         << "\tL-inf error norm: " << error_owned.linfty_norm() << std::endl;
 }
-
 
 template <class basis>
 void
@@ -373,6 +366,5 @@ ModelDG_t<basis>::run()
                        "u");
   this->output_results();
 }
-
 
 #endif /* ModelDG_t_HPP_*/

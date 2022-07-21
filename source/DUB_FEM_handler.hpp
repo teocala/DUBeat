@@ -41,9 +41,9 @@
 
 #include "DUBValues.hpp"
 
-
 /**
- * @brief Class to apply the conversions of a discretized solution between Dubiner basis and FEM basis representations.
+ * @brief Class to apply the conversions of a discretized solution between
+ * Dubiner basis and FEM basis representations.
  */
 template <unsigned int dim>
 class DUBFEMHandler : public DUBValues<dim>
@@ -86,10 +86,10 @@ public:
 
   /// Conversion of an analytical solution to a vector of Dubiner coefficients.
   lifex::LinAlg::MPI::Vector
-  analytical_to_dubiner(lifex::LinAlg::MPI::Vector dub_solution,
+  analytical_to_dubiner(
+    lifex::LinAlg::MPI::Vector                           dub_solution,
     const std::shared_ptr<dealii::Function<lifex::dim>> &u_analytical);
 };
-
 
 template <unsigned int dim>
 lifex::LinAlg::MPI::Vector
@@ -122,7 +122,6 @@ DUBFEMHandler<dim>::dubiner_to_fem(
 
   return fem_solution;
 }
-
 
 template <unsigned int dim>
 lifex::LinAlg::MPI::Vector
@@ -167,11 +166,10 @@ DUBFEMHandler<dim>::fem_to_dubiner(
   return dub_solution;
 }
 
-
 template <unsigned int dim>
 lifex::LinAlg::MPI::Vector
 DUBFEMHandler<dim>::analytical_to_dubiner(
-  lifex::LinAlg::MPI::Vector dub_solution,
+  lifex::LinAlg::MPI::Vector                           dub_solution,
   const std::shared_ptr<dealii::Function<lifex::dim>> &u_analytical)
 {
   const dealii::FE_SimplexDGP<dim> fe_dg(this->poly_degree);
@@ -202,6 +200,5 @@ DUBFEMHandler<dim>::analytical_to_dubiner(
 
   return dub_solution;
 }
-
 
 #endif /* DUBFEMHandler_HPP_*/

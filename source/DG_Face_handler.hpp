@@ -41,7 +41,8 @@
 #include "QGaussLegendreSimplex.hpp"
 
 /**
- * @brief Class for the main operations on the faces of a discontinuous Galerkin element.
+ * @brief Class for the main operations on the faces of a discontinuous
+ * Galerkin element.
  */
 template <unsigned int dim>
 class DGFaceHandler : public DGVolumeHandler<dim>
@@ -117,7 +118,6 @@ public:
   virtual ~DGFaceHandler() = default;
 };
 
-
 template <unsigned int dim>
 void
 DGFaceHandler<dim>::reinit(
@@ -130,7 +130,6 @@ DGFaceHandler<dim>::reinit(
   this->fe_values->reinit(new_cell);
   this->initialized = true;
 }
-
 
 template <unsigned int dim>
 dealii::Point<dim>
@@ -145,7 +144,6 @@ DGFaceHandler<dim>::quadrature_real(const unsigned int q) const
 
   return fe_face_values->quadrature_point(q);
 }
-
 
 template <unsigned int dim>
 dealii::Point<dim>
@@ -162,7 +160,6 @@ DGFaceHandler<dim>::quadrature_ref(const unsigned int q) const
                                                     quadrature_real(q));
 }
 
-
 template <unsigned int dim>
 double
 DGFaceHandler<dim>::quadrature_weight(
@@ -177,7 +174,6 @@ DGFaceHandler<dim>::quadrature_weight(
 
   return QGLpoints_face.weight(quadrature_point_no);
 }
-
 
 template <unsigned int dim>
 int
@@ -210,7 +206,6 @@ DGFaceHandler<dim>::corresponding_neigh_index(
   return quad;
 }
 
-
 template <unsigned int dim>
 dealii::Tensor<1, dim>
 DGFaceHandler<dim>::get_normal() const
@@ -220,7 +215,6 @@ DGFaceHandler<dim>::get_normal() const
 
   return fe_face_values->normal_vector(0);
 }
-
 
 /// Specialization to measure the face in two dimensions (i.e., length of a
 /// segment).
@@ -233,7 +227,6 @@ DGFaceHandler<2>::get_measure() const
 
   return this->cell->face(edge)->measure();
 }
-
 
 /// Specialization to measure the area of the face for a three dimensional
 /// tethraedron (i.e., area of a triangle). The method exploits the Erone's
@@ -254,6 +247,5 @@ DGFaceHandler<3>::get_measure() const
                    (semi_per - face->line(1)->measure()) *
                    (semi_per - face->line(2)->measure())); // Erone's formula
 }
-
 
 #endif /* DGFaceHandler_HPP_*/

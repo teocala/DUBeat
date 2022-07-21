@@ -11,7 +11,7 @@ HEADERS=$(wildcard *.hpp)
 exe_sources=$(filter main%.cpp,$(SRCS))
 EXEC=$(exe_sources:.cpp=)
 
-#========================== 
+#==========================
 .phony= all clean distclean doc
 
 .DEFAULT_GOAL = all
@@ -39,7 +39,3 @@ $(DEPEND): $(SRCS)
 	done
 
 -include $(DEPEND)
-
-
-
-

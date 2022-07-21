@@ -37,23 +37,26 @@
 /// This routine computes the n Gauss-Legendre nodes and weights on a given
 /// interval (a,b)
 extern std::pair<std::vector<dealii::Point<1>>, std::vector<double>>
-gauleg(const double left_position, const double right_position, const unsigned int n_quadrature_points)
+gauleg(const double       left_position,
+       const double       right_position,
+       const unsigned int n_quadrature_points)
 {
   AssertThrow(left_position < right_position,
               dealii::StandardExceptions::ExcMessage(
                 "(a,b) is an interval, hence a must be lower than b."));
 
-  // The following lines follow the definition of Gauss-Legendre nodes on an interval.
+  // The following lines follow the definition of Gauss-Legendre nodes on an
+  // interval.
 
   const double middle_point = 0.5 * (right_position + left_position);
-  const double half_length = 0.5 * (right_position - left_position);
+  const double half_length  = 0.5 * (right_position - left_position);
 
   std::vector<dealii::Point<1>> coords(n_quadrature_points);
   std::vector<double>           weights(n_quadrature_points);
 
   double z, z1, p1, p2, p3, pp = 0.0;
 
-  for (unsigned int i = 1; i <= (n_quadrature_points+1)/2.; ++i)
+  for (unsigned int i = 1; i <= (n_quadrature_points + 1) / 2.; ++i)
     {
       z  = std::cos(M_PI * (i - 0.25) / (n_quadrature_points + 0.5));
       z1 = z + 1.;
@@ -77,7 +80,7 @@ gauleg(const double left_position, const double right_position, const unsigned i
 
       const dealii::Point<1> P1(middle_point - half_length * z);
       const dealii::Point<1> P2(middle_point + half_length * z);
-      coords[i - 1] = P1;
+      coords[i - 1]                   = P1;
       coords[n_quadrature_points - i] = P2;
       weights[i - 1] = 2.0 * half_length / ((1.0 - z * z) * pp * pp);
       weights[n_quadrature_points - i] = weights[i - 1];
@@ -86,9 +89,9 @@ gauleg(const double left_position, const double right_position, const unsigned i
   return {coords, weights};
 }
 
-
 /**
- * @brief Class representing the Gauss Legendre quadrature formula on simplex elements.
+ * @brief Class representing the Gauss Legendre quadrature formula on simplex
+ * elements.
  */
 template <unsigned int dim>
 class QGaussLegendreSimplex : public dealii::Quadrature<dim>
@@ -98,10 +101,10 @@ public:
   QGaussLegendreSimplex<dim>(const unsigned int n_quadrature_points);
 };
 
-
 /// To create @f$n@f$ quadrature points and weights in the segment @f$(0,1)@f$.
 template <>
-QGaussLegendreSimplex<1>::QGaussLegendreSimplex(const unsigned int n_quadrature_points)
+QGaussLegendreSimplex<1>::QGaussLegendreSimplex(
+  const unsigned int n_quadrature_points)
   : dealii::Quadrature<1>(n_quadrature_points)
 {
   std::vector<dealii::Point<1>> coords_1D(n_quadrature_points);
@@ -112,11 +115,11 @@ QGaussLegendreSimplex<1>::QGaussLegendreSimplex(const unsigned int n_quadrature_
   this->weights           = weights_1D;
 }
 
-
-/// To create @f$n^2@f$ quadrature points and weights on the triangle @f$(0,0) ,
-/// (0.1) , (1,0)@f$.
+/// To create @f$n^2@f$ quadrature points and weights on the triangle @f$(0,0)
+/// , (0.1) , (1,0)@f$.
 template <>
-QGaussLegendreSimplex<2>::QGaussLegendreSimplex(const unsigned int n_quadrature_points)
+QGaussLegendreSimplex<2>::QGaussLegendreSimplex(
+  const unsigned int n_quadrature_points)
   : dealii::Quadrature<2>(n_quadrature_points)
 {
   std::vector<dealii::Point<1>> coords_1D(n_quadrature_points);
@@ -131,10 +134,12 @@ QGaussLegendreSimplex<2>::QGaussLegendreSimplex(const unsigned int n_quadrature_
       for (unsigned int j = 0; j < n_quadrature_points; ++j)
         {
           const dealii::Point<2> P((1 + coords_1D[i][0]) / 2,
-                                   (1 - coords_1D[i][0]) * (1 + coords_1D[j][0]) / 4);
+                                   (1 - coords_1D[i][0]) *
+                                     (1 + coords_1D[j][0]) / 4);
 
           coords_2D.push_back(P);
-          weights_2D.push_back((1 - coords_1D[i][0]) * weights_1D[i] * weights_1D[j] / 8);
+          weights_2D.push_back((1 - coords_1D[i][0]) * weights_1D[i] *
+                               weights_1D[j] / 8);
         }
     }
 
@@ -142,11 +147,11 @@ QGaussLegendreSimplex<2>::QGaussLegendreSimplex(const unsigned int n_quadrature_
   this->weights           = weights_2D;
 }
 
-
 /// To create @f$n^3@f$ quadrature points and weights on the tetrahedron
 /// @f$(0,0,0) , (1,0,0) , (0,1,0) , (0,0,1)@f$.
 template <>
-QGaussLegendreSimplex<3>::QGaussLegendreSimplex(const unsigned int n_quadrature_points)
+QGaussLegendreSimplex<3>::QGaussLegendreSimplex(
+  const unsigned int n_quadrature_points)
   : dealii::Quadrature<3>(n_quadrature_points)
 {
   std::vector<dealii::Point<1>> coords_1D(n_quadrature_points);
@@ -162,14 +167,18 @@ QGaussLegendreSimplex<3>::QGaussLegendreSimplex(const unsigned int n_quadrature_
         {
           for (unsigned int k = 0; k < n_quadrature_points; ++k)
             {
-              const dealii::Point<3> new_coords((coords_1D[i][0] + 1) * (coords_1D[j][0] - 1) *
-                                         (coords_1D[k][0] - 1) / 8,
-                                       (1 - coords_1D[k][0]) * (1 + coords_1D[j][0]) / 4,
-                                       (coords_1D[k][0] + 1) / 2);
+              const dealii::Point<3> new_coords((coords_1D[i][0] + 1) *
+                                                  (coords_1D[j][0] - 1) *
+                                                  (coords_1D[k][0] - 1) / 8,
+                                                (1 - coords_1D[k][0]) *
+                                                  (1 + coords_1D[j][0]) / 4,
+                                                (coords_1D[k][0] + 1) / 2);
 
               coords_3D.push_back(new_coords);
-              weights_3D.push_back((1 - coords_1D[k][0]) * (1 - coords_1D[k][0]) * (1 - coords_1D[j][0]) *
-                             weights_1D[i] * weights_1D[j] * weights_1D[k] / 64);
+              weights_3D.push_back((1 - coords_1D[k][0]) *
+                                   (1 - coords_1D[k][0]) *
+                                   (1 - coords_1D[j][0]) * weights_1D[i] *
+                                   weights_1D[j] * weights_1D[k] / 64);
             }
         }
     }
@@ -177,6 +186,5 @@ QGaussLegendreSimplex<3>::QGaussLegendreSimplex(const unsigned int n_quadrature_
   this->quadrature_points = coords_3D;
   this->weights           = weights_3D;
 }
-
 
 #endif /* QGAUSSLEGENDRESIMPLEX_HPP_*/

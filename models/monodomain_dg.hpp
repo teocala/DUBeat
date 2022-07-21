@@ -27,7 +27,6 @@
 #ifndef MONODOMAIN_DG_HPP_
 #define MONODOMAIN_DG_HPP_
 
-
 #include "lifex/core/core_model.hpp"
 #include "lifex/core/init.hpp"
 
@@ -168,7 +167,6 @@ namespace lifex::examples
       }
     };
 
-
     /**
      * @brief Neumann boundary condition of the trans-membrane potential.
      */
@@ -238,7 +236,6 @@ namespace lifex::examples
       }
     };
 
-
     /**
      * @brief Gradient of the trans-membrane potential.
      */
@@ -287,7 +284,6 @@ namespace lifex::examples
       }
     };
 
-
     /**
      * @brief Exact solution of the gating variable.
      */
@@ -322,7 +318,6 @@ namespace lifex::examples
                  std::exp(-5 * this->get_time());
       }
     };
-
 
     /**
      * @brief Gradient of the gating variable.
@@ -382,10 +377,9 @@ namespace lifex::examples
     };
   } // namespace monodomain_DG
 
-
   /**
-   * @brief  Class to solve the monodomain equation for the electrophysiology problem
-   * using the Discontinuous Galerkin method.
+   * @brief  Class to solve the monodomain equation for the electrophysiology
+   * problem using the Discontinuous Galerkin method.
    *
    * @f[
    * \begin{aligned}
@@ -508,7 +502,6 @@ namespace lifex::examples
     assemble_system() override;
   };
 
-
   template <class basis>
   void
   Monodomain_DG<basis>::run()
@@ -516,7 +509,6 @@ namespace lifex::examples
     this->create_mesh();
     this->setup_system();
     time_initializaton();
-
 
     while (this->time < this->prm_time_final)
       {
@@ -535,7 +527,6 @@ namespace lifex::examples
         // Initial guess.
         this->solution_owned = this->solution_ext;
         this->solve_system();
-
 
         this->intermediate_error_print(this->solution_owned,
                                        this->solution_ex_owned,
@@ -566,7 +557,6 @@ namespace lifex::examples
     this->output_results();
   }
 
-
   template <class basis>
   void
   Monodomain_DG<basis>::update_time()
@@ -593,7 +583,6 @@ namespace lifex::examples
                                      this->solution_ex_owned_w);
     this->solution_ex_w = this->solution_ex_owned_w;
   }
-
 
   template <class basis>
   void
@@ -644,7 +633,6 @@ namespace lifex::examples
     bdf_handler_w.initialize(this->prm_bdf_order, sol_init_w);
   }
 
-
   template <class basis>
   void
   Monodomain_DG<basis>::assemble_system()
@@ -658,7 +646,6 @@ namespace lifex::examples
     solution_owned_w *= this->prm_time_step / alpha_bdf;
 
     solution_w = solution_owned_w;
-
 
     this->matrix = 0;
     this->rhs    = 0;
@@ -763,6 +750,5 @@ namespace lifex::examples
     this->rhs.compress(VectorOperation::add);
   }
 } // namespace lifex::examples
-
 
 #endif /* MONODOMAIN_DG_HPP_*/
