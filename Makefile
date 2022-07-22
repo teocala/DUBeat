@@ -11,8 +11,10 @@ HEADERS=$(wildcard *.hpp)
 exe_sources=$(filter main%.cpp,$(SRCS))
 EXEC=$(exe_sources:.cpp=)
 
+DOXYFILE = ./Doxyfile
+
 #==========================
-.phony= all clean distclean doc
+.PHONY = all doc clean distclean
 
 .DEFAULT_GOAL = all
 

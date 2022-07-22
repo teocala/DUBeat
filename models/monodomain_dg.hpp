@@ -538,10 +538,11 @@ namespace lifex::examples
                                        "w");
       }
 
-    this->conversion_to_fem(this->solution_owned);
-    this->conversion_to_fem(this->solution_owned_w);
     this->solution   = this->solution_owned;
     this->solution_w = this->solution_owned_w;
+    this->conversion_to_fem(this->solution);
+    this->conversion_to_fem(this->solution_w);
+    dealii::VectorTools::interpolate(this->dof_handler, *(this->u_ex), this->solution_ex);
 
     this->compute_errors(this->solution_owned,
                          this->solution_ex_owned,
@@ -574,14 +575,9 @@ namespace lifex::examples
     bdf_handler_w.time_advance(solution_owned_w, true);
     solution_bdf_w = this->bdf_handler_w.get_sol_bdf();
 
-    dealii::VectorTools::interpolate(this->dof_handler,
-                                     *(this->u_ex),
-                                     this->solution_ex_owned);
-    this->solution_ex = this->solution_ex_owned;
-    dealii::VectorTools::interpolate(this->dof_handler,
-                                     *(this->w_ex),
-                                     this->solution_ex_owned_w);
-    this->solution_ex_w = this->solution_ex_owned_w;
+    // Update solution_ex_owned from the updated u_ex.
+    this->discretize_analytical_solution(this->u_ex, this->solution_ex_owned);
+    this->discretize_analytical_solution(this->w_ex, this->solution_ex_owned_w);
   }
 
   template <class basis>
@@ -603,24 +599,15 @@ namespace lifex::examples
     solution_ex_owned_w.reinit(owned_dofs, this->mpi_comm);
     solution_ex_w.reinit(owned_dofs, relevant_dofs, this->mpi_comm);
 
-    w_ex->set_time(this->prm_time_init);
-    lifex::VectorTools::interpolate(this->dof_handler,
-                                    *w_ex,
-                                    solution_ex_owned_w);
-    solution_ex_w = solution_ex_owned_w;
-    solution_w = solution_owned_w = solution_ex_owned_w;
-
-    solution_w = solution_owned_w;
-
     this->u_ex->set_time(this->prm_time_init);
-    lifex::VectorTools::interpolate(this->dof_handler,
-                                    *this->u_ex,
-                                    this->solution_ex_owned);
+    this->discretize_analytical_solution(this->u_ex, this->solution_ex_owned);
     this->solution_ex = this->solution_ex_owned;
     this->solution = this->solution_owned = this->solution_ex_owned;
 
-    this->conversion_to_dub(this->solution_owned);
-    this->conversion_to_dub(this->solution_owned_w);
+    w_ex->set_time(this->prm_time_init);
+      this->discretize_analytical_solution(this->w_ex, this->solution_ex_owned_w);
+    solution_ex_w = solution_ex_owned_w;
+    solution_w = solution_owned_w = solution_ex_owned_w;
 
     const std::vector<lifex::LinAlg::MPI::Vector> sol_init(
       this->prm_bdf_order, this->solution_owned);

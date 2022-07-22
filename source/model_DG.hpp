@@ -425,7 +425,8 @@ ModelDG<basis>::compute_errors(
   error_calculator.compute_errors();
   std::vector<double> errors = error_calculator.output_errors();
 
-  pcout << std::endl <<
+  pcout << std::endl
+        << solution_name << ":" << std::endl
         << "Error L^inf: " << std::setw(6) << std::fixed << std::setprecision(6) << errors[0] << std::endl
         << "Error L^2:   " << std::setw(6) << std::fixed << std::setprecision(6) << errors[1] << std::endl
         << "Error H^1:   " << std::setw(6) << std::fixed << std::setprecision(6) << errors[2] << std::endl

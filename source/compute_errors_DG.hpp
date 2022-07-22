@@ -46,11 +46,11 @@
  * @brief Class to compute the errors between the numerical solution (solution_owned) and the exact solution (solution_ex_owned).
  * Four definitions of error are implemented:
  *
- * @f[ \|u-u_h\|_{L^\infty}:=  \sup_{x\in \Omega} |u(x)-u_h(x)|  @f]
- * @f[ \|u-u_h\|_{L^2}^2 := \int_{\Omega} |u(x)-u_h(x)|^2 \, dx  @f]
-* @f[ \|u-u_h\|_{H^1}^2 := \|u-u_h\|_{L^2}^2 + \|\nabla u-\nabla u_h\|_{L^2}^2  @f]
-* @f[ \|u-u_h\|_{DG}^2 := \|\nabla u-\nabla u_h\|_{L^2}^2 +\gamma \|[[ u-\nabla u_h]]\|_{L^2(\mathcal{F})}^2  @f]
-* where @f[\gamma @f] is the stability coefficient and the @f[L^2(\mathcal{F}) @f] norm is computed on the faces instead of the volume.
+ * @f[ \|u-u_h\|_{L^\infty(\Omega)}:=  \sup_{x\in \Omega} |u(x)-u_h(x)|  @f]
+ * @f[ \|u-u_h\|_{L^2(\Omega)}^2 := \int_{\Omega} |u(x)-u_h(x)|^2 \, dx  @f]
+* @f[ \|u-u_h\|_{H^1(\Omega)}^2 := \|u-u_h\|_{L^2(\Omega)}^2 + \|\nabla u-\nabla u_h\|_{L^2(\Omega)}^2  @f]
+* @f[ \|u-u_h\|_{DG(\Omega)}^2 := \|\nabla u-\nabla u_h\|_{L^2(\Omega)}^2 +\gamma \|[[ u-\nabla u_h]]\|_{L^2(\mathcal{F})}^2  @f]
+* where @f$\gamma @f$ is the stability coefficient and the @f$L^2(\mathcal{F}) @f$ norm is computed on the faces instead of the volume.
  */
 
 template <class basis>
@@ -88,25 +88,25 @@ public:
   const std::shared_ptr<dealii::Function<lifex::dim>> &grad_u_ex_input,
   const char *                                         solution_name_input);
 
-  /// Compute errors following the preferences in the list. E.g., errors_defs={"L2"} will only compute the L2 error.
+  /// Compute errors following the preferences in the list. E.g., errors_defs={"L2"} will only compute the @f$L^2@f$ error.
   void compute_errors(std::list<const char*> errors_defs={"inf","L2","H1","DG"});
 
-  /// Output of the errors following the preferences in the list. E.g., errors_defs={"L2"} will only output the L2 error.
+  /// Output of the errors following the preferences in the list. E.g., errors_defs={"L2"} will only output the @f$L^2@f$ error.
   /// The output vector contains the errors in the order of the input list.
   std::vector<double> output_errors(std::list<const char*> errors_defs={"inf","L2","H1","DG"}) const;
 
 private:
 
-  /// Compute the L^inf error.
+  /// Compute the @f$L^\infty@f$ error.
   void compute_error_inf();
 
-  /// Compute the L^2 error.
+  /// Compute the @f$L^2@f$ error.
   void compute_error_L2();
 
-  /// Compute the H^1 error.
+  /// Compute the @f$H^1@f$ error.
   void compute_error_H1();
 
-  /// Compute the DG error.
+  /// Compute the @f$DG@f$ error.
   void compute_error_DG();
 
   /// Dof handler object of the problem.
@@ -123,7 +123,7 @@ private:
   /// Number of degrees of freedom per cell.
   const unsigned int dofs_per_cell;
 
-  /// Stability coefficient, needed for the computation of the DG error.
+  /// Stability coefficient, needed for the computation of the @f$DG@f$ error.
   const double stability_coefficient;
 
   /// Polynomial degree.
@@ -147,7 +147,7 @@ private:
   /// String that contains the solution name (to write on output files, default "u").
   char *                                         solution_name;
 
-  /// Array that contains the current errors (in order, L^inf, L^2, H^1, DG).
+  /// Array that contains the current errors (in order, @f$L^\infty@f$, @f$L^2@f$, @f$H^1@f$, @f$DG@f$).
   std::array<double,4> errors;
 
   /// Member to compute conversion to FEM basis, needed for L^inf error.
@@ -192,7 +192,8 @@ Compute_Errors_DG<basis>::compute_errors(std::list<const char*>errors_defs)
   {
     this->compute_error_inf();
   }
-  // Computation of the errors.
+
+  // We need to respect the following order because the H1 semi error contributes to the DG error and the L2 error contributes to the H1 error.
   if (std::find(errors_defs.begin(), errors_defs.end(), "DG") != errors_defs.end())
   {
     this->compute_error_L2();
@@ -246,7 +247,7 @@ Compute_Errors_DG<basis>::compute_error_inf()
   errors[0] = difference.linfty_norm();
 }
 
-
+/// Specialized version for Dubiner basis. Before computing the @f$L^\infty@f$ error, the vector solutions are transformed in terms of FEM coefficients.
 template <>
 void
 Compute_Errors_DG<DUBValues<lifex::dim>>::compute_error_inf()
