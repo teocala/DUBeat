@@ -82,13 +82,13 @@ public:
   /// Conversion of a discretized solution from FEM coefficients to Dubiner
   /// coefficients.
   lifex::LinAlg::MPI::Vector
-  fem_to_dubiner(const lifex::LinAlg::MPI::Vector &fem_solution);
+  fem_to_dubiner(const lifex::LinAlg::MPI::Vector &fem_solution) const;
 
   /// Conversion of an analytical solution to a vector of Dubiner coefficients.
   lifex::LinAlg::MPI::Vector
   analytical_to_dubiner(
     lifex::LinAlg::MPI::Vector                           dub_solution,
-    const std::shared_ptr<dealii::Function<lifex::dim>> &u_analytical);
+    const std::shared_ptr<dealii::Function<lifex::dim>> &u_analytical) const;
 };
 
 template <unsigned int dim>
@@ -126,7 +126,7 @@ DUBFEMHandler<dim>::dubiner_to_fem(
 template <unsigned int dim>
 lifex::LinAlg::MPI::Vector
 DUBFEMHandler<dim>::fem_to_dubiner(
-  const lifex::LinAlg::MPI::Vector &fem_solution)
+  const lifex::LinAlg::MPI::Vector &fem_solution) const
 {
   const dealii::FE_SimplexDGP<dim> fe_dg(this->poly_degree);
   DGVolumeHandler<dim>             vol_handler(this->poly_degree);
@@ -170,7 +170,7 @@ template <unsigned int dim>
 lifex::LinAlg::MPI::Vector
 DUBFEMHandler<dim>::analytical_to_dubiner(
   lifex::LinAlg::MPI::Vector                           dub_solution,
-  const std::shared_ptr<dealii::Function<lifex::dim>> &u_analytical)
+  const std::shared_ptr<dealii::Function<lifex::dim>> &u_analytical) const
 {
   const dealii::FE_SimplexDGP<dim> fe_dg(this->poly_degree);
   DGVolumeHandler<dim>             vol_handler(this->poly_degree);
@@ -188,7 +188,8 @@ DUBFEMHandler<dim>::analytical_to_dubiner(
           dub_solution[dof_indices[i]] = 0;
           for (unsigned int q = 0; q < n_quad_points; ++q)
             {
-              eval_on_quad = u_analytical->value(vol_handler.quadrature_ref(q));
+              eval_on_quad =
+                u_analytical->value(vol_handler.quadrature_real(q));
 
               dub_solution[dof_indices[i]] +=
                 eval_on_quad *

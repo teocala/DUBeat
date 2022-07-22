@@ -245,9 +245,7 @@ ModelDG_t<basis>::update_time()
   bdf_handler.time_advance(this->solution_owned, true);
   this->solution_bdf = bdf_handler.get_sol_bdf();
 
-  dealii::VectorTools::interpolate(this->dof_handler,
-                                   *(this->u_ex),
-                                   this->solution_ex_owned);
+  this->discretize_analytical_solution(this->u_ex, this->solution_ex_owned);
 }
 
 template <class basis>
@@ -256,12 +254,11 @@ ModelDG_t<basis>::time_initializaton()
 {
   // Initialize BDF handler.
   this->u_ex->set_time(prm_time_init);
+
+  // Solution_owned and solution_ex_owned at the initial time are the
+  // discretization of the analytical u_ex.
   this->discretize_analytical_solution(this->u_ex, this->solution_owned);
-
   this->solution_ex_owned = this->solution_owned;
-  this->conversion_to_fem(this->solution_ex_owned);
-
-  this->solution = this->solution_ex = this->solution_ex_owned;
 
   const std::vector<lifex::LinAlg::MPI::Vector> sol_init(this->prm_bdf_order,
                                                          this->solution_owned);
@@ -316,11 +313,11 @@ ModelDG_t<DUBValues<lifex::dim>>::intermediate_error_print(
   lifex::LinAlg::MPI::Vector error_owned;
   error_owned.reinit(solution_owned);
 
-  const DUBFEMHandler<lifex::dim> dub_fem_values(this->fe->degree,
+  const DUBFEMHandler<lifex::dim> dub_fem_values(this->prm_fe_degree,
                                                  this->dof_handler);
 
   error_owned = dub_fem_values.dubiner_to_fem(solution_owned);
-  error_owned -= solution_ex_owned;
+  error_owned -= dub_fem_values.dubiner_to_fem(solution_ex_owned);
   pcerr << solution_name << ":"
         << "\tL-inf error norm: " << error_owned.linfty_norm() << std::endl;
 }
@@ -357,13 +354,18 @@ ModelDG_t<basis>::run()
                                      "u");
     }
 
-  this->conversion_to_fem(this->solution_owned);
-  this->solution = this->solution_owned;
   this->compute_errors(this->solution_owned,
                        this->solution_ex_owned,
                        this->u_ex,
                        this->grad_u_ex,
                        "u");
+
+  // Definition of the solutions to plot.
+  this->solution = this->solution_owned;
+  this->conversion_to_fem(this->solution);
+  dealii::VectorTools::interpolate(this->dof_handler,
+                                   *(this->u_ex),
+                                   this->solution_ex);
   this->output_results();
 }
 

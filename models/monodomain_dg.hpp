@@ -650,23 +650,22 @@ namespace lifex::examples
     this->matrix = 0;
     this->rhs    = 0;
 
-    const unsigned int dofs_per_cell = this->fe->dofs_per_cell;
 
-    FullMatrix<double> V(dofs_per_cell, dofs_per_cell);
-    FullMatrix<double> M(dofs_per_cell, dofs_per_cell);
-    FullMatrix<double> S(dofs_per_cell, dofs_per_cell);
-    FullMatrix<double> I(dofs_per_cell, dofs_per_cell);
-    FullMatrix<double> I_t(dofs_per_cell, dofs_per_cell);
-    FullMatrix<double> IN(dofs_per_cell, dofs_per_cell);
-    FullMatrix<double> IN_t(dofs_per_cell, dofs_per_cell);
-    FullMatrix<double> SN(dofs_per_cell, dofs_per_cell);
-    FullMatrix<double> C(dofs_per_cell, dofs_per_cell);
+    FullMatrix<double> V(this->dofs_per_cell, this->dofs_per_cell);
+    FullMatrix<double> M(this->dofs_per_cell, this->dofs_per_cell);
+    FullMatrix<double> S(this->dofs_per_cell, this->dofs_per_cell);
+    FullMatrix<double> I(this->dofs_per_cell, this->dofs_per_cell);
+    FullMatrix<double> I_t(this->dofs_per_cell, this->dofs_per_cell);
+    FullMatrix<double> IN(this->dofs_per_cell, this->dofs_per_cell);
+    FullMatrix<double> IN_t(this->dofs_per_cell, this->dofs_per_cell);
+    FullMatrix<double> SN(this->dofs_per_cell, this->dofs_per_cell);
+    FullMatrix<double> C(this->dofs_per_cell, this->dofs_per_cell);
 
-    Vector<double>                       cell_rhs(dofs_per_cell);
-    Vector<double>                       cell_rhs_edge(dofs_per_cell);
-    Vector<double>                       u0_rhs(dofs_per_cell);
-    Vector<double>                       w0_rhs(dofs_per_cell);
-    std::vector<types::global_dof_index> dof_indices(dofs_per_cell);
+    Vector<double>                       cell_rhs(this->dofs_per_cell);
+    Vector<double>                       cell_rhs_edge(this->dofs_per_cell);
+    Vector<double>                       u0_rhs(this->dofs_per_cell);
+    Vector<double>                       w0_rhs(this->dofs_per_cell);
+    std::vector<types::global_dof_index> dof_indices(this->dofs_per_cell);
 
     for (const auto &cell : this->dof_handler.active_cell_iterators())
       {
@@ -708,7 +707,7 @@ namespace lifex::examples
               {
                 this->assemble->reinit(cell, edge);
                 std::vector<types::global_dof_index> dof_indices_neigh(
-                  dofs_per_cell);
+                  this->dofs_per_cell);
 
                 if (!cell->at_boundary(edge))
                   {
