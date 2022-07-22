@@ -55,6 +55,7 @@
 #include "DG_Volume_handler.hpp"
 #include "DG_error_parser.hpp"
 #include "DUB_FEM_handler.hpp"
+#include "compute_errors_DG.hpp"
 
 /**
  * @brief Class representing the resolution of problems using discontinuous
@@ -100,31 +101,6 @@ public:
   virtual ~ModelDG() = default;
 
 protected:
-  /// To convert a discretized solution in FEM basis (does nothing if problem is
-  /// in DGFEM). In-place version.
-  void
-  conversion_to_fem(lifex::LinAlg::MPI::Vector &sol_owned);
-
-  /// To convert a discretized solution in FEM basis (does nothing if problem is
-  /// in DGFEM). Const version.
-  lifex::LinAlg::MPI::Vector
-  conversion_to_fem(const lifex::LinAlg::MPI::Vector &sol_owned) const;
-
-  /// To convert a discretized solution in Dubiner basis (only for problems
-  /// using Dubiner basis). In-place version.
-  void
-  conversion_to_dub(lifex::LinAlg::MPI::Vector &sol_owned);
-
-  /// To convert a discretized solution in Dubiner basis (only for problems
-  /// using Dubiner basis). Const version.
-  lifex::LinAlg::MPI::Vector
-  conversion_to_dub(const lifex::LinAlg::MPI::Vector &sol_owned) const;
-
-  /// Conversion of an analytical solution from FEM to basis coefficients.
-  void
-  discretize_analytical_solution(
-    const std::shared_ptr<dealii::Function<lifex::dim>> &u_analytical,
-    lifex::LinAlg::MPI::Vector &                         sol_owned);
 
   /// Setup of the problem before the resolution.
   virtual void
@@ -133,14 +109,6 @@ protected:
   /// Assembly of the linear system, pure virtual.
   virtual void
   assemble_system() = 0;
-
-  /// To compute errors at the end of system solving.
-  void
-  compute_errors(const lifex::LinAlg::MPI::Vector &solution_owned,
-                 const lifex::LinAlg::MPI::Vector &solution_ex_owned,
-                 const std::shared_ptr<dealii::Function<lifex::dim>> &u_ex,
-                 const std::shared_ptr<dealii::Function<lifex::dim>> &grad_u_ex,
-                 const char *solution_name) const;
 
   /// Creation of mesh, default path.
   void
@@ -154,9 +122,43 @@ protected:
   void
   solve_system();
 
+  /// To compute errors at the end of system solving.
+  void
+  compute_errors(const lifex::LinAlg::MPI::Vector &solution_owned,
+                 const lifex::LinAlg::MPI::Vector &solution_ex_owned,
+                 const std::shared_ptr<dealii::Function<lifex::dim>> &u_ex,
+                 const std::shared_ptr<dealii::Function<lifex::dim>> &grad_u_ex,
+                 const char *solution_name = (char*)"u") const;
+
   /// Output of results.
   void
   output_results() const;
+
+  /// To convert a discretized solution in FEM basis (does nothing if problem is in
+  /// DGFEM). In-place version.
+  void
+  conversion_to_fem(lifex::LinAlg::MPI::Vector &sol_owned);
+
+  /// To convert a discretized solution in FEM basis (does nothing if problem is in
+  /// DGFEM). Const version.
+  lifex::LinAlg::MPI::Vector
+  conversion_to_fem(const lifex::LinAlg::MPI::Vector &sol_owned) const;
+
+  /// To convert a discretized solution in Dubiner basis (only for problems using
+  /// Dubiner basis). In-place version.
+  void
+  conversion_to_dub(lifex::LinAlg::MPI::Vector &sol_owned);
+
+  /// To convert a discretized solution in Dubiner basis (only for problems using
+  /// Dubiner basis). Const version.
+  lifex::LinAlg::MPI::Vector
+  conversion_to_dub(const lifex::LinAlg::MPI::Vector &sol_owned) const;
+
+  /// Conversion of an analytical solution from FEM to basis coefficients.
+  void
+  discretize_analytical_solution(
+    const std::shared_ptr<dealii::Function<lifex::dim>> &u_analytical,
+    lifex::LinAlg::MPI::Vector &                         sol_owned);
 
   /// Name of the class/problem.
   const std::string model_name;
@@ -174,9 +176,8 @@ protected:
   unsigned int dofs_per_cell;
   /// DoFHandler (internal use for useful already implemented methods).
   dealii::DoFHandler<lifex::dim> dof_handler;
-  /// Member used for conversions between analytical, nodal and modal
-  /// representations of the solutions.
-  std::unique_ptr<DUBFEMHandler<lifex::dim>> dub_fem_values;
+  /// Member used for conversions between analytical, nodal and modal representations of the solutions.
+  std::shared_ptr<DUBFEMHandler<lifex::dim>> dub_fem_values;
   /// Matrix assembler.
   std::unique_ptr<DGAssemble<basis>> assemble;
   /// Linear solver handler.
@@ -280,6 +281,7 @@ ModelDG<basis>::run()
   create_mesh();
   setup_system();
 
+
   discretize_analytical_solution(u_ex, solution_ex_owned);
   solution_ex = solution_ex_owned;
   conversion_to_fem(solution_ex);
@@ -299,264 +301,14 @@ ModelDG<basis>::run()
 
 template <class basis>
 void
-ModelDG<basis>::compute_errors(
-  const lifex::LinAlg::MPI::Vector &                   solution_owned,
-  const lifex::LinAlg::MPI::Vector &                   solution_ex_owned,
-  const std::shared_ptr<dealii::Function<lifex::dim>> &u_ex,
-  const std::shared_ptr<dealii::Function<lifex::dim>> &grad_u_ex,
-  const char *                                         solution_name) const
-{
-  AssertThrow(u_ex != nullptr,
-              dealii::StandardExceptions::ExcMessage(
-                "Not valid pointer to the exact solution."));
-
-  AssertThrow(grad_u_ex != nullptr,
-              dealii::StandardExceptions::ExcMessage(
-                "Not valid pointer to the gradient of the exact solution."));
-
-  AssertThrow(solution_owned.size() == solution_ex_owned.size(),
-              dealii::StandardExceptions::ExcMessage(
-                "The exact solution vector and the approximate solution vector "
-                "must have the same length."));
-
-  const std::unique_ptr<basis> basis_ptr(
-    std::make_unique<basis>(prm_fe_degree));
-
-  std::cout << solution_name << " ERRORS: " << std::endl;
-  std::vector<double> errors = {0, 0, 0, 0};
-
-  // error L+inf
-  lifex::LinAlg::MPI::Vector solution_fem = conversion_to_fem(solution_owned);
-  lifex::LinAlg::MPI::Vector solution_ex_fem =
-    conversion_to_fem(solution_ex_owned);
-
-  lifex::LinAlg::MPI::Vector difference = solution_fem;
-  difference -= solution_ex_fem;
-
-  errors[0] = difference.linfty_norm();
-  std::cout << "L-inf error norm: " << errors[0] << std::endl;
-
-  // error L2
-  double error_L2 = 0;
-
-  DGVolumeHandler<lifex::dim> vol_handler(prm_fe_degree);
-  const unsigned int          n_q_points =
-    static_cast<int>(std::pow(prm_fe_degree + 2, lifex::dim));
-  std::vector<lifex::types::global_dof_index> dof_indices(dofs_per_cell);
-
-  double local_approx;
-
-  for (const auto &cell : dof_handler.active_cell_iterators())
-    {
-      vol_handler.reinit(cell);
-
-      if (cell->is_locally_owned())
-        {
-          const dealii::Tensor<2, lifex::dim> BJinv =
-            vol_handler.get_jacobian_inverse();
-          const double det = 1 / determinant(BJinv);
-
-          cell->get_dof_indices(dof_indices);
-
-          for (unsigned int q = 0; q < n_q_points; ++q)
-            {
-              local_approx = 0;
-
-              for (unsigned int i = 0; i < dofs_per_cell; ++i)
-                {
-                  local_approx +=
-                    basis_ptr->shape_value(i, vol_handler.quadrature_ref(q)) *
-                    solution_owned[dof_indices[i]];
-                }
-
-              error_L2 +=
-                pow(local_approx - u_ex->value(vol_handler.quadrature_real(q)),
-                    2) *
-                det * vol_handler.quadrature_weight(q);
-            }
-        }
-    }
-
-  errors[1] = sqrt(error_L2);
-  std::cout << "L-2 error norm: " << errors[1] << std::endl;
-
-  // error H1
-  double                        error_semi_H1 = 0;
-  dealii::Tensor<1, lifex::dim> local_approx_gradient;
-  dealii::Tensor<1, lifex::dim> local_grad_exact;
-  dealii::Tensor<1, lifex::dim> pointwise_diff;
-  for (const auto &cell : dof_handler.active_cell_iterators())
-    {
-      vol_handler.reinit(cell);
-
-      if (cell->is_locally_owned())
-        {
-          const dealii::Tensor<2, lifex::dim> BJinv =
-            vol_handler.get_jacobian_inverse();
-          const double det = 1 / determinant(BJinv);
-
-          cell->get_dof_indices(dof_indices);
-
-          for (unsigned int q = 0; q < n_q_points; ++q)
-            {
-              local_grad_exact      = 0;
-              local_approx_gradient = 0;
-              pointwise_diff        = 0;
-
-              for (unsigned int j = 0; j < lifex::dim; ++j)
-                {
-                  local_grad_exact[j] =
-                    grad_u_ex->value(vol_handler.quadrature_real(q), j);
-
-                  for (unsigned int i = 0; i < dofs_per_cell; ++i)
-                    {
-                      local_approx_gradient[j] +=
-                        basis_ptr->shape_grad(
-                          i, vol_handler.quadrature_ref(q))[j] *
-                        solution_owned[dof_indices[i]];
-                    }
-                }
-
-              pointwise_diff =
-                local_grad_exact - (local_approx_gradient * BJinv);
-
-              error_semi_H1 += pointwise_diff * pointwise_diff * det *
-                               vol_handler.quadrature_weight(q);
-            }
-        }
-    }
-
-  errors[2] = sqrt(error_L2 + error_semi_H1);
-  std::cout << "H-1 error norm: " << errors[2] << std::endl;
-
-  // Error DG
-  double error_DG = 0;
-
-  const unsigned int n_q_points_face =
-    static_cast<int>(std::pow(prm_fe_degree + 2, lifex::dim - 1));
-  DGFaceHandler<lifex::dim> face_handler(prm_fe_degree);
-  DGFaceHandler<lifex::dim> face_handler_neigh(prm_fe_degree);
-
-  for (const auto &cell : dof_handler.active_cell_iterators())
-    {
-      vol_handler.reinit(cell);
-
-      if (cell->is_locally_owned())
-        {
-          cell->get_dof_indices(dof_indices);
-
-          for (const auto &edge : cell->face_indices())
-            {
-              face_handler.reinit(cell, edge);
-
-              const double face_measure      = face_handler.get_measure();
-              const double unit_face_measure = (4.0 - lifex::dim) / 2;
-              const double measure_ratio     = face_measure / unit_face_measure;
-              const double h_local           = (cell->measure()) / face_measure;
-
-              lifex::LinAlg::MPI::Vector difference = solution_owned;
-              difference -= solution_ex_owned;
-
-              const double local_stability_coeff =
-                (prm_stability_coeff * pow(prm_fe_degree, 2)) / h_local;
-
-              std::vector<lifex::types::global_dof_index> dof_indices_neigh(
-                dofs_per_cell);
-
-              for (unsigned int q = 0; q < n_q_points_face; ++q)
-                {
-                  for (unsigned int i = 0; i < dofs_per_cell; ++i)
-                    {
-                      for (unsigned int j = 0; j < dofs_per_cell; ++j)
-                        {
-                          error_DG +=
-                            difference[dof_indices[i]] *
-                            difference[dof_indices[j]] * local_stability_coeff *
-                            basis_ptr->shape_value(
-                              i, face_handler.quadrature_ref(q)) *
-                            basis_ptr->shape_value(
-                              j, face_handler.quadrature_ref(q)) *
-                            face_handler.quadrature_weight(q) * measure_ratio;
-
-                          if (!cell->at_boundary(edge))
-                            {
-                              const auto neighcell = cell->neighbor(edge);
-                              const auto neighedge =
-                                cell->neighbor_face_no(edge);
-                              neighcell->get_dof_indices(dof_indices_neigh);
-                              face_handler_neigh.reinit(neighcell, neighedge);
-
-                              const unsigned int nq =
-                                face_handler.corresponding_neigh_index(
-                                  q, face_handler_neigh);
-
-                              error_DG -=
-                                difference[dof_indices[i]] *
-                                difference[dof_indices_neigh[j]] *
-                                local_stability_coeff *
-                                basis_ptr->shape_value(
-                                  i, face_handler.quadrature_ref(q)) *
-                                basis_ptr->shape_value(
-                                  j, face_handler_neigh.quadrature_ref(nq)) *
-                                face_handler.quadrature_weight(q) *
-                                measure_ratio;
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-  errors[3] = sqrt(error_semi_H1 + error_DG);
-  std::cout << "DG error norm: " << errors[3] << std::endl << std::endl;
-
-  error_parser::update_datafile(
-    lifex::dim, prm_n_refinements, model_name, errors, solution_name);
-}
-
-template <class basis>
-void
-ModelDG<basis>::create_mesh()
-{
-  std::string mesh_path = "../meshes/" + std::to_string(lifex::dim) + "D_" +
-                          std::to_string(prm_n_refinements) + ".msh";
-  AssertThrow(std::filesystem::exists(mesh_path),
-              dealii::StandardExceptions::ExcMessage(
-                "This mesh file/directory does not exist."));
-
-  // Tetrahedral meshes can currently be imported only from file
-  triangulation.initialize_from_file(mesh_path, 1);
-  triangulation.set_element_type(lifex::utils::MeshHandler::ElementType::Tet);
-  triangulation.create_mesh();
-}
-
-template <class basis>
-void
-ModelDG<basis>::create_mesh(std::string mesh_path)
-{
-  AssertThrow(std::filesystem::exists(mesh_path),
-              dealii::StandardExceptions::ExcMessage(
-                "This mesh file/directory does not exist."));
-
-  // Tetrahedral meshes can currently be imported only from file
-  triangulation.initialize_from_file(mesh_path, 1);
-  triangulation.set_element_type(lifex::utils::MeshHandler::ElementType::Tet);
-  triangulation.create_mesh();
-}
-
-template <class basis>
-void
 ModelDG<basis>::setup_system()
 {
-  std::unique_ptr<dealii::FE_SimplexDGP<lifex::dim>> fe =
-    std::make_unique<dealii::FE_SimplexDGP<lifex::dim>>(prm_fe_degree);
+  std::unique_ptr<dealii::FE_SimplexDGP<lifex::dim>> fe = std::make_unique<dealii::FE_SimplexDGP<lifex::dim>>(prm_fe_degree);
   assemble = std::make_unique<DGAssemble<basis>>(prm_fe_degree);
 
   dof_handler.reinit(triangulation.get());
   dof_handler.distribute_dofs(*fe);
-  dub_fem_values =
-    std::make_unique<DUBFEMHandler<lifex::dim>>(prm_fe_degree, dof_handler);
+  dub_fem_values = std::make_shared<DUBFEMHandler<lifex::dim>>(prm_fe_degree, dof_handler);
 
   triangulation.get_info().print(prm_subsection_path,
                                  dof_handler.n_dofs(),
@@ -621,6 +373,70 @@ ModelDG<basis>::setup_system()
 
 template <class basis>
 void
+ModelDG<basis>::create_mesh()
+{
+  std::string mesh_path = "../meshes/" + std::to_string(lifex::dim) + "D_" +
+                          std::to_string(prm_n_refinements) + ".msh";
+  AssertThrow(std::filesystem::exists(mesh_path),
+              dealii::StandardExceptions::ExcMessage(
+                "This mesh file/directory does not exist."));
+
+  // Tetrahedral meshes can currently be imported only from file
+  triangulation.initialize_from_file(mesh_path, 1);
+  triangulation.set_element_type(lifex::utils::MeshHandler::ElementType::Tet);
+  triangulation.create_mesh();
+}
+
+template <class basis>
+void
+ModelDG<basis>::create_mesh(std::string mesh_path)
+{
+  AssertThrow(std::filesystem::exists(mesh_path),
+              dealii::StandardExceptions::ExcMessage(
+                "This mesh file/directory does not exist."));
+
+  // Tetrahedral meshes can currently be imported only from file
+  triangulation.initialize_from_file(mesh_path, 1);
+  triangulation.set_element_type(lifex::utils::MeshHandler::ElementType::Tet);
+  triangulation.create_mesh();
+}
+
+template <class basis>
+void
+ModelDG<basis>::solve_system()
+{
+  preconditioner.initialize(matrix);
+  linear_solver.solve(matrix, solution_owned, rhs, preconditioner);
+  solution = solution_owned;
+}
+
+
+template <class basis>
+void
+ModelDG<basis>::compute_errors(
+  const lifex::LinAlg::MPI::Vector &                   solution_owned,
+  const lifex::LinAlg::MPI::Vector &                   solution_ex_owned,
+  const std::shared_ptr<dealii::Function<lifex::dim>> &u_ex,
+  const std::shared_ptr<dealii::Function<lifex::dim>> &grad_u_ex,
+  const char *                                         solution_name) const
+{
+  Compute_Errors_DG<basis> error_calculator(prm_fe_degree, prm_stability_coeff, dofs_per_cell, dof_handler);
+  error_calculator.reinit(solution_owned,solution_ex_owned, u_ex, grad_u_ex, solution_name);
+  error_calculator.compute_errors();
+  std::vector<double> errors = error_calculator.output_errors();
+
+  pcout << std::endl <<
+        << "Error L^inf: " << std::setw(6) << std::fixed << std::setprecision(6) << errors[0] << std::endl
+        << "Error L^2:   " << std::setw(6) << std::fixed << std::setprecision(6) << errors[1] << std::endl
+        << "Error H^1:   " << std::setw(6) << std::fixed << std::setprecision(6) << errors[2] << std::endl
+        << "Error DG:    " << std::setw(6) << std::fixed << std::setprecision(6) << errors[3] << std::endl;
+
+  error_parser::update_datafile(
+    lifex::dim, prm_n_refinements, model_name, errors, solution_name);
+}
+
+template <class basis>
+void
 ModelDG<basis>::output_results() const
 {
   lifex::DataOut<lifex::dim> data_out;
@@ -633,15 +449,6 @@ ModelDG<basis>::output_results() const
   lifex::utils::dataout_write_hdf5(data_out, "solution", false);
 
   data_out.clear();
-}
-
-template <class basis>
-void
-ModelDG<basis>::solve_system()
-{
-  preconditioner.initialize(matrix);
-  linear_solver.solve(matrix, solution_owned, rhs, preconditioner);
-  solution = solution_owned;
 }
 
 /// Conversion of a discretized solution from Dubiner coefficients to FEM
@@ -666,8 +473,7 @@ ModelDG<DUBValues<lifex::dim>>::conversion_to_fem(
 /// Conversion to FEM coefficients, const version.
 template <class basis>
 lifex::LinAlg::MPI::Vector
-ModelDG<basis>::conversion_to_fem(
-  const lifex::LinAlg::MPI::Vector &sol_owned) const
+ModelDG<basis>::conversion_to_fem(const lifex::LinAlg::MPI::Vector &sol_owned) const
 {
   return sol_owned;
 }
@@ -675,11 +481,9 @@ ModelDG<basis>::conversion_to_fem(
 /// Conversion to FEM coefficients, const version.
 template <>
 lifex::LinAlg::MPI::Vector
-ModelDG<DUBValues<lifex::dim>>::conversion_to_fem(
-  const lifex::LinAlg::MPI::Vector &sol_owned) const
+ModelDG<DUBValues<lifex::dim>>::conversion_to_fem(const lifex::LinAlg::MPI::Vector &sol_owned) const
 {
-  lifex::LinAlg::MPI::Vector sol_fem =
-    dub_fem_values->dubiner_to_fem(sol_owned);
+  lifex::LinAlg::MPI::Vector sol_fem = dub_fem_values->dubiner_to_fem(sol_owned);
   return sol_fem;
 }
 
@@ -705,8 +509,7 @@ ModelDG<DUBValues<lifex::dim>>::conversion_to_dub(
 /// Conversion to DUB coefficients, const version.
 template <class basis>
 lifex::LinAlg::MPI::Vector
-ModelDG<basis>::conversion_to_dub(
-  const lifex::LinAlg::MPI::Vector &sol_owned) const
+ModelDG<basis>::conversion_to_dub(const lifex::LinAlg::MPI::Vector &sol_owned) const
 {
   return sol_owned;
 }
@@ -714,11 +517,9 @@ ModelDG<basis>::conversion_to_dub(
 /// Conversion to DUB coefficients, const version.
 template <>
 lifex::LinAlg::MPI::Vector
-ModelDG<DUBValues<lifex::dim>>::conversion_to_dub(
-  const lifex::LinAlg::MPI::Vector &sol_owned) const
+ModelDG<DUBValues<lifex::dim>>::conversion_to_dub(const lifex::LinAlg::MPI::Vector &sol_owned) const
 {
-  lifex::LinAlg::MPI::Vector sol_dub =
-    dub_fem_values->fem_to_dubiner(sol_owned);
+  lifex::LinAlg::MPI::Vector sol_dub = dub_fem_values->fem_to_dubiner(sol_owned);
   return sol_dub;
 }
 

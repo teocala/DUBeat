@@ -86,6 +86,14 @@ public:
   virtual ~ModelDG_t() = default;
 
 protected:
+  /// Override for declaration of additional parameters.
+  void
+  declare_parameters(lifex::ParamHandler &params) const override;
+
+  /// Override to parse additional parameters.
+  void
+  parse_parameters(lifex::ParamHandler &params) override;
+
   /// Setup for the time-dependent problems at time-step 0.
   virtual void
   time_initializaton();
@@ -100,15 +108,7 @@ protected:
     const lifex::LinAlg::MPI::Vector &                   solution_owned,
     const lifex::LinAlg::MPI::Vector &                   solution_ex_owned,
     const std::shared_ptr<dealii::Function<lifex::dim>> &u_ex,
-    const char *                                         solution_name);
-
-  /// Override for declaration of additional parameters.
-  void
-  declare_parameters(lifex::ParamHandler &params) const override;
-
-  /// Override to parse additional parameters.
-  void
-  parse_parameters(lifex::ParamHandler &params) override;
+    const char *                                         solution_name = (char*)"u");
 
   /// Override for the simulation run.
   void
@@ -233,36 +233,23 @@ ModelDG_t<basis>::parse_parameters(lifex::ParamHandler &params)
   params.leave_subsection();
 }
 
-template <class basis>
-void
-ModelDG_t<basis>::update_time()
-{
-  this->u_ex->set_time(this->time);
-  this->f_ex->set_time(this->time);
-  this->g_n->set_time(this->time);
-  this->grad_u_ex->set_time(this->time);
-
-  bdf_handler.time_advance(this->solution_owned, true);
-  this->solution_bdf = bdf_handler.get_sol_bdf();
-
-  this->discretize_analytical_solution(this->u_ex, this->solution_ex_owned);
-}
 
 template <class basis>
 void
 ModelDG_t<basis>::time_initializaton()
 {
-  // Initialize BDF handler.
+  // Set initial time to the exact analytical solution.
   this->u_ex->set_time(prm_time_init);
 
-  // Solution_owned and solution_ex_owned at the initial time are the
-  // discretization of the analytical u_ex.
+  // Solution_owned and solution_ex_owned at the initial time are the discretization of the analytical u_ex.
   this->discretize_analytical_solution(this->u_ex, this->solution_owned);
   this->solution_ex_owned = this->solution_owned;
 
+  // Initialization of the initial solution.
   const std::vector<lifex::LinAlg::MPI::Vector> sol_init(this->prm_bdf_order,
                                                          this->solution_owned);
 
+  // Initialization of the BDFHandler
   bdf_handler.initialize(this->prm_bdf_order, sol_init);
 }
 
@@ -283,44 +270,31 @@ ModelDG_t<basis>::intermediate_error_print(
                 "The exact solution vector and the approximate solution vector "
                 "must have the same length."));
 
-  lifex::LinAlg::MPI::Vector error_owned;
-  error_owned.reinit(solution_owned);
+  lifex::LinAlg::MPI::Vector error_owned = this->conversion_to_fem(solution_owned);
+  error_owned -= this->conversion_to_fem(solution_ex_owned);
 
-  error_owned = solution_owned;
-  error_owned -= solution_ex_owned;
   pcerr << solution_name << ":"
         << "\tL-inf error norm: " << error_owned.linfty_norm() << std::endl;
 }
 
-/// Specialized version for Dubiner basis.
-template <>
+
+template <class basis>
 void
-ModelDG_t<DUBValues<lifex::dim>>::intermediate_error_print(
-  const lifex::LinAlg::MPI::Vector &                   solution_owned,
-  const lifex::LinAlg::MPI::Vector &                   solution_ex_owned,
-  const std::shared_ptr<dealii::Function<lifex::dim>> &u_ex,
-  const char *                                         solution_name)
+ModelDG_t<basis>::update_time()
 {
-  AssertThrow(u_ex != nullptr,
-              dealii::StandardExceptions::ExcMessage(
-                "Not valid pointer to the exact solution."));
+  // Update time for all the known analytical functions.
+  this->u_ex->set_time(this->time);
+  this->f_ex->set_time(this->time);
+  this->g_n->set_time(this->time);
+  this->grad_u_ex->set_time(this->time);
 
-  AssertThrow(solution_owned.size() == solution_ex_owned.size(),
-              dealii::StandardExceptions::ExcMessage(
-                "The exact solution vector and the approximate solution vector "
-                "must have the same length."));
+  bdf_handler.time_advance(this->solution_owned, true);
+  this->solution_bdf = bdf_handler.get_sol_bdf();
 
-  lifex::LinAlg::MPI::Vector error_owned;
-  error_owned.reinit(solution_owned);
-
-  const DUBFEMHandler<lifex::dim> dub_fem_values(this->prm_fe_degree,
-                                                 this->dof_handler);
-
-  error_owned = dub_fem_values.dubiner_to_fem(solution_owned);
-  error_owned -= dub_fem_values.dubiner_to_fem(solution_ex_owned);
-  pcerr << solution_name << ":"
-        << "\tL-inf error norm: " << error_owned.linfty_norm() << std::endl;
+  // Update solution_ex_owned from the updated u_ex.
+  this->discretize_analytical_solution(this->u_ex, this->solution_ex_owned);
 }
+
 
 template <class basis>
 void
@@ -350,22 +324,18 @@ ModelDG_t<basis>::run()
 
       this->intermediate_error_print(this->solution_owned,
                                      this->solution_ex_owned,
-                                     this->u_ex,
-                                     "u");
+                                     this->u_ex);
     }
 
   this->compute_errors(this->solution_owned,
                        this->solution_ex_owned,
                        this->u_ex,
-                       this->grad_u_ex,
-                       "u");
+                       this->grad_u_ex);
 
   // Definition of the solutions to plot.
   this->solution = this->solution_owned;
   this->conversion_to_fem(this->solution);
-  dealii::VectorTools::interpolate(this->dof_handler,
-                                   *(this->u_ex),
-                                   this->solution_ex);
+  dealii::VectorTools::interpolate(this->dof_handler, *(this->u_ex), this->solution_ex);
   this->output_results();
 }
 
