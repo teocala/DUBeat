@@ -1,6 +1,6 @@
 #!/bin/bash
 ## ---------------------------------------------------------------------
-## Copyright (C) 2019 - 2021 by the lifex authors.
+## Copyright (C) 2019 - 2020 by the lifex authors.
 ##
 ## This file is part of lifex.
 ##
@@ -29,35 +29,31 @@
 ##
 
 #
-# This script indents all source files of lifex according to our usual
-# code formatting standards. It is used to ensure that our code base looks
-# uniform, as uniformity helps make code easier to read.
-#
-# While we're already touching every file, this script also makes
-# sure we set permissions correctly and checks for correct unix-style line
-# endings.
+# This script does the same thing as scripts/format/indent_all but only
+# reformats files which have changed (or have been added but neither
+# staged/committed) since the last merge commit to the master branch.
 #
 # The script needs to be executed as
-#   ./scripts/format/indent_all
+#   ./scripts/format/indent
 # from the top-level directory of the source tree, or via
-#   make indent_all
+#   make indent
 # from a build directory.
 #
 # The script can be invoked with lifex_CLANG_FORMAT to change
 # the default version of clang-format. For example:
-#   lifex_CLANG_FORMAT=clang-format-10.0.0 ./scripts/format/indent_all
+#   lifex_CLANG_FORMAT=clang-format-10.0.0 ./scripts/format/indent
 # or,
-#   make lifex_CLANG_FORMAT="clang-format-10.0.0" indent_all
+#   make lifex_CLANG_FORMAT="clang-format-10.0.0" indent
 #
 # Note: If the script is invoked with REPORT_ONLY=true set,
-#   REPORT_ONLY=true ./scripts/format/indent_all
+#   REPORT_ONLY=true ./scripts/format/indent
 # or,
-#   make REPORT_ONLY=true indent_all
+#   make REPORT_ONLY=true indent
 # then indentation errors will only be reported without any actual file
 # changes.
 #
 
-if [ ! -f extra/indent_common ]; then
+if [ ! -f extra/indent/indent_common ]; then
   echo "*** This script must be run from the top-level directory."
   exit 1
 fi
@@ -68,8 +64,8 @@ source extra/indent_common
 checks
 
 # Process all source and header files.
-process ". source models extra" ".*\.(cpp|hpp)" format_file
+process_changed ". source models extra" ".*\.(cpp|hpp)" format_file
 
 # Fix permissions and convert to unix line ending if necessary.
-process ". source models extra" ".*\.(cpp|hpp)" fix_permissions
-process ". source models extra" ".*\.(cpp|hpp)" dos_to_unix
+process_changed ". source models extra" ".*\.(cpp|hpp)" fix_permissions
+process_changed ". source models extra" ".*\.(cpp|hpp)" dos_to_unix

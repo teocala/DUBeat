@@ -108,7 +108,7 @@ protected:
     const lifex::LinAlg::MPI::Vector &                   solution_owned,
     const lifex::LinAlg::MPI::Vector &                   solution_ex_owned,
     const std::shared_ptr<dealii::Function<lifex::dim>> &u_ex,
-    const char *                                         solution_name = (char*)"u");
+    const char *solution_name = (char *)"u");
 
   /// Override for the simulation run.
   void
@@ -241,7 +241,8 @@ ModelDG_t<basis>::time_initializaton()
   // Set initial time to the exact analytical solution.
   this->u_ex->set_time(prm_time_init);
 
-  // Solution_owned and solution_ex_owned at the initial time are the discretization of the analytical u_ex.
+  // Solution_owned and solution_ex_owned at the initial time are the
+  // discretization of the analytical u_ex.
   this->discretize_analytical_solution(this->u_ex, this->solution_owned);
   this->solution_ex_owned = this->solution_owned;
 
@@ -270,7 +271,8 @@ ModelDG_t<basis>::intermediate_error_print(
                 "The exact solution vector and the approximate solution vector "
                 "must have the same length."));
 
-  lifex::LinAlg::MPI::Vector error_owned = this->conversion_to_fem(solution_owned);
+  lifex::LinAlg::MPI::Vector error_owned =
+    this->conversion_to_fem(solution_owned);
   error_owned -= this->conversion_to_fem(solution_ex_owned);
 
   pcerr << solution_name << ":"
@@ -302,6 +304,8 @@ ModelDG_t<basis>::run()
 {
   this->create_mesh();
   this->setup_system();
+  this->initialize_solution(this->solution_owned, this->solution);
+  this->initialize_solution(this->solution_ex_owned, this->solution_ex);
   this->time_initializaton();
 
   while (this->time < this->prm_time_final)
@@ -335,7 +339,10 @@ ModelDG_t<basis>::run()
   // Definition of the solutions to plot.
   this->solution = this->solution_owned;
   this->conversion_to_fem(this->solution);
-  dealii::VectorTools::interpolate(this->dof_handler, *(this->u_ex), this->solution_ex);
+  dealii::VectorTools::interpolate(this->dof_handler,
+                                   *(this->u_ex),
+                                   this->solution_ex);
+  // Generation of the graphical output.
   this->output_results();
 }
 

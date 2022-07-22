@@ -48,9 +48,12 @@
  *
  * @f[ \|u-u_h\|_{L^\infty(\Omega)}:=  \sup_{x\in \Omega} |u(x)-u_h(x)|  @f]
  * @f[ \|u-u_h\|_{L^2(\Omega)}^2 := \int_{\Omega} |u(x)-u_h(x)|^2 \, dx  @f]
-* @f[ \|u-u_h\|_{H^1(\Omega)}^2 := \|u-u_h\|_{L^2(\Omega)}^2 + \|\nabla u-\nabla u_h\|_{L^2(\Omega)}^2  @f]
-* @f[ \|u-u_h\|_{DG(\Omega)}^2 := \|\nabla u-\nabla u_h\|_{L^2(\Omega)}^2 +\gamma \|[[ u-\nabla u_h]]\|_{L^2(\mathcal{F})}^2  @f]
-* where @f$\gamma @f$ is the stability coefficient and the @f$L^2(\mathcal{F}) @f$ norm is computed on the faces instead of the volume.
+ * @f[ \|u-u_h\|_{H^1(\Omega)}^2 := \|u-u_h\|_{L^2(\Omega)}^2 + \|\nabla
+ * u-\nabla u_h\|_{L^2(\Omega)}^2  @f]
+ * @f[ \|u-u_h\|_{DG(\Omega)}^2 := \|\nabla u-\nabla u_h\|_{L^2(\Omega)}^2
+ * +\gamma \|[[ u-\nabla u_h]]\|_{L^2(\mathcal{F})}^2  @f] where @f$\gamma @f$
+ * is the stability coefficient and the @f$L^2(\mathcal{F}) @f$ norm is computed
+ * on the faces instead of the volume.
  */
 
 template <class basis>
@@ -58,56 +61,71 @@ class Compute_Errors_DG
 {
 public:
   /// Constructor.
-  Compute_Errors_DG<basis>(const unsigned int degree, const double stability_coeff, const unsigned int local_dofs,
-                     const dealii::DoFHandler<lifex::dim> &dof_hand):
-    dof_handler(dof_hand)
+  Compute_Errors_DG<basis>(const unsigned int degree,
+                           const double       stability_coeff,
+                           const unsigned int local_dofs,
+                           const dealii::DoFHandler<lifex::dim> &dof_hand)
+    : dof_handler(dof_hand)
     , n_quad_points(static_cast<int>(std::pow(degree + 2, lifex::dim)))
     , n_quad_points_face(static_cast<int>(std::pow(degree + 2, lifex::dim - 1)))
     , dofs_per_cell(local_dofs)
     , fe_degree(degree)
     , stability_coefficient(stability_coeff)
     , basis_ptr(std::make_unique<basis>(degree))
-    , solution_name((char*)"u")
-    , errors ({0,0,0,0})
-    , dub_fem_values (std::make_shared<DUBFEMHandler<lifex::dim>>(degree, dof_handler))
+    , solution_name((char *)"u")
+    , errors({0, 0, 0, 0})
+    , dub_fem_values(
+        std::make_shared<DUBFEMHandler<lifex::dim>>(degree, dof_handler))
   {}
 
   /// Default copy constructor.
   Compute_Errors_DG<basis>(Compute_Errors_DG<basis> &ComputeErrorsDG) = default;
 
   /// Default const copy constructor.
-  Compute_Errors_DG<basis>(const Compute_Errors_DG<basis> &ComputeErrorsDG) = default;
+  Compute_Errors_DG<basis>(const Compute_Errors_DG<basis> &ComputeErrorsDG) =
+    default;
 
   /// Default move constructor.
-  Compute_Errors_DG<basis>(Compute_Errors_DG<basis> &&ComputeErrorsDG) = default;
+  Compute_Errors_DG<basis>(Compute_Errors_DG<basis> &&ComputeErrorsDG) =
+    default;
 
   /// Reinitialization with new computed and exact solutions.
-  void reinit(const lifex::LinAlg::MPI::Vector &                   sol_owned,
-  const lifex::LinAlg::MPI::Vector &                   sol_ex_owned,
-  const std::shared_ptr<dealii::Function<lifex::dim>> &u_ex_input,
-  const std::shared_ptr<dealii::Function<lifex::dim>> &grad_u_ex_input,
-  const char *                                         solution_name_input);
+  void
+  reinit(const lifex::LinAlg::MPI::Vector &                   sol_owned,
+         const lifex::LinAlg::MPI::Vector &                   sol_ex_owned,
+         const std::shared_ptr<dealii::Function<lifex::dim>> &u_ex_input,
+         const std::shared_ptr<dealii::Function<lifex::dim>> &grad_u_ex_input,
+         const char *solution_name_input);
 
-  /// Compute errors following the preferences in the list. E.g., errors_defs={"L2"} will only compute the @f$L^2@f$ error.
-  void compute_errors(std::list<const char*> errors_defs={"inf","L2","H1","DG"});
+  /// Compute errors following the preferences in the list. E.g.,
+  /// errors_defs={"L2"} will only compute the @f$L^2@f$ error.
+  void
+  compute_errors(
+    std::list<const char *> errors_defs = {"inf", "L2", "H1", "DG"});
 
-  /// Output of the errors following the preferences in the list. E.g., errors_defs={"L2"} will only output the @f$L^2@f$ error.
-  /// The output vector contains the errors in the order of the input list.
-  std::vector<double> output_errors(std::list<const char*> errors_defs={"inf","L2","H1","DG"}) const;
+  /// Output of the errors following the preferences in the list. E.g.,
+  /// errors_defs={"L2"} will only output the @f$L^2@f$ error. The output vector
+  /// contains the errors in the order of the input list.
+  std::vector<double>
+  output_errors(
+    std::list<const char *> errors_defs = {"inf", "L2", "H1", "DG"}) const;
 
 private:
-
   /// Compute the @f$L^\infty@f$ error.
-  void compute_error_inf();
+  void
+  compute_error_inf();
 
   /// Compute the @f$L^2@f$ error.
-  void compute_error_L2();
+  void
+  compute_error_L2();
 
   /// Compute the @f$H^1@f$ error.
-  void compute_error_H1();
+  void
+  compute_error_H1();
 
   /// Compute the @f$DG@f$ error.
-  void compute_error_DG();
+  void
+  compute_error_DG();
 
   /// Dof handler object of the problem.
   const dealii::DoFHandler<lifex::dim> &dof_handler;
@@ -133,10 +151,10 @@ private:
   const std::unique_ptr<basis> basis_ptr;
 
   /// Computed solution.
-  lifex::LinAlg::MPI::Vector                   solution_owned;
+  lifex::LinAlg::MPI::Vector solution_owned;
 
   /// Exact solution to compare with the numerical one.
-  lifex::LinAlg::MPI::Vector                   solution_ex_owned;
+  lifex::LinAlg::MPI::Vector solution_ex_owned;
 
   /// Analytical exact solution.
   std::shared_ptr<dealii::Function<lifex::dim>> u_ex;
@@ -144,36 +162,38 @@ private:
   /// Gradient of the analytical exact solution.
   std::shared_ptr<dealii::Function<lifex::dim>> grad_u_ex;
 
-  /// String that contains the solution name (to write on output files, default "u").
-  char *                                         solution_name;
+  /// String that contains the solution name (to write on output files, default
+  /// "u").
+  char *solution_name;
 
-  /// Array that contains the current errors (in order, @f$L^\infty@f$, @f$L^2@f$, @f$H^1@f$, @f$DG@f$).
-  std::array<double,4> errors;
+  /// Array that contains the current errors (in order, @f$L^\infty@f$,
+  /// @f$L^2@f$, @f$H^1@f$, @f$DG@f$).
+  std::array<double, 4> errors;
 
   /// Member to compute conversion to FEM basis, needed for L^inf error.
   std::shared_ptr<DUBFEMHandler<lifex::dim>> dub_fem_values;
-
 };
 
 template <class basis>
 void
-Compute_Errors_DG<basis>::reinit(const lifex::LinAlg::MPI::Vector & sol_owned,
-const lifex::LinAlg::MPI::Vector &                   sol_ex_owned,
-const std::shared_ptr<dealii::Function<lifex::dim>> &u_ex_input,
-const std::shared_ptr<dealii::Function<lifex::dim>> &grad_u_ex_input,
-const char *                                         solution_name_input)
+Compute_Errors_DG<basis>::reinit(
+  const lifex::LinAlg::MPI::Vector &                   sol_owned,
+  const lifex::LinAlg::MPI::Vector &                   sol_ex_owned,
+  const std::shared_ptr<dealii::Function<lifex::dim>> &u_ex_input,
+  const std::shared_ptr<dealii::Function<lifex::dim>> &grad_u_ex_input,
+  const char *                                         solution_name_input)
 {
-  solution_owned = sol_owned;
+  solution_owned    = sol_owned;
   solution_ex_owned = sol_ex_owned;
-  u_ex = u_ex_input;
-  grad_u_ex = grad_u_ex_input;
-  solution_name = (char*) solution_name_input;
+  u_ex              = u_ex_input;
+  grad_u_ex         = grad_u_ex_input;
+  solution_name     = (char *)solution_name_input;
 }
 
 
 template <class basis>
 void
-Compute_Errors_DG<basis>::compute_errors(std::list<const char*>errors_defs)
+Compute_Errors_DG<basis>::compute_errors(std::list<const char *> errors_defs)
 {
   AssertThrow(u_ex != nullptr,
               dealii::StandardExceptions::ExcMessage(
@@ -188,51 +208,59 @@ Compute_Errors_DG<basis>::compute_errors(std::list<const char*>errors_defs)
                 "The exact solution vector and the approximate solution vector "
                 "must have the same length."));
 
-  if (std::find(errors_defs.begin(), errors_defs.end(), "inf") != errors_defs.end())
-  {
-    this->compute_error_inf();
-  }
+  if (std::find(errors_defs.begin(), errors_defs.end(), "inf") !=
+      errors_defs.end())
+    {
+      this->compute_error_inf();
+    }
 
-  // We need to respect the following order because the H1 semi error contributes to the DG error and the L2 error contributes to the H1 error.
-  if (std::find(errors_defs.begin(), errors_defs.end(), "DG") != errors_defs.end())
-  {
-    this->compute_error_L2();
-    this->compute_error_H1();
-    this->compute_error_DG();
-  }
-  else if(std::find(errors_defs.begin(), errors_defs.end(), "H1") != errors_defs.end())
-  {
-    this->compute_error_L2();
-    this->compute_error_H1();
-  }
-  else if(std::find(errors_defs.begin(), errors_defs.end(), "L2") != errors_defs.end())
-  {
-    this->compute_error_L2();
-  }
+  // We need to respect the following order because the H1 semi error
+  // contributes to the DG error and the L2 error contributes to the H1 error.
+  if (std::find(errors_defs.begin(), errors_defs.end(), "DG") !=
+      errors_defs.end())
+    {
+      this->compute_error_L2();
+      this->compute_error_H1();
+      this->compute_error_DG();
+    }
+  else if (std::find(errors_defs.begin(), errors_defs.end(), "H1") !=
+           errors_defs.end())
+    {
+      this->compute_error_L2();
+      this->compute_error_H1();
+    }
+  else if (std::find(errors_defs.begin(), errors_defs.end(), "L2") !=
+           errors_defs.end())
+    {
+      this->compute_error_L2();
+    }
 }
 
 
 template <class basis>
 std::vector<double>
-Compute_Errors_DG<basis>::output_errors(std::list<const char*>errors_defs) const
+Compute_Errors_DG<basis>::output_errors(
+  std::list<const char *> errors_defs) const
 {
   std::vector<double> output_errors = {};
 
-  for (auto error_def = errors_defs.begin(); error_def != errors_defs.end(); error_def++)
-  {
-    AssertThrow(*error_def == "inf" || *error_def == "L2" || *error_def == "H1" || *error_def == "DG",
-                dealii::StandardExceptions::ExcMessage(
-                  "Error definition must be inf, L2, H1 or DG."));
+  for (auto error_def = errors_defs.begin(); error_def != errors_defs.end();
+       error_def++)
+    {
+      AssertThrow(*error_def == "inf" || *error_def == "L2" ||
+                    *error_def == "H1" || *error_def == "DG",
+                  dealii::StandardExceptions::ExcMessage(
+                    "Error definition must be inf, L2, H1 or DG."));
 
-    if (*error_def=="inf")
-      output_errors.push_back(errors[0]);
-    else if (*error_def =="L2")
-      output_errors.push_back(errors[1]);
-    else if (*error_def =="H1")
-      output_errors.push_back(errors[2]);
-    else
-      output_errors.push_back(errors[3]);
-  }
+      if (*error_def == "inf")
+        output_errors.push_back(errors[0]);
+      else if (*error_def == "L2")
+        output_errors.push_back(errors[1]);
+      else if (*error_def == "H1")
+        output_errors.push_back(errors[2]);
+      else
+        output_errors.push_back(errors[3]);
+    }
   return output_errors;
 }
 
@@ -247,13 +275,16 @@ Compute_Errors_DG<basis>::compute_error_inf()
   errors[0] = difference.linfty_norm();
 }
 
-/// Specialized version for Dubiner basis. Before computing the @f$L^\infty@f$ error, the vector solutions are transformed in terms of FEM coefficients.
+/// Specialized version for Dubiner basis. Before computing the @f$L^\infty@f$
+/// error, the vector solutions are transformed in terms of FEM coefficients.
 template <>
 void
 Compute_Errors_DG<DUBValues<lifex::dim>>::compute_error_inf()
 {
-  lifex::LinAlg::MPI::Vector solution_fem = dub_fem_values->dubiner_to_fem(solution_owned);
-  lifex::LinAlg::MPI::Vector solution_ex_fem = dub_fem_values->dubiner_to_fem(solution_ex_owned);
+  lifex::LinAlg::MPI::Vector solution_fem =
+    dub_fem_values->dubiner_to_fem(solution_owned);
+  lifex::LinAlg::MPI::Vector solution_ex_fem =
+    dub_fem_values->dubiner_to_fem(solution_ex_owned);
 
   lifex::LinAlg::MPI::Vector difference = solution_fem;
   difference -= solution_ex_fem;
@@ -268,7 +299,7 @@ Compute_Errors_DG<basis>::compute_error_L2()
 {
   double error_L2 = 0;
 
-  DGVolumeHandler<lifex::dim> vol_handler(fe_degree);
+  DGVolumeHandler<lifex::dim>                 vol_handler(fe_degree);
   std::vector<lifex::types::global_dof_index> dof_indices(dofs_per_cell);
 
   double local_approx;
@@ -316,7 +347,7 @@ Compute_Errors_DG<basis>::compute_error_H1()
   dealii::Tensor<1, lifex::dim> local_grad_exact;
   dealii::Tensor<1, lifex::dim> pointwise_diff;
 
-  DGVolumeHandler<lifex::dim> vol_handler(fe_degree);
+  DGVolumeHandler<lifex::dim>                 vol_handler(fe_degree);
   std::vector<lifex::types::global_dof_index> dof_indices(dofs_per_cell);
 
   for (const auto &cell : dof_handler.active_cell_iterators())
@@ -345,7 +376,8 @@ Compute_Errors_DG<basis>::compute_error_H1()
                   for (unsigned int i = 0; i < dofs_per_cell; ++i)
                     {
                       local_approx_gradient[j] +=
-                        basis_ptr->shape_grad(i, vol_handler.quadrature_ref(q))[j] *
+                        basis_ptr->shape_grad(
+                          i, vol_handler.quadrature_ref(q))[j] *
                         solution_owned[dof_indices[i]];
                     }
                 }
@@ -359,7 +391,7 @@ Compute_Errors_DG<basis>::compute_error_H1()
         }
     }
 
-  errors[2] = sqrt(errors[1]*errors[1] + error_semi_H1);
+  errors[2] = sqrt(errors[1] * errors[1] + error_semi_H1);
 }
 
 
@@ -369,10 +401,10 @@ Compute_Errors_DG<basis>::compute_error_DG()
 {
   double error_DG = 0;
 
-  DGVolumeHandler<lifex::dim> vol_handler(fe_degree);
+  DGVolumeHandler<lifex::dim>                 vol_handler(fe_degree);
   std::vector<lifex::types::global_dof_index> dof_indices(dofs_per_cell);
-  DGFaceHandler<lifex::dim> face_handler(fe_degree);
-  DGFaceHandler<lifex::dim> face_handler_neigh(fe_degree);
+  DGFaceHandler<lifex::dim>                   face_handler(fe_degree);
+  DGFaceHandler<lifex::dim>                   face_handler_neigh(fe_degree);
 
   for (const auto &cell : dof_handler.active_cell_iterators())
     {
@@ -409,8 +441,10 @@ Compute_Errors_DG<basis>::compute_error_DG()
                           error_DG +=
                             difference[dof_indices[i]] *
                             difference[dof_indices[j]] * local_stability_coeff *
-                            basis_ptr->shape_value(i, face_handler.quadrature_ref(q)) *
-                            basis_ptr->shape_value(j, face_handler.quadrature_ref(q)) *
+                            basis_ptr->shape_value(
+                              i, face_handler.quadrature_ref(q)) *
+                            basis_ptr->shape_value(
+                              j, face_handler.quadrature_ref(q)) *
                             face_handler.quadrature_weight(q) * measure_ratio;
 
                           if (!cell->at_boundary(edge))
@@ -442,11 +476,9 @@ Compute_Errors_DG<basis>::compute_error_DG()
             }
         }
     }
-  double error_semi_H1 = errors[2]*errors[2] - errors[1]*errors[1];
-  errors[3] = sqrt(error_semi_H1 + error_DG);
+  double error_semi_H1 = errors[2] * errors[2] - errors[1] * errors[1];
+  errors[3]            = sqrt(error_semi_H1 + error_DG);
 }
-
-
 
 
 #endif /* ComputeErrorsDG_HPP_*/

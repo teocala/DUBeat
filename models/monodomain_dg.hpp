@@ -508,6 +508,12 @@ namespace lifex::examples
   {
     this->create_mesh();
     this->setup_system();
+
+    this->initialize_solution(this->solution_owned, this->solution);
+    this->initialize_solution(this->solution_ex_owned, this->solution_ex);
+    this->initialize_solution(this->solution_owned_w, this->solution_w);
+    this->initialize_solution(this->solution_ex_owned_w, this->solution_ex_w);
+
     time_initializaton();
 
     while (this->time < this->prm_time_final)
@@ -542,7 +548,9 @@ namespace lifex::examples
     this->solution_w = this->solution_owned_w;
     this->conversion_to_fem(this->solution);
     this->conversion_to_fem(this->solution_w);
-    dealii::VectorTools::interpolate(this->dof_handler, *(this->u_ex), this->solution_ex);
+    dealii::VectorTools::interpolate(this->dof_handler,
+                                     *(this->u_ex),
+                                     this->solution_ex);
 
     this->compute_errors(this->solution_owned,
                          this->solution_ex_owned,
@@ -584,28 +592,13 @@ namespace lifex::examples
   void
   Monodomain_DG<basis>::time_initializaton()
   {
-    // Initialize BDF handler.
-    dealii::IndexSet owned_dofs = this->dof_handler.locally_owned_dofs();
-    dealii::IndexSet relevant_dofs;
-    dealii::IndexSet active_dofs;
-    lifex::DoFTools::extract_locally_relevant_dofs(this->dof_handler,
-                                                   relevant_dofs);
-    lifex::DoFTools::extract_locally_active_dofs(this->dof_handler,
-                                                 active_dofs);
-
-    solution_owned_w.reinit(owned_dofs, this->mpi_comm);
-    solution_w.reinit(owned_dofs, relevant_dofs, this->mpi_comm);
-
-    solution_ex_owned_w.reinit(owned_dofs, this->mpi_comm);
-    solution_ex_w.reinit(owned_dofs, relevant_dofs, this->mpi_comm);
-
     this->u_ex->set_time(this->prm_time_init);
     this->discretize_analytical_solution(this->u_ex, this->solution_ex_owned);
     this->solution_ex = this->solution_ex_owned;
     this->solution = this->solution_owned = this->solution_ex_owned;
 
     w_ex->set_time(this->prm_time_init);
-      this->discretize_analytical_solution(this->w_ex, this->solution_ex_owned_w);
+    this->discretize_analytical_solution(this->w_ex, this->solution_ex_owned_w);
     solution_ex_w = solution_ex_owned_w;
     solution_w = solution_owned_w = solution_ex_owned_w;
 

@@ -51,44 +51,10 @@ else
 fi
 
 checks() {
-
   # Add the location 'download_clang-format' or 'compile_clang-format'
   # installs clang-format to to the local PATH.
   CLANG_FORMAT_PATH="$(cd "$(dirname "$0")" && pwd)/clang-format-10.0.0/bin"
   export PATH="${CLANG_FORMAT_PATH}:${PATH}"
-
-  # check formatting of usernames and email addresses, examples that will be detected as invalid:
-  # single-word-name <a@b.com>
-  # Name Surname <name@notebook.local>
-  # Name Surname <a@no-domain>
-  #
-  # Finally, to stay sane, just go back until the beginning of 2019 for now.
-  #
-  # first user names:
-  git log --since "2019-01-01" --format="%aN" | sort -u | while read name ; do
-      words=($name)
-      # If $name has less than two words (count elements in the list $words).
-      if [ "${#words[@]}" -lt "2" ]; then
-    echo "Invalid author '$name' without firstname and lastname"
-    exit 2
-      fi
-  done || exit 2
-
-  # now emails:
-  git log --since "2019-01-01" --format="%aE" | sort -u | while read email ; do
-      words=($name)
-      # If $email does not contain a dot.
-      if ! echo "$email" | grep -q "\."; then
-    echo "Invalid email '$email'"
-    exit 3
-      fi
-      # If $email ends with ".local".
-      if ! echo "$email" | grep -q -v -e "\.local$"; then
-    echo "Invalid email '$email'"
-    exit 3
-      fi
-  done || exit 3
-
 }
 
 #

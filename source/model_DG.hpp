@@ -101,10 +101,14 @@ public:
   virtual ~ModelDG() = default;
 
 protected:
-
   /// Setup of the problem before the resolution.
   virtual void
   setup_system();
+
+  /// To inizialize the solutions using the deal.II reinit.
+  void
+  initialize_solution(lifex::LinAlg::MPI::Vector &solution_owned,
+                      lifex::LinAlg::MPI::Vector &solution);
 
   /// Assembly of the linear system, pure virtual.
   virtual void
@@ -128,29 +132,29 @@ protected:
                  const lifex::LinAlg::MPI::Vector &solution_ex_owned,
                  const std::shared_ptr<dealii::Function<lifex::dim>> &u_ex,
                  const std::shared_ptr<dealii::Function<lifex::dim>> &grad_u_ex,
-                 const char *solution_name = (char*)"u") const;
+                 const char *solution_name = (char *)"u") const;
 
   /// Output of results.
   void
   output_results() const;
 
-  /// To convert a discretized solution in FEM basis (does nothing if problem is in
-  /// DGFEM). In-place version.
+  /// To convert a discretized solution in FEM basis (does nothing if problem is
+  /// in DGFEM). In-place version.
   void
   conversion_to_fem(lifex::LinAlg::MPI::Vector &sol_owned);
 
-  /// To convert a discretized solution in FEM basis (does nothing if problem is in
-  /// DGFEM). Const version.
+  /// To convert a discretized solution in FEM basis (does nothing if problem is
+  /// in DGFEM). Const version.
   lifex::LinAlg::MPI::Vector
   conversion_to_fem(const lifex::LinAlg::MPI::Vector &sol_owned) const;
 
-  /// To convert a discretized solution in Dubiner basis (only for problems using
-  /// Dubiner basis). In-place version.
+  /// To convert a discretized solution in Dubiner basis (only for problems
+  /// using Dubiner basis). In-place version.
   void
   conversion_to_dub(lifex::LinAlg::MPI::Vector &sol_owned);
 
-  /// To convert a discretized solution in Dubiner basis (only for problems using
-  /// Dubiner basis). Const version.
+  /// To convert a discretized solution in Dubiner basis (only for problems
+  /// using Dubiner basis). Const version.
   lifex::LinAlg::MPI::Vector
   conversion_to_dub(const lifex::LinAlg::MPI::Vector &sol_owned) const;
 
@@ -176,7 +180,8 @@ protected:
   unsigned int dofs_per_cell;
   /// DoFHandler (internal use for useful already implemented methods).
   dealii::DoFHandler<lifex::dim> dof_handler;
-  /// Member used for conversions between analytical, nodal and modal representations of the solutions.
+  /// Member used for conversions between analytical, nodal and modal
+  /// representations of the solutions.
   std::shared_ptr<DUBFEMHandler<lifex::dim>> dub_fem_values;
   /// Matrix assembler.
   std::unique_ptr<DGAssemble<basis>> assemble;
@@ -278,24 +283,30 @@ template <class basis>
 void
 ModelDG<basis>::run()
 {
+  // Initialization
   create_mesh();
   setup_system();
-
-
+  initialize_solution(solution_owned, solution);
+  initialize_solution(solution_ex_owned, solution_ex);
   discretize_analytical_solution(u_ex, solution_ex_owned);
   solution_ex = solution_ex_owned;
   conversion_to_fem(solution_ex);
 
   // Initial guess.
   solution = solution_owned = 0;
+
+  // Computation of the numerical solution.
   assemble_system();
   solve_system();
 
+  // Provide FEM solution for the graphical output.
   solution = solution_owned;
   conversion_to_fem(solution);
 
+  // Computation and output of the errors.
   compute_errors(solution_owned, solution_ex_owned, u_ex, grad_u_ex, "u");
 
+  // Generation of the graphical output.
   output_results();
 }
 
@@ -303,12 +314,14 @@ template <class basis>
 void
 ModelDG<basis>::setup_system()
 {
-  std::unique_ptr<dealii::FE_SimplexDGP<lifex::dim>> fe = std::make_unique<dealii::FE_SimplexDGP<lifex::dim>>(prm_fe_degree);
+  std::unique_ptr<dealii::FE_SimplexDGP<lifex::dim>> fe =
+    std::make_unique<dealii::FE_SimplexDGP<lifex::dim>>(prm_fe_degree);
   assemble = std::make_unique<DGAssemble<basis>>(prm_fe_degree);
 
   dof_handler.reinit(triangulation.get());
   dof_handler.distribute_dofs(*fe);
-  dub_fem_values = std::make_shared<DUBFEMHandler<lifex::dim>>(prm_fe_degree, dof_handler);
+  dub_fem_values =
+    std::make_shared<DUBFEMHandler<lifex::dim>>(prm_fe_degree, dof_handler);
 
   triangulation.get_info().print(prm_subsection_path,
                                  dof_handler.n_dofs(),
@@ -363,12 +376,22 @@ ModelDG<basis>::setup_system()
     matrix, owned_dofs, dsp, preconditioner.uses_bddc(), active_dofs);
 
   rhs.reinit(owned_dofs, mpi_comm);
+}
+
+template <class basis>
+void
+ModelDG<basis>::initialize_solution(lifex::LinAlg::MPI::Vector &solution_owned,
+                                    lifex::LinAlg::MPI::Vector &solution)
+{
+  dealii::IndexSet owned_dofs = dof_handler.locally_owned_dofs();
+  dealii::IndexSet relevant_dofs;
+  dealii::IndexSet active_dofs;
+
+  lifex::DoFTools::extract_locally_relevant_dofs(dof_handler, relevant_dofs);
+  lifex::DoFTools::extract_locally_active_dofs(dof_handler, active_dofs);
 
   solution_owned.reinit(owned_dofs, mpi_comm);
   solution.reinit(owned_dofs, relevant_dofs, mpi_comm);
-
-  solution_ex_owned.reinit(owned_dofs, mpi_comm);
-  solution_ex.reinit(owned_dofs, relevant_dofs, mpi_comm);
 }
 
 template <class basis>
@@ -420,17 +443,25 @@ ModelDG<basis>::compute_errors(
   const std::shared_ptr<dealii::Function<lifex::dim>> &grad_u_ex,
   const char *                                         solution_name) const
 {
-  Compute_Errors_DG<basis> error_calculator(prm_fe_degree, prm_stability_coeff, dofs_per_cell, dof_handler);
-  error_calculator.reinit(solution_owned,solution_ex_owned, u_ex, grad_u_ex, solution_name);
+  Compute_Errors_DG<basis> error_calculator(prm_fe_degree,
+                                            prm_stability_coeff,
+                                            dofs_per_cell,
+                                            dof_handler);
+  error_calculator.reinit(
+    solution_owned, solution_ex_owned, u_ex, grad_u_ex, solution_name);
   error_calculator.compute_errors();
   std::vector<double> errors = error_calculator.output_errors();
 
   pcout << std::endl
         << solution_name << ":" << std::endl
-        << "Error L^inf: " << std::setw(6) << std::fixed << std::setprecision(6) << errors[0] << std::endl
-        << "Error L^2:   " << std::setw(6) << std::fixed << std::setprecision(6) << errors[1] << std::endl
-        << "Error H^1:   " << std::setw(6) << std::fixed << std::setprecision(6) << errors[2] << std::endl
-        << "Error DG:    " << std::setw(6) << std::fixed << std::setprecision(6) << errors[3] << std::endl;
+        << "Error L^inf: " << std::setw(6) << std::fixed << std::setprecision(6)
+        << errors[0] << std::endl
+        << "Error L^2:   " << std::setw(6) << std::fixed << std::setprecision(6)
+        << errors[1] << std::endl
+        << "Error H^1:   " << std::setw(6) << std::fixed << std::setprecision(6)
+        << errors[2] << std::endl
+        << "Error DG:    " << std::setw(6) << std::fixed << std::setprecision(6)
+        << errors[3] << std::endl;
 
   error_parser::update_datafile(
     lifex::dim, prm_n_refinements, model_name, errors, solution_name);
@@ -474,7 +505,8 @@ ModelDG<DUBValues<lifex::dim>>::conversion_to_fem(
 /// Conversion to FEM coefficients, const version.
 template <class basis>
 lifex::LinAlg::MPI::Vector
-ModelDG<basis>::conversion_to_fem(const lifex::LinAlg::MPI::Vector &sol_owned) const
+ModelDG<basis>::conversion_to_fem(
+  const lifex::LinAlg::MPI::Vector &sol_owned) const
 {
   return sol_owned;
 }
@@ -482,9 +514,11 @@ ModelDG<basis>::conversion_to_fem(const lifex::LinAlg::MPI::Vector &sol_owned) c
 /// Conversion to FEM coefficients, const version.
 template <>
 lifex::LinAlg::MPI::Vector
-ModelDG<DUBValues<lifex::dim>>::conversion_to_fem(const lifex::LinAlg::MPI::Vector &sol_owned) const
+ModelDG<DUBValues<lifex::dim>>::conversion_to_fem(
+  const lifex::LinAlg::MPI::Vector &sol_owned) const
 {
-  lifex::LinAlg::MPI::Vector sol_fem = dub_fem_values->dubiner_to_fem(sol_owned);
+  lifex::LinAlg::MPI::Vector sol_fem =
+    dub_fem_values->dubiner_to_fem(sol_owned);
   return sol_fem;
 }
 
@@ -510,7 +544,8 @@ ModelDG<DUBValues<lifex::dim>>::conversion_to_dub(
 /// Conversion to DUB coefficients, const version.
 template <class basis>
 lifex::LinAlg::MPI::Vector
-ModelDG<basis>::conversion_to_dub(const lifex::LinAlg::MPI::Vector &sol_owned) const
+ModelDG<basis>::conversion_to_dub(
+  const lifex::LinAlg::MPI::Vector &sol_owned) const
 {
   return sol_owned;
 }
@@ -518,9 +553,11 @@ ModelDG<basis>::conversion_to_dub(const lifex::LinAlg::MPI::Vector &sol_owned) c
 /// Conversion to DUB coefficients, const version.
 template <>
 lifex::LinAlg::MPI::Vector
-ModelDG<DUBValues<lifex::dim>>::conversion_to_dub(const lifex::LinAlg::MPI::Vector &sol_owned) const
+ModelDG<DUBValues<lifex::dim>>::conversion_to_dub(
+  const lifex::LinAlg::MPI::Vector &sol_owned) const
 {
-  lifex::LinAlg::MPI::Vector sol_dub = dub_fem_values->fem_to_dubiner(sol_owned);
+  lifex::LinAlg::MPI::Vector sol_dub =
+    dub_fem_values->fem_to_dubiner(sol_owned);
   return sol_dub;
 }
 
