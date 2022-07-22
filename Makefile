@@ -26,6 +26,7 @@ clean:
 distclean:
 	$(MAKE) clean
 	$(RM) -f ./doc $(DEPEND)
+	$(RM) -f *.h5 *.xdmf *.prm *.data
 
 doc:
 	doxygen $(DOXYFILE)

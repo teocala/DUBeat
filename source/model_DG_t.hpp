@@ -233,7 +233,6 @@ ModelDG_t<basis>::parse_parameters(lifex::ParamHandler &params)
   params.leave_subsection();
 }
 
-
 template <class basis>
 void
 ModelDG_t<basis>::time_initializaton()
@@ -279,7 +278,6 @@ ModelDG_t<basis>::intermediate_error_print(
         << "\tL-inf error norm: " << error_owned.linfty_norm() << std::endl;
 }
 
-
 template <class basis>
 void
 ModelDG_t<basis>::update_time()
@@ -296,7 +294,6 @@ ModelDG_t<basis>::update_time()
   // Update solution_ex_owned from the updated u_ex.
   this->discretize_analytical_solution(this->u_ex, this->solution_ex_owned);
 }
-
 
 template <class basis>
 void

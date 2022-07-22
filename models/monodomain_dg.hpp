@@ -630,7 +630,6 @@ namespace lifex::examples
     this->matrix = 0;
     this->rhs    = 0;
 
-
     FullMatrix<double> V(this->dofs_per_cell, this->dofs_per_cell);
     FullMatrix<double> M(this->dofs_per_cell, this->dofs_per_cell);
     FullMatrix<double> S(this->dofs_per_cell, this->dofs_per_cell);

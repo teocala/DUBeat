@@ -433,7 +433,6 @@ ModelDG<basis>::solve_system()
   solution = solution_owned;
 }
 
-
 template <class basis>
 void
 ModelDG<basis>::compute_errors(

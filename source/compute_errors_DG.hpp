@@ -41,10 +41,10 @@
 
 #include "DUBValues.hpp"
 
-
 /**
- * @brief Class to compute the errors between the numerical solution (solution_owned) and the exact solution (solution_ex_owned).
- * Four definitions of error are implemented:
+ * @brief Class to compute the errors between the numerical solution
+ * (solution_owned) and the exact solution (solution_ex_owned). Four definitions
+ * of error are implemented:
  *
  * @f[ \|u-u_h\|_{L^\infty(\Omega)}:=  \sup_{x\in \Omega} |u(x)-u_h(x)|  @f]
  * @f[ \|u-u_h\|_{L^2(\Omega)}^2 := \int_{\Omega} |u(x)-u_h(x)|^2 \, dx  @f]
@@ -190,7 +190,6 @@ Compute_Errors_DG<basis>::reinit(
   solution_name     = (char *)solution_name_input;
 }
 
-
 template <class basis>
 void
 Compute_Errors_DG<basis>::compute_errors(std::list<const char *> errors_defs)
@@ -236,7 +235,6 @@ Compute_Errors_DG<basis>::compute_errors(std::list<const char *> errors_defs)
     }
 }
 
-
 template <class basis>
 std::vector<double>
 Compute_Errors_DG<basis>::output_errors(
@@ -264,7 +262,6 @@ Compute_Errors_DG<basis>::output_errors(
   return output_errors;
 }
 
-
 template <class basis>
 void
 Compute_Errors_DG<basis>::compute_error_inf()
@@ -291,7 +288,6 @@ Compute_Errors_DG<DUBValues<lifex::dim>>::compute_error_inf()
 
   errors[0] = difference.linfty_norm();
 }
-
 
 template <class basis>
 void
@@ -394,7 +390,6 @@ Compute_Errors_DG<basis>::compute_error_H1()
   errors[2] = sqrt(errors[1] * errors[1] + error_semi_H1);
 }
 
-
 template <class basis>
 void
 Compute_Errors_DG<basis>::compute_error_DG()
@@ -479,6 +474,5 @@ Compute_Errors_DG<basis>::compute_error_DG()
   double error_semi_H1 = errors[2] * errors[2] - errors[1] * errors[1];
   errors[3]            = sqrt(error_semi_H1 + error_DG);
 }
-
 
 #endif /* ComputeErrorsDG_HPP_*/
