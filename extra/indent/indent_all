@@ -68,8 +68,8 @@ source extra/indent/indent_common
 checks
 
 # Process all source and header files.
-process ". source models extra" ".*\.(cpp|hpp)" format_file
+process ". source models extra build" ".*\.(cpp|hpp)" format_file
 
 # Fix permissions and convert to unix line ending if necessary.
-process ". source models extra" ".*\.(cpp|hpp)" fix_permissions
-process ". source models extra" ".*\.(cpp|hpp)" dos_to_unix
+process ". source models extra build" ".*\.(cpp|hpp)" fix_permissions
+process ". source models extra build" ".*\.(cpp|hpp)" dos_to_unix
