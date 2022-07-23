@@ -70,7 +70,7 @@ To obtain your executable, you then need to
 ### See your results
 Results can be viewed in two ways:
 - By default, you should see on the screen the numerical errors with the exact solution. In addition, the `DG_error_parser` class will write the errors on a `.data` file. Finally, you can use the `generate_convergence_plots.py` script to create plots of the errors for different mesh refinements starting from a `.data` file.
-- The code generates two solution files, open `solution.xdmf` with [GMSH][] to see the contour plots of the numerical and exact solutions.
+- The code generates two solution files, open `solution.xdmf` with [ParaView][] to see the contour plots of the numerical and exact solutions.
 
 ### Documentation, indentation and cleaning
 - In the main folder, run
@@ -97,7 +97,7 @@ Results can be viewed in two ways:
 - Other applications/problems can be easily implemented. Just implement your own model header as in the `models` folder!  
   Notice that the addition of a new type of DG matrix needs to be supplemented in the `DG_Assemble.hpp` methods.
 - As for now, simplices meshes can not be built runtime in [deal.II][]. Therefore, some example meshes are provided in the folder `meshes` and used in the default version.
-  In case you need to use your own mesh files, you need to use the version of the `create_mesh` method in `Model_DG` that accepts a user mesh path.
+  In case you need to use your own `.msh` files, you need to use the version of the `create_mesh` method in `Model_DG` that accepts a user mesh path.
 - If you need to add new scripts/folders, remember to add them to the `make` and `indent` configurations.
 
 
@@ -105,7 +105,7 @@ Results can be viewed in two ways:
 [lifex]: https://lifex.gitlab.io/
 [dedicated page]: https://docs.github.com/en/authentication/connecting-to-github-with-ssh
 [download and install]: https://lifex.gitlab.io/lifex/download-and-install.html
-[GMSH]: https://gmsh.info/
+[ParaView]: https://www.paraview.org/
 [Doxygen]: https://doxygen.nl/
 [Graphviz]: https://graphviz.org/
 [CMake]: https://cmake.org/
