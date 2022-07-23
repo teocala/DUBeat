@@ -30,7 +30,8 @@
 #include "../models/laplace_dg.hpp"
 #include "../models/monodomain_dg.hpp"
 
-/// This file is an example of main execution script. The model below can be defined using the example models and adopting either DGFEM or Dubiner basis.
+/// This file is an example of main execution script. The model below can be
+/// defined using the example models and adopting either DGFEM or Dubiner basis.
 
 int
 main(int argc, char **argv)
