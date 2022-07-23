@@ -14,13 +14,13 @@ They both work in either 2 or 3 dimensions depending on the lifex configuration 
 
 
 ### Dependencies
-`DUBeat 1.0.0` depends almost exclusively on the [lifex][] 1.4.0 installation and its dependencies. Check its [download and install][] page to verify you satisfy all its dependencies.   
+`DUBeat 1.0.0` relies almost exclusively on the [lifex][] `1.4.0` installation and its dependencies. Check its [download and install][] page to verify you satisfy all its requirements.   
 In particular, the library has been implemented using:
 - [CMake][] = `3.16.3`
 - [Doxygen][] = `1.8.17`
 - [Graphviz][] = `2.42.2`  
 
-and all the other packages are included in the lifex `mk` module, `2022.0` version. This module can be downloaded from [here][] and we refer again to the [download and install][] page for its installation. In particular, this package contains:
+and other libraries included in the lifex `mk` module, `2022.0` version. This module can be downloaded from [here][] and we refer again to the [download and install][] page for its installation. In particular, this package contains:
 - [ADOL-C][] = `2.7.2`
 - [Boost][] = `1.76.0`
 - [deal.II][] = `9.3.1`
@@ -40,7 +40,7 @@ and all the other packages are included in the lifex `mk` module, `2022.0` versi
 
 2. `DUBeat` is an only header library, so what you have just downloaded is already the library installation.
 
-3. Before preparing your simulation, modify the variable `LIFEX_PATH` in the `Makefile.inc` file specifying your local lifex directory.  
+3. Modify the variable `LIFEX_PATH` in the `Makefile.inc` file specifying your local lifex directory.  
 
 ### Prepare your simulation
 In the `models` folder we have already provided three different models:
@@ -51,8 +51,8 @@ In the `models` folder we have already provided three different models:
 In addition, you find an example main execution script in the `build` folder.   
 
 To obtain your executable, you then need to
-1. Choose your model in the `main_dubiner_dg.cpp` script.
-2. Go back in the main directory and run `make` to compile the script.
+1. Choose your model modifying the `main_dubiner_dg.cpp` script.
+2. Go back to the main directory and run `make` to compile the script.
 
 ### Run your simulation
 1. Now that the execution file is ready, move to the `build` folder and type
