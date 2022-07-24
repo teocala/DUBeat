@@ -56,16 +56,16 @@ To obtain your executable, you then need to
 
 ### Run your simulation
 1. Now that the execution file is ready, move to the `build` folder and type
-  ```bash
-  ./main_dubiner_dg -g
-  ```
-  to generate the `main_dubiner_dg.prm` parameter file.
-2. You can now set your parameters in this file without the need to re-compile. In particular, you can specify the mesh refinement that consists in the choice of the mesh file from the `meshes` folder.
+    ```bash
+    ./main_dubiner_dg -g
+    ```
+    to generate the `main_dubiner_dg.prm` parameter file.   
+2. You can now set your parameters in this file without the need to re-compile. In particular, you can specify the mesh refinement that consists in the choice of the mesh file from the `meshes` folder.   
 3. Write
-  ```bash
-  ./main_dubiner_dg
-  ```
-  to run your simulation.
+    ```bash
+    ./main_dubiner_dg
+    ```
+    to run your simulation.
 
 ### See your results
 Results can be viewed in two ways:
