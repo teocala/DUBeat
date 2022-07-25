@@ -89,25 +89,25 @@ namespace lifex::examples
     class RightHandSide : public Function<dim>
     {
     private:
-      /// Parameter monodomain equation
+      /// Parameter monodomain equation.
       double ChiM;
 
-      /// Diffusion scalar parameter
+      /// Diffusion scalar parameter.
       double Sigma;
 
-      /// Membrane capacity
+      /// Membrane capacity.
       double Cm;
 
-      /// Factor for the nonlinear reaction in Fitzhugh Nagumo model
+      /// Factor for the nonlinear reaction in Fitzhugh Nagumo model.
       double kappa;
 
-      /// Parameter ODE
+      /// Parameter ODE.
       double epsilon;
 
-      /// Parameter ODE
+      /// Parameter ODE.
       double gamma;
 
-      /// Parameter ODE
+      /// Parameter ODE.
       double a;
 
     public:
@@ -173,7 +173,7 @@ namespace lifex::examples
     class BCNeumann : public Function<dim>
     {
     private:
-      /// Diffusion scalar parameter
+      /// Diffusion scalar parameter.
       double Sigma;
 
     public:
@@ -265,17 +265,17 @@ namespace lifex::examples
           }
         else // dim=3
           {
-            if (component == 0) // x
+            if (component == 0) // x.
               return 2 * M_PI * std::cos(2 * M_PI * p[0] + M_PI / 4) *
                      std::sin(2 * M_PI * p[1] + M_PI / 4) *
                      std::sin(2 * M_PI * p[2] + M_PI / 4) *
                      std::exp(-5 * this->get_time());
-            if (component == 1) // y
+            if (component == 1) // y.
               return 2 * M_PI * std::sin(2 * M_PI * p[0] + M_PI / 4) *
                      std::cos(2 * M_PI * p[1] + M_PI / 4) *
                      std::sin(2 * M_PI * p[2] + M_PI / 4) *
                      std::exp(-5 * this->get_time());
-            else // z
+            else // z.
               return 2 * M_PI * std::sin(2 * M_PI * p[0] + M_PI / 4) *
                      std::sin(2 * M_PI * p[1] + M_PI / 4) *
                      std::cos(2 * M_PI * p[2] + M_PI / 4) *
@@ -290,10 +290,10 @@ namespace lifex::examples
     class ExactSolution_w : public utils::FunctionDirichlet
     {
     private:
-      /// Parameter ODE
+      /// Parameter ODE.
       double epsilon;
 
-      /// Parameter ODE
+      /// Parameter ODE.
       double gamma;
 
     public:
@@ -375,7 +375,7 @@ namespace lifex::examples
           }
       }
     };
-  } // namespace monodomain_DG
+  } // namespace monodomain_fitzhugh_DG
 
   /**
    * @brief  Class to solve the monodomain equation with Fitzhugh-Nagumo ionic model for the cardiac electrophysiology
@@ -424,22 +424,31 @@ namespace lifex::examples
    * @f]
    * where @f$\Delta t = t^{n+1}-t^{n}@f$ is the time step.
    *
-   * Boundary conditions, initial conditions and source terms are provided assuming that the exact solution is:
+   * Boundary conditions, initial conditions and source terms are provided
+   * assuming that the exact solution is:
    *
    * @f[
    * \begin{alignat*}{5}
-   * d=2: \: &V_{m_\mathrm{ex}}(x,y) &&= \sin(2\pi x)\sin(2\pi y)e^{-5t}, \hspace{6mm} &&(x,y) &&\in \Omega=(1,1)^2&&, t \in [0,T], \\
-   *  &w_{\mathrm{ex}}(x,y) &&= \frac{\epsilon}{\epsilon\cdot\gamma -5}\sin(2\pi x)\sin(2\pi y)e^{-5t}, \hspace{6mm} &&(x,y) &&\in \Omega=(1,1)^2&&, t \in [0,T], \\
-   * d=3: \: &V_{m_\mathrm{ex}}(x,y,z) &&= \sin\left(2\pi x + \frac{\pi}{4}\right)\sin\left(2\pi y + \frac{\pi}{4}\right)\sin\left(2\pi z + \frac{\pi}{4}\right) e^{-5t}, \hspace{6mm} &&(x,y,z) &&\in \Omega=(1,1)^3&&, t \in [0,T], \\
-   * &w_{\mathrm{ex}}(x,y,z) &&= \frac{\epsilon}{\epsilon\cdot\gamma -5} \sin(2\pi x)\sin(2\pi y)\sin(2\pi z) e^{-5t}, \hspace{6mm} &&(x,y,z) &&\in \Omega=(1,1)^3&&, t \in [0,T].
+   * d=2: \: &V_{m_\mathrm{ex}}(x,y) &&= \sin(2\pi x)\sin(2\pi y)e^{-5t},
+   * \hspace{6mm} &&(x,y) &&\in \Omega=(1,1)^2&&, t \in [0,T], \\
+   *  &w_{\mathrm{ex}}(x,y) &&= \frac{\epsilon}{\epsilon\cdot\gamma -5}\sin(2\pi
+   * x)\sin(2\pi y)e^{-5t}, \hspace{6mm} &&(x,y) &&\in \Omega=(1,1)^2&&, t \in
+   * [0,T], \\
+   * d=3: \: &V_{m_\mathrm{ex}}(x,y,z) &&= \sin\left(2\pi x +
+   * \frac{\pi}{4}\right)\sin\left(2\pi y + \frac{\pi}{4}\right)\sin\left(2\pi z
+   * + \frac{\pi}{4}\right) e^{-5t}, \hspace{6mm} &&(x,y,z) &&\in
+   * \Omega=(1,1)^3&&, t \in [0,T], \\ &w_{\mathrm{ex}}(x,y,z) &&=
+   * \frac{\epsilon}{\epsilon\cdot\gamma -5} \sin(2\pi x)\sin(2\pi y)\sin(2\pi
+   * z) e^{-5t}, \hspace{6mm} &&(x,y,z) &&\in \Omega=(1,1)^3&&, t \in [0,T].
    * \end{alignat*}
    * @f]
-   * Finally, @f$d@f$ is specified in the lifex configuration and @f$T@f$ as well as the monodomain scalar parameters in the .prm parameter file.
+   * Finally, @f$d@f$ is specified in the lifex configuration and @f$T@f$ as
+   * well as the monodomain scalar parameters in the .prm parameter file.
    */
-   */
+  * /
 
-  template <class basis>
-  class Monodomain_fitzhugh_DG : public ModelDG_t<basis>
+    template <class basis>
+    class Monodomain_fitzhugh_DG : public ModelDG_t<basis>
   {
   public:
     /// Constructor.
@@ -453,14 +462,17 @@ namespace lifex::examples
       , gamma(0.1)
       , a(13e-3)
     {
-      this->u_ex      = std::make_shared<monodomain_fitzhugh_DG::ExactSolution>();
-      this->grad_u_ex = std::make_shared<monodomain_fitzhugh_DG::GradExactSolution>();
-      this->f_ex      = std::make_shared<monodomain_fitzhugh_DG::RightHandSide>(
+      this->u_ex = std::make_shared<monodomain_fitzhugh_DG::ExactSolution>();
+      this->grad_u_ex =
+        std::make_shared<monodomain_fitzhugh_DG::GradExactSolution>();
+      this->f_ex = std::make_shared<monodomain_fitzhugh_DG::RightHandSide>(
         ChiM, Sigma, Cm, kappa, epsilon, gamma, a);
       this->g_n = std::make_shared<monodomain_fitzhugh_DG::BCNeumann>(Sigma);
-      w_ex = std::make_shared<monodomain_fitzhugh_DG::ExactSolution_w>(epsilon, gamma);
+      w_ex = std::make_shared<monodomain_fitzhugh_DG::ExactSolution_w>(epsilon,
+                                                                       gamma);
       grad_w_ex =
-        std::make_shared<monodomain_fitzhugh_DG::GradExactSolution_w>(epsilon, gamma);
+        std::make_shared<monodomain_fitzhugh_DG::GradExactSolution_w>(epsilon,
+                                                                      gamma);
     }
 
   private:
@@ -642,8 +654,11 @@ namespace lifex::examples
     this->matrix = 0;
     this->rhs    = 0;
 
-    // The method is needed to define how the system matrix and rhs term are defined for the monodomain problem with Fithugh-Nagumo ionic model.
-    // The full matrix is composed by different sub-matrices that are called with simple capital letters. We refer here to the DG_Assemble methods for their definition.
+    // The method is needed to define how the system matrix and rhs term are
+    // defined for the monodomain problem with Fithugh-Nagumo ionic model. The
+    // full matrix is composed by different sub-matrices that are called with
+    // simple capital letters. We refer here to the DG_Assemble methods for
+    // their definition.
 
     // See DG_Assemble::local_V().
     FullMatrix<double> V(this->dofs_per_cell, this->dofs_per_cell);
@@ -684,7 +699,8 @@ namespace lifex::examples
             M *= alpha_bdf;
             M *= ChiM;
             M *= Cm;
-            C = this->assemble->local_non_linear_fitzhugh(this->solution_owned, a);
+            C = this->assemble->local_non_linear_fitzhugh(this->solution_owned,
+                                                          a);
             C *= kappa;
             C *= ChiM;
 
