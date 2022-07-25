@@ -232,14 +232,13 @@ public:
   dealii::Vector<double>
   local_w0_M_rhs(const lifex::LinAlg::MPI::Vector &u0) const;
 
-  /// Assembly of the non-linear local matrix of the monodomain problem (using
-  /// semi-implicit schemes):
+  /// Assembly of the non-linear local matrix of the Fitzhugh-Nagumo model:
   /// @f[C(i,j)=\int_{\mathcal{K}} \chi_m k
   /// (u^n-1)(u^n-a) \varphi_j \varphi_i \, dx @f]
   /// where @f$\chi_m@f$ and @f$k@f$ are parameters of the monodomain equation
   /// and @f$u^n@f$ is the solution at a generic previous step @f$ n@f$.
   dealii::FullMatrix<double>
-  local_non_linear(const lifex::LinAlg::MPI::Vector &u0, const double a) const;
+  local_non_linear_fitzhugh(const lifex::LinAlg::MPI::Vector &u0, const double a) const;
 
   /// Destructor.
   virtual ~DGAssemble() = default;
@@ -697,7 +696,7 @@ DGAssemble<basis>::local_w0_M_rhs(const lifex::LinAlg::MPI::Vector &u0) const
 
 template <class basis>
 dealii::FullMatrix<double>
-DGAssemble<basis>::local_non_linear(const lifex::LinAlg::MPI::Vector &u0,
+DGAssemble<basis>::local_non_linear_fitzhugh(const lifex::LinAlg::MPI::Vector &u0,
                                     const double                      a) const
 {
   dealii::FullMatrix<double>          C(dofs_per_cell, dofs_per_cell);

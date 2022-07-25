@@ -243,6 +243,15 @@ namespace lifex::examples
    * u_{\mathrm{BDF}\sigma}^n}{\Delta t} - \Delta u^{n+1} + u^{n+1} = f^{n+1},
    * @f]
    * where @f$\Delta t = t^{n+1}-t^{n}@f$ is the time step.
+   *
+   * Boundary conditions, initial condition and source terms are provided assuming that the exact solution is:
+   * @f[
+   * \begin{alignat*}{5}
+   * &d=2: \, u_\mathrm{ex}(x,y) &&= \sin(2\pi x)\sin(2\pi y)e^{-5t}, \hspace{6mm} &&(x,y)  &&\in \Omega=(1,1)^2&&, t \in [0,T], \\
+   * &d=3: \, u_\mathrm{ex}(x,y,z) &&= \sin\left(2\pi x + \frac{\pi}{4}\right)\sin\left(2\pi y + \frac{\pi}{4}\right)\sin\left(2\pi z + \frac{\pi}{4}\right) e^{-5t}, \hspace{6mm} &&(x,y,z) &&\in \Omega=(1,1)^3&&, t \in [0,T].
+   * \end{alignat*}
+   * @f]
+   * Finally, @f$d@f$ is specified in the lifex configuration and @f$T@f$ in the .prm parameter file.
    */
 
   template <class basis>
@@ -272,18 +281,33 @@ namespace lifex::examples
     this->matrix = 0;
     this->rhs    = 0;
 
+    // The method is needed to define how the system matrix and rhs term are defined for the heat problem with Neumann boundary conditions.
+    // The full matrix is composed by different sub-matrices that are called with simple capital letters. We refer here to the DG_Assemble methods for their definition.
+
+    // See DG_Assemble::local_V().
     FullMatrix<double> V(this->dofs_per_cell, this->dofs_per_cell);
+    // See DG_Assemble::local_M().
     FullMatrix<double> M(this->dofs_per_cell, this->dofs_per_cell);
+    // See DG_Assemble::local_S().
     FullMatrix<double> S(this->dofs_per_cell, this->dofs_per_cell);
+    // See DG_Assemble::local_I().
     FullMatrix<double> I(this->dofs_per_cell, this->dofs_per_cell);
+    // Transpose of I.
     FullMatrix<double> I_t(this->dofs_per_cell, this->dofs_per_cell);
+    // See DG_Assemble::local_IN().
     FullMatrix<double> IN(this->dofs_per_cell, this->dofs_per_cell);
+    // Transpose of IN.
     FullMatrix<double> IN_t(this->dofs_per_cell, this->dofs_per_cell);
+    // See DG_Assemble::local_SN().
     FullMatrix<double> SN(this->dofs_per_cell, this->dofs_per_cell);
 
+    // See DG_Assemble::local_rhs().
     Vector<double>                       cell_rhs(this->dofs_per_cell);
+    // See DG_Assemble::local_rhs_edge_neumann().
     Vector<double>                       cell_rhs_edge(this->dofs_per_cell);
+    // See DG_Assemble::local_u0_M_rhs().
     Vector<double>                       u0_rhs(this->dofs_per_cell);
+
     std::vector<types::global_dof_index> dof_indices(this->dofs_per_cell);
 
     const double &alpha_bdf = this->bdf_handler.get_alpha();

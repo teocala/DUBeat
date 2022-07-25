@@ -149,6 +149,15 @@ namespace lifex::examples
    * In particular, it can be solved using the FEM basis
    * (basis=dealii::FE_SimplexDGP<lifex::dim>) or the Dubiner basis
    * (basis=DUBValues<lifex::dim>).
+   *
+   * Boundary conditions and source terms are provided assuming that the exact solution is:
+   * @f[
+   * \begin{aligned}
+   * &d=2: \, u_\mathrm{ex}(x,y) = e^{x+y}, \hspace{6mm} (x,y) \in \Omega=(1,1)^2, \\
+   * &d=3: \, u_\mathrm{ex}(x,y,z) = e^{x+y+z}, \hspace{6mm} (x,y,z) \in \Omega=(1,1)^3.
+   * \end{aligned}
+   * @f]
+   * Finally, @f$d@f$ is specified in the lifex configuration.
    */
 
   template <class basis>
@@ -177,18 +186,33 @@ namespace lifex::examples
     this->matrix = 0;
     this->rhs    = 0;
 
+    // The method is needed to define how the system matrix and rhs term are defined for the Laplace problem with Dirichlet boundary conditions.
+    // The full matrix is composed by different sub-matrices that are called with simple capital letters. We refer here to the DG_Assemble methods for their definition.
+
+    // See DG_Assemble::local_V().
     FullMatrix<double> V(this->dofs_per_cell, this->dofs_per_cell);
+    // See DG_Assemble::local_S().
     FullMatrix<double> S(this->dofs_per_cell, this->dofs_per_cell);
+    // See DG_Assemble::local_I().
     FullMatrix<double> I(this->dofs_per_cell, this->dofs_per_cell);
+    // Transpose of I.
     FullMatrix<double> I_t(this->dofs_per_cell, this->dofs_per_cell);
+    // See DG_Assemble::local_IB().
     FullMatrix<double> IB(this->dofs_per_cell, this->dofs_per_cell);
+    // Transpose of IB.
     FullMatrix<double> IB_t(this->dofs_per_cell, this->dofs_per_cell);
+    // See DG_Assemble::local_IN().
     FullMatrix<double> IN(this->dofs_per_cell, this->dofs_per_cell);
+    // Transpose of IN.
     FullMatrix<double> IN_t(this->dofs_per_cell, this->dofs_per_cell);
+    // See DG_Assemble::local_SN().
     FullMatrix<double> SN(this->dofs_per_cell, this->dofs_per_cell);
 
+    // See DG_Assemble::local_rhs().
     Vector<double>                       cell_rhs(this->dofs_per_cell);
+    // See DG_Assemble::local_rhs_edge_dirichlet().
     Vector<double>                       cell_rhs_edge(this->dofs_per_cell);
+
     std::vector<types::global_dof_index> dof_indices(this->dofs_per_cell);
 
     for (const auto &cell : this->dof_handler.active_cell_iterators())

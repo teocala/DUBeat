@@ -24,8 +24,8 @@
  * @author Matteo Calafà <matteo.calafa@mail.polimi.it>.
  */
 
-#ifndef MONODOMAIN_DG_HPP_
-#define MONODOMAIN_DG_HPP_
+#ifndef MONODOMAIN_FITZHUGH_DG_HPP_
+#define MONODOMAIN_FITZHUGH_DG_HPP_
 
 #include "lifex/core/core_model.hpp"
 #include "lifex/core/init.hpp"
@@ -54,7 +54,7 @@
 
 namespace lifex::examples
 {
-  namespace monodomain_DG
+  namespace monodomain_fitzhugh_DG
   {
     /**
      * @brief Exact solution of the trans-membrane potential.
@@ -378,8 +378,8 @@ namespace lifex::examples
   } // namespace monodomain_DG
 
   /**
-   * @brief  Class to solve the monodomain equation for the electrophysiology
-   * problem using the Discontinuous Galerkin method.
+   * @brief  Class to solve the monodomain equation with Fitzhugh-Nagumo ionic model for the cardiac electrophysiology
+   * using the discontinuous Galerkin method.
    *
    * @f[
    * \begin{aligned}
@@ -423,16 +423,28 @@ namespace lifex::examples
    * \quad & \text{in } \Omega \times  \{ n = 0 \} \end{aligned}
    * @f]
    * where @f$\Delta t = t^{n+1}-t^{n}@f$ is the time step.
-   * Note that now the problem is linear.
+   *
+   * Boundary conditions, initial conditions and source terms are provided assuming that the exact solution is:
+   *
+   * @f[
+   * \begin{alignat*}{5}
+   * d=2: \: &V_{m_\mathrm{ex}}(x,y) &&= \sin(2\pi x)\sin(2\pi y)e^{-5t}, \hspace{6mm} &&(x,y) &&\in \Omega=(1,1)^2&&, t \in [0,T], \\
+   *  &w_{\mathrm{ex}}(x,y) &&= \frac{\epsilon}{\epsilon\cdot\gamma -5}\sin(2\pi x)\sin(2\pi y)e^{-5t}, \hspace{6mm} &&(x,y) &&\in \Omega=(1,1)^2&&, t \in [0,T], \\
+   * d=3: \: &V_{m_\mathrm{ex}}(x,y,z) &&= \sin\left(2\pi x + \frac{\pi}{4}\right)\sin\left(2\pi y + \frac{\pi}{4}\right)\sin\left(2\pi z + \frac{\pi}{4}\right) e^{-5t}, \hspace{6mm} &&(x,y,z) &&\in \Omega=(1,1)^3&&, t \in [0,T], \\
+   * &w_{\mathrm{ex}}(x,y,z) &&= \frac{\epsilon}{\epsilon\cdot\gamma -5} \sin(2\pi x)\sin(2\pi y)\sin(2\pi z) e^{-5t}, \hspace{6mm} &&(x,y,z) &&\in \Omega=(1,1)^3&&, t \in [0,T].
+   * \end{alignat*}
+   * @f]
+   * Finally, @f$d@f$ is specified in the lifex configuration and @f$T@f$ as well as the monodomain scalar parameters in the .prm parameter file.
+   */
    */
 
   template <class basis>
-  class Monodomain_DG : public ModelDG_t<basis>
+  class Monodomain_fitzhugh_DG : public ModelDG_t<basis>
   {
   public:
     /// Constructor.
-    Monodomain_DG<basis>()
-      : ModelDG_t<basis>("Monodomain")
+    Monodomain_fitzhugh_DG<basis>()
+      : ModelDG_t<basis>("Monodomain Fitzhugh")
       , ChiM(1e5)
       , Sigma(0.12)
       , Cm(1e-2)
@@ -441,14 +453,14 @@ namespace lifex::examples
       , gamma(0.1)
       , a(13e-3)
     {
-      this->u_ex      = std::make_shared<monodomain_DG::ExactSolution>();
-      this->grad_u_ex = std::make_shared<monodomain_DG::GradExactSolution>();
-      this->f_ex      = std::make_shared<monodomain_DG::RightHandSide>(
+      this->u_ex      = std::make_shared<monodomain_fitzhugh_DG::ExactSolution>();
+      this->grad_u_ex = std::make_shared<monodomain_fitzhugh_DG::GradExactSolution>();
+      this->f_ex      = std::make_shared<monodomain_fitzhugh_DG::RightHandSide>(
         ChiM, Sigma, Cm, kappa, epsilon, gamma, a);
-      this->g_n = std::make_shared<monodomain_DG::BCNeumann>(Sigma);
-      w_ex = std::make_shared<monodomain_DG::ExactSolution_w>(epsilon, gamma);
+      this->g_n = std::make_shared<monodomain_fitzhugh_DG::BCNeumann>(Sigma);
+      w_ex = std::make_shared<monodomain_fitzhugh_DG::ExactSolution_w>(epsilon, gamma);
       grad_w_ex =
-        std::make_shared<monodomain_DG::GradExactSolution_w>(epsilon, gamma);
+        std::make_shared<monodomain_fitzhugh_DG::GradExactSolution_w>(epsilon, gamma);
     }
 
   private:
@@ -504,7 +516,7 @@ namespace lifex::examples
 
   template <class basis>
   void
-  Monodomain_DG<basis>::run()
+  Monodomain_fitzhugh_DG<basis>::run()
   {
     this->create_mesh();
     this->setup_system();
@@ -568,7 +580,7 @@ namespace lifex::examples
 
   template <class basis>
   void
-  Monodomain_DG<basis>::update_time()
+  Monodomain_fitzhugh_DG<basis>::update_time()
   {
     this->u_ex->set_time(this->time);
     this->f_ex->set_time(this->time);
@@ -590,7 +602,7 @@ namespace lifex::examples
 
   template <class basis>
   void
-  Monodomain_DG<basis>::time_initializaton()
+  Monodomain_fitzhugh_DG<basis>::time_initializaton()
   {
     this->u_ex->set_time(this->prm_time_init);
     this->discretize_analytical_solution(this->u_ex, this->solution_ex_owned);
@@ -615,7 +627,7 @@ namespace lifex::examples
 
   template <class basis>
   void
-  Monodomain_DG<basis>::assemble_system()
+  Monodomain_fitzhugh_DG<basis>::assemble_system()
   {
     const double &alpha_bdf = this->bdf_handler.get_alpha();
 
@@ -630,14 +642,26 @@ namespace lifex::examples
     this->matrix = 0;
     this->rhs    = 0;
 
+    // The method is needed to define how the system matrix and rhs term are defined for the monodomain problem with Fithugh-Nagumo ionic model.
+    // The full matrix is composed by different sub-matrices that are called with simple capital letters. We refer here to the DG_Assemble methods for their definition.
+
+    // See DG_Assemble::local_V().
     FullMatrix<double> V(this->dofs_per_cell, this->dofs_per_cell);
+    // See DG_Assemble::local_M().
     FullMatrix<double> M(this->dofs_per_cell, this->dofs_per_cell);
+    // See DG_Assemble::local_S().
     FullMatrix<double> S(this->dofs_per_cell, this->dofs_per_cell);
+    // See DG_Assemble::local_I().
     FullMatrix<double> I(this->dofs_per_cell, this->dofs_per_cell);
+    // Transpose of I.
     FullMatrix<double> I_t(this->dofs_per_cell, this->dofs_per_cell);
+    // See DG_Assemble::local_IN().
     FullMatrix<double> IN(this->dofs_per_cell, this->dofs_per_cell);
+    // Transpose of IN.
     FullMatrix<double> IN_t(this->dofs_per_cell, this->dofs_per_cell);
+    // See DG_Assemble::local_SN().
     FullMatrix<double> SN(this->dofs_per_cell, this->dofs_per_cell);
+    // See DG_Assemble::local_non_linear_fitzhugh().
     FullMatrix<double> C(this->dofs_per_cell, this->dofs_per_cell);
 
     Vector<double>                       cell_rhs(this->dofs_per_cell);
@@ -660,7 +684,7 @@ namespace lifex::examples
             M *= alpha_bdf;
             M *= ChiM;
             M *= Cm;
-            C = this->assemble->local_non_linear(this->solution_owned, a);
+            C = this->assemble->local_non_linear_fitzhugh(this->solution_owned, a);
             C *= kappa;
             C *= ChiM;
 
@@ -729,4 +753,4 @@ namespace lifex::examples
   }
 } // namespace lifex::examples
 
-#endif /* MONODOMAIN_DG_HPP_*/
+#endif /* MONODOMAIN_FITZHUGH_DG_HPP_*/
