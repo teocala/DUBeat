@@ -59,7 +59,7 @@ clean:
 
 distclean:
 	$(MAKE) clean
-	$(RM) -r ./documentation
+	$(RM) -r ./documentation/html ./documentation/latex
 	cd $(DIR); $(RM) -f *.h5 *.xdmf *.prm *.data
 
 doc:
