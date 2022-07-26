@@ -15,7 +15,7 @@ They both work in either 2 or 3 dimensions depending on the lifex configuration 
 
 
 ### Dependencies
-`DUBeat 1.0.0` relies almost exclusively on the [lifex][] `1.4.0` installation and its dependencies. Check its [download and install][] page to verify you satisfy all its requirements.
+`DUBeat 1.0.0` relies almost exclusively on the [lifex][] `1.5.0` installation and its dependencies. Check its [download and install][] page to verify you satisfy all its requirements.
 In particular, the library has been implemented using:
 - [CMake][] = `3.16.3`
 - [Doxygen][] = `1.8.17`
@@ -35,7 +35,7 @@ and other libraries included in the lifex `mk` module, `2022.0` version. This mo
 ### Download and install
 1. To download the library, move to the directory where you desire to install `DUBeat` and use the following bash command.
   ```bash
-  git clone git@github.com:teocala/PACS_Project.git
+  git clone git@github.com:teocala/DUBeat.git
   ```
   Notice that the previous operation requires the SSH key authentication, see the Github [dedicated page][] for more information.
 

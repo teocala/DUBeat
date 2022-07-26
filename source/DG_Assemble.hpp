@@ -27,18 +27,6 @@
 #ifndef DGAssemble_HPP_
 #define DGAssemble_HPP_
 
-#include "lifex/core/core_model.hpp"
-#include "lifex/core/init.hpp"
-
-#include "lifex/utils/geometry/mesh_handler.hpp"
-
-#include "lifex/utils/io/data_writer.hpp"
-
-#include "lifex/utils/numerics/bc_handler.hpp"
-#include "lifex/utils/numerics/linear_solver_handler.hpp"
-#include "lifex/utils/numerics/preconditioner_handler.hpp"
-#include "lifex/utils/numerics/tools.hpp"
-
 #include <deal.II/base/parameter_handler.h>
 
 #include <deal.II/fe/mapping_q1_eulerian.h>
@@ -52,6 +40,14 @@
 #include "DG_Face_handler.hpp"
 #include "DG_Volume_handler.hpp"
 #include "DUB_FEM_handler.hpp"
+#include "source/core_model.hpp"
+#include "source/geometry/mesh_handler.hpp"
+#include "source/init.hpp"
+#include "source/io/data_writer.hpp"
+#include "source/numerics/bc_handler.hpp"
+#include "source/numerics/linear_solver_handler.hpp"
+#include "source/numerics/preconditioner_handler.hpp"
+#include "source/numerics/tools.hpp"
 
 /**
  * @brief Class for the assembly of the main local matrices for discontinuous

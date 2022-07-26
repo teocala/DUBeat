@@ -24,11 +24,10 @@
  * @author Matteo Calafà <matteo.calafa@mail.polimi.it>.
  */
 
-#include "lifex/core/init.hpp"
-
 #include "../models/heat_dg.hpp"
 #include "../models/laplace_dg.hpp"
 #include "../models/monodomain_fitzhugh_dg.hpp"
+#include "source/init.hpp"
 
 /// This file is an example of main execution script. The model below can be
 /// defined using the example models and adopting either DGFEM or Dubiner basis.

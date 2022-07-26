@@ -23,9 +23,9 @@
 # The make file used in the DUBeat library.
 #
 
-LIFEX_PATH?=/home/matteo/lifex
+LIFEX_PATH?=/home/matteo/lifex-dev
 
-lifexInc=$(LIFEX_PATH)
+lifexInc=$(LIFEX_PATH)/core
 lifexLib=$(LIFEX_PATH)/build/lib
 mkDealiiInc?=/u/sw/toolchains/gcc-glibc/11.2.0/pkgs/dealii/9.3.1/include
 mkDealiiLib?=/u/sw/toolchains/gcc-glibc/11.2.0/pkgs/dealii/9.3.1/lib

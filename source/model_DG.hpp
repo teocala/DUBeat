@@ -27,18 +27,6 @@
 #ifndef ModelDG_HPP_
 #define ModelDG_HPP_
 
-#include "lifex/core/core_model.hpp"
-#include "lifex/core/init.hpp"
-
-#include "lifex/utils/geometry/mesh_handler.hpp"
-
-#include "lifex/utils/io/data_writer.hpp"
-
-#include "lifex/utils/numerics/bc_handler.hpp"
-#include "lifex/utils/numerics/linear_solver_handler.hpp"
-#include "lifex/utils/numerics/preconditioner_handler.hpp"
-#include "lifex/utils/numerics/tools.hpp"
-
 #include <deal.II/base/exceptions.h>
 #include <deal.II/base/parameter_handler.h>
 
@@ -56,6 +44,14 @@
 #include "DG_error_parser.hpp"
 #include "DUB_FEM_handler.hpp"
 #include "compute_errors_DG.hpp"
+#include "source/core_model.hpp"
+#include "source/geometry/mesh_handler.hpp"
+#include "source/init.hpp"
+#include "source/io/data_writer.hpp"
+#include "source/numerics/bc_handler.hpp"
+#include "source/numerics/linear_solver_handler.hpp"
+#include "source/numerics/preconditioner_handler.hpp"
+#include "source/numerics/tools.hpp"
 
 /**
  * @brief Class representing the resolution of problems using discontinuous
@@ -372,8 +368,7 @@ ModelDG<basis>::setup_system()
                                                     mpi_comm,
                                                     relevant_dofs);
 
-  lifex::utils::initialize_matrix(
-    matrix, owned_dofs, dsp, preconditioner.uses_bddc(), active_dofs);
+  lifex::utils::initialize_matrix(matrix, owned_dofs, dsp);
 
   rhs.reinit(owned_dofs, mpi_comm);
 }

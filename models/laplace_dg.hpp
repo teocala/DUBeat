@@ -27,18 +27,6 @@
 #ifndef LAPLACE_DG_HPP_
 #define LAPLACE_DG_HPP_
 
-#include "lifex/core/core_model.hpp"
-#include "lifex/core/init.hpp"
-
-#include "lifex/utils/geometry/mesh_handler.hpp"
-
-#include "lifex/utils/io/data_writer.hpp"
-
-#include "lifex/utils/numerics/bc_handler.hpp"
-#include "lifex/utils/numerics/linear_solver_handler.hpp"
-#include "lifex/utils/numerics/preconditioner_handler.hpp"
-#include "lifex/utils/numerics/tools.hpp"
-
 #include <memory>
 #include <vector>
 
@@ -48,6 +36,14 @@
 #include "../source/DUBValues.hpp"
 #include "../source/DUB_FEM_handler.hpp"
 #include "../source/model_DG.hpp"
+#include "source/core_model.hpp"
+#include "source/geometry/mesh_handler.hpp"
+#include "source/init.hpp"
+#include "source/io/data_writer.hpp"
+#include "source/numerics/bc_handler.hpp"
+#include "source/numerics/linear_solver_handler.hpp"
+#include "source/numerics/preconditioner_handler.hpp"
+#include "source/numerics/tools.hpp"
 
 namespace lifex::examples
 {
