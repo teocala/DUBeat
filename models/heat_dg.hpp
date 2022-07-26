@@ -313,7 +313,7 @@ namespace lifex::examples
     Vector<double> u0_rhs(this->dofs_per_cell);
 
     std::vector<types::global_dof_index> dof_indices(this->dofs_per_cell);
-
+    dealii::IndexSet owned_dofs = this->dof_handler.locally_owned_dofs();
     const double &alpha_bdf = this->bdf_handler.get_alpha();
 
     for (const auto &cell : this->dof_handler.active_cell_iterators())
@@ -321,7 +321,7 @@ namespace lifex::examples
         if (cell->is_locally_owned())
           {
             this->assemble->reinit(cell);
-            cell->get_dof_indices(dof_indices);
+            dof_indices = this->dof_handler.get_dof_indices(cell);
 
             V = this->assemble->local_V();
             M = this->assemble->local_M();
@@ -329,7 +329,7 @@ namespace lifex::examples
             M *= alpha_bdf;
 
             cell_rhs = this->assemble->local_rhs(this->f_ex);
-            u0_rhs   = this->assemble->local_u0_M_rhs(this->solution_bdf);
+            u0_rhs   = this->assemble->local_u0_M_rhs(this->solution_bdf, dof_indices);
             u0_rhs /= this->prm_time_step;
 
             this->matrix.add(dof_indices, V);
@@ -353,7 +353,7 @@ namespace lifex::examples
                     this->matrix.add(dof_indices, I_t);
 
                     const auto neighcell = cell->neighbor(edge);
-                    neighcell->get_dof_indices(dof_indices_neigh);
+                    dof_indices_neigh = this->dof_handler.get_dof_indices(neighcell);
 
                     std::tie(IN, IN_t) =
                       this->assemble->local_IN(this->prm_penalty_coeff);

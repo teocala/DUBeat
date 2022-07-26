@@ -220,7 +220,7 @@ namespace lifex::examples
         if (cell->is_locally_owned())
           {
             this->assemble->reinit(cell);
-            cell->get_dof_indices(dof_indices);
+            dof_indices = this->dof_handler.get_dof_indices(cell);
 
             V        = this->assemble->local_V();
             cell_rhs = this->assemble->local_rhs(this->f_ex);
@@ -245,7 +245,7 @@ namespace lifex::examples
                     this->matrix.add(dof_indices, I_t);
 
                     const auto neighcell = cell->neighbor(edge);
-                    neighcell->get_dof_indices(dof_indices_neigh);
+                    dof_indices_neigh = this->dof_handler.get_dof_indices(neighcell);
 
                     std::tie(IN, IN_t) =
                       this->assemble->local_IN(this->prm_penalty_coeff);

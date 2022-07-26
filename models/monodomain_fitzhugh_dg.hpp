@@ -563,13 +563,6 @@ namespace lifex::examples
                                        "w");
       }
 
-    this->solution   = this->solution_owned;
-    this->solution_w = this->solution_owned_w;
-    this->conversion_to_fem(this->solution);
-    this->conversion_to_fem(this->solution_w);
-    dealii::VectorTools::interpolate(this->dof_handler,
-                                     *(this->u_ex),
-                                     this->solution_ex);
 
     this->compute_errors(this->solution_owned,
                          this->solution_ex_owned,
@@ -582,6 +575,15 @@ namespace lifex::examples
                          this->grad_w_ex,
                          "w");
 
+    // Generation of the graphical output.
+    if (this->prm_fe_degree < 3) // due to the current deal.II availabilities.
+    {
+      this->solution_ex = this->solution_ex_owned;
+      this->conversion_to_fem(this->solution_ex);
+      this->solution = this->solution_owned;
+      this->conversion_to_fem(this->solution);
+      this->output_results();
+    }
     this->output_results();
   }
 
@@ -680,12 +682,14 @@ namespace lifex::examples
     Vector<double>                       w0_rhs(this->dofs_per_cell);
     std::vector<types::global_dof_index> dof_indices(this->dofs_per_cell);
 
+    dealii::IndexSet owned_dofs = this->dof_handler.locally_owned_dofs();;
+
     for (const auto &cell : this->dof_handler.active_cell_iterators())
       {
         if (cell->is_locally_owned())
           {
             this->assemble->reinit(cell);
-            cell->get_dof_indices(dof_indices);
+            dof_indices = this->dof_handler.get_dof_indices(cell);
 
             V = this->assemble->local_V();
             V *= Sigma;
@@ -695,18 +699,18 @@ namespace lifex::examples
             M *= ChiM;
             M *= Cm;
             C = this->assemble->local_non_linear_fitzhugh(this->solution_owned,
-                                                          a);
+                                                          a, dof_indices);
             C *= kappa;
             C *= ChiM;
 
             cell_rhs = this->assemble->local_rhs(this->f_ex);
 
-            u0_rhs = this->assemble->local_u0_M_rhs(this->solution_bdf);
+            u0_rhs = this->assemble->local_u0_M_rhs(this->solution_bdf, dof_indices);
             u0_rhs /= this->prm_time_step;
             u0_rhs *= ChiM;
             u0_rhs *= Cm;
 
-            w0_rhs = this->assemble->local_w0_M_rhs(solution_owned_w);
+            w0_rhs = this->assemble->local_w0_M_rhs(solution_owned_w, dof_indices);
             w0_rhs *= ChiM;
             w0_rhs *= (-1);
 
@@ -736,7 +740,7 @@ namespace lifex::examples
                     this->matrix.add(dof_indices, I_t);
 
                     const auto neighcell = cell->neighbor(edge);
-                    neighcell->get_dof_indices(dof_indices_neigh);
+                    dof_indices_neigh = this->dof_handler.get_dof_indices(neighcell);
 
                     std::tie(IN, IN_t) =
                       this->assemble->local_IN(this->prm_penalty_coeff);

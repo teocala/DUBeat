@@ -40,6 +40,7 @@
 #include <vector>
 
 #include "DUBValues.hpp"
+#include "DoFHandler_DG.hpp"
 
 /**
  * @brief Class to compute the errors between the numerical solution
@@ -64,7 +65,7 @@ public:
   Compute_Errors_DG<basis>(const unsigned int degree,
                            const double       stability_coeff,
                            const unsigned int local_dofs,
-                           const dealii::DoFHandler<lifex::dim> &dof_hand)
+                           const DoFHandler_DG<basis> &dof_hand)
     : dof_handler(dof_hand)
     , n_quad_points(static_cast<int>(std::pow(degree + 2, lifex::dim)))
     , n_quad_points_face(static_cast<int>(std::pow(degree + 2, lifex::dim - 1)))
@@ -75,7 +76,7 @@ public:
     , solution_name((char *)"u")
     , errors({0, 0, 0, 0})
     , dub_fem_values(
-        std::make_shared<DUBFEMHandler<lifex::dim>>(degree, dof_handler))
+        std::make_shared<DUBFEMHandler<basis>>(degree, dof_handler))
   {}
 
   /// Default copy constructor.
@@ -128,7 +129,7 @@ private:
   compute_error_DG();
 
   /// Dof handler object of the problem.
-  const dealii::DoFHandler<lifex::dim> &dof_handler;
+  const DoFHandler_DG<basis> &dof_handler;
 
   /// Number of quadrature points in the volume element.
   /// By default: @f$(degree+2)^{dim}@f$.
@@ -171,7 +172,7 @@ private:
   std::array<double, 4> errors;
 
   /// Member to compute conversion to FEM basis, needed for L^inf error.
-  std::shared_ptr<DUBFEMHandler<lifex::dim>> dub_fem_values;
+  std::shared_ptr<DUBFEMHandler<basis>> dub_fem_values;
 };
 
 template <class basis>
@@ -310,7 +311,7 @@ Compute_Errors_DG<basis>::compute_error_L2()
             vol_handler.get_jacobian_inverse();
           const double det = 1 / determinant(BJinv);
 
-          cell->get_dof_indices(dof_indices);
+          dof_indices = dof_handler.get_dof_indices(cell);
 
           for (unsigned int q = 0; q < n_quad_points; ++q)
             {
@@ -356,7 +357,7 @@ Compute_Errors_DG<basis>::compute_error_H1()
             vol_handler.get_jacobian_inverse();
           const double det = 1 / determinant(BJinv);
 
-          cell->get_dof_indices(dof_indices);
+          dof_indices = dof_handler.get_dof_indices(cell);
 
           for (unsigned int q = 0; q < n_quad_points; ++q)
             {
@@ -407,7 +408,7 @@ Compute_Errors_DG<basis>::compute_error_DG()
 
       if (cell->is_locally_owned())
         {
-          cell->get_dof_indices(dof_indices);
+          dof_indices = dof_handler.get_dof_indices(cell);
 
           for (const auto &edge : cell->face_indices())
             {
@@ -447,7 +448,7 @@ Compute_Errors_DG<basis>::compute_error_DG()
                               const auto neighcell = cell->neighbor(edge);
                               const auto neighedge =
                                 cell->neighbor_face_no(edge);
-                              neighcell->get_dof_indices(dof_indices_neigh);
+                              dof_indices_neigh = dof_handler.get_dof_indices(neighcell);
                               face_handler_neigh.reinit(neighcell, neighedge);
 
                               const unsigned int nq =

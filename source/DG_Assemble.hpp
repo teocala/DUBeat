@@ -111,8 +111,7 @@ public:
         static_cast<int>(std::pow(n_quad_points_1D, lifex::dim - 1)))
     , poly_degree(degree)
   {
-    const dealii::FE_SimplexDGP<lifex::dim> fe_dg(degree);
-    dofs_per_cell = fe_dg.dofs_per_cell;
+    dofs_per_cell = this->get_dofs_per_cell();
   }
 
   /// Default copy constructor.
@@ -134,6 +133,10 @@ public:
   void
   reinit(const typename dealii::DoFHandler<lifex::dim>::active_cell_iterator
            &new_cell);
+
+  /// Return the number of degrees of freedom per element.
+  unsigned int
+  get_dofs_per_cell() const;
 
   /// Assembly of stiffness matrix: @f[V(i,j)=\int_{\mathcal{K}} \nabla
   /// \varphi_j \cdot \nabla \varphi_i \,dx @f]
@@ -217,7 +220,7 @@ public:
   /// @f[F(i)= \int_{\mathcal{K}} u^n \varphi_i \, dx @f]
   /// where @f$u^n@f$ is the solution at a generic previous step @f$ n@f$.
   dealii::Vector<double>
-  local_u0_M_rhs(const lifex::LinAlg::MPI::Vector &u0) const;
+  local_u0_M_rhs(const lifex::LinAlg::MPI::Vector &u0, const std::vector<dealii::types::global_dof_index> & dof_indices) const;
 
   /// Assembly of the right hand side term associated to the previous time-step
   /// gating variable solution (for monodomain problem):
@@ -226,7 +229,7 @@ public:
   /// step
   /// @f$ n@f$.
   dealii::Vector<double>
-  local_w0_M_rhs(const lifex::LinAlg::MPI::Vector &u0) const;
+  local_w0_M_rhs(const lifex::LinAlg::MPI::Vector &u0, const std::vector<dealii::types::global_dof_index> & dof_indices) const;
 
   /// Assembly of the non-linear local matrix of the Fitzhugh-Nagumo model:
   /// @f[C(i,j)=\int_{\mathcal{K}} \chi_m k
@@ -235,7 +238,8 @@ public:
   /// and @f$u^n@f$ is the solution at a generic previous step @f$ n@f$.
   dealii::FullMatrix<double>
   local_non_linear_fitzhugh(const lifex::LinAlg::MPI::Vector &u0,
-                            const double                      a) const;
+                            const double                      a,
+                          const std::vector<dealii::types::global_dof_index> & dof_indices) const;
 
   /// Destructor.
   virtual ~DGAssemble() = default;
@@ -266,6 +270,26 @@ DGAssemble<basis>::reinit(
 {
   cell = new_cell;
   vol_handler.reinit(new_cell);
+}
+
+template <class basis>
+unsigned int
+DGAssemble<basis>::get_dofs_per_cell() const
+{
+  // The analytical formula is:
+  // n_dof_per_cell = (p+1)*(p+2)*...(p+d) / d!,
+  // where p is the space order and d the space dimension..
+
+  unsigned int denominator = 1;
+  unsigned int nominator = 1;
+
+  for (unsigned int i = 1; i <= lifex::dim; i++)
+  {
+    denominator *= i;
+    nominator *= poly_degree+i;
+  }
+
+  return (int)(nominator/denominator);
 }
 
 template <class basis>
@@ -625,11 +649,8 @@ DGAssemble<basis>::local_IN(const double theta) const
 
 template <class basis>
 dealii::Vector<double>
-DGAssemble<basis>::local_u0_M_rhs(const lifex::LinAlg::MPI::Vector &u0) const
+DGAssemble<basis>::local_u0_M_rhs(const lifex::LinAlg::MPI::Vector &u0, const std::vector<dealii::types::global_dof_index> & dof_indices) const
 {
-  std::vector<dealii::types::global_dof_index> dof_indices(dofs_per_cell);
-  cell->get_dof_indices(dof_indices);
-
   std::vector<double> u_bdf_loc(n_quad_points);
   std::fill(u_bdf_loc.begin(), u_bdf_loc.end(), 0);
 
@@ -664,11 +685,8 @@ DGAssemble<basis>::local_u0_M_rhs(const lifex::LinAlg::MPI::Vector &u0) const
 
 template <class basis>
 dealii::Vector<double>
-DGAssemble<basis>::local_w0_M_rhs(const lifex::LinAlg::MPI::Vector &u0) const
+DGAssemble<basis>::local_w0_M_rhs(const lifex::LinAlg::MPI::Vector &u0, const std::vector<dealii::types::global_dof_index> & dof_indices) const
 {
-  std::vector<dealii::types::global_dof_index> dof_indices(dofs_per_cell);
-  cell->get_dof_indices(dof_indices);
-
   dealii::Vector<double>              cell_rhs(dofs_per_cell);
   const dealii::Tensor<2, lifex::dim> BJinv =
     vol_handler.get_jacobian_inverse();
@@ -695,15 +713,13 @@ template <class basis>
 dealii::FullMatrix<double>
 DGAssemble<basis>::local_non_linear_fitzhugh(
   const lifex::LinAlg::MPI::Vector &u0,
-  const double                      a) const
+  const double                      a, const std::vector<dealii::types::global_dof_index> & dof_indices) const
 {
   dealii::FullMatrix<double>          C(dofs_per_cell, dofs_per_cell);
   const dealii::Tensor<2, lifex::dim> BJinv =
     vol_handler.get_jacobian_inverse();
   const double det = 1 / determinant(BJinv);
 
-  std::vector<dealii::types::global_dof_index> dof_indices(dofs_per_cell);
-  cell->get_dof_indices(dof_indices);
 
   double non_lu;
   double non_lin;

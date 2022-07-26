@@ -329,14 +329,16 @@ ModelDG_t<basis>::run()
                        this->u_ex,
                        this->grad_u_ex);
 
-  // Definition of the solutions to plot.
-  this->solution = this->solution_owned;
-  this->conversion_to_fem(this->solution);
-  dealii::VectorTools::interpolate(this->dof_handler,
-                                   *(this->u_ex),
-                                   this->solution_ex);
+
   // Generation of the graphical output.
-  this->output_results();
+  if (this->prm_fe_degree < 3) // due to the current deal.II availabilities.
+  {
+    this->solution_ex = this->solution_ex_owned;
+    this->conversion_to_fem(this->solution_ex);
+    this->solution = this->solution_owned;
+    this->conversion_to_fem(this->solution);
+    this->output_results();
+  }
 }
 
 #endif /* ModelDG_t_HPP_*/

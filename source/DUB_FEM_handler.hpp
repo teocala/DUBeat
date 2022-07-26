@@ -42,17 +42,18 @@
 #include <vector>
 
 #include "DUBValues.hpp"
+#include "DoFHandler_DG.hpp"
 
 /**
  * @brief Class to apply the conversions of a discretized solution between
  * Dubiner basis and FEM basis representations.
  */
-template <unsigned int dim>
-class DUBFEMHandler : public DUBValues<dim>
+template <class basis>
+class DUBFEMHandler : public DUBValues<lifex::dim>
 {
 private:
   /// Dof handler object of the problem.
-  const dealii::DoFHandler<dim> &dof_handler;
+  const DoFHandler_DG<basis> &dof_handler;
 
   /// Number of quadrature points in the volume element.
   /// By default: @f$(degree+2)^{dim}@f$.
@@ -60,21 +61,21 @@ private:
 
 public:
   /// Constructor.
-  DUBFEMHandler<dim>(const unsigned int             degree,
-                     const dealii::DoFHandler<dim> &dof_hand)
-    : DUBValues<dim>(degree)
+  DUBFEMHandler<basis>(const unsigned int             degree,
+                     const DoFHandler_DG<basis> &dof_hand)
+    : DUBValues<lifex::dim>(degree)
     , dof_handler(dof_hand)
-    , n_quad_points(static_cast<int>(std::pow(degree + 2, dim)))
+    , n_quad_points(static_cast<int>(std::pow(degree + 2, lifex::dim)))
   {}
 
   /// Default copy constructor.
-  DUBFEMHandler<dim>(DUBFEMHandler<dim> &DUBFEMHandler) = default;
+  DUBFEMHandler<basis>(DUBFEMHandler<basis> &DUBFEMHandler) = default;
 
   /// Default const copy constructor.
-  DUBFEMHandler<dim>(const DUBFEMHandler<dim> &DUBFEMHandler) = default;
+  DUBFEMHandler<basis>(const DUBFEMHandler<basis> &DUBFEMHandler) = default;
 
   /// Default move constructor.
-  DUBFEMHandler<dim>(DUBFEMHandler<dim> &&DUBFEMHandler) = default;
+  DUBFEMHandler<basis>(DUBFEMHandler<basis> &&DUBFEMHandler) = default;
 
   /// Conversion of a discretized solution from Dubiner coefficients to FEM
   /// coefficients.
@@ -93,9 +94,9 @@ public:
     const std::shared_ptr<dealii::Function<lifex::dim>> &u_analytical) const;
 };
 
-template <unsigned int dim>
+template <class basis>
 lifex::LinAlg::MPI::Vector
-DUBFEMHandler<dim>::dubiner_to_fem(
+DUBFEMHandler<basis>::dubiner_to_fem(
   const lifex::LinAlg::MPI::Vector &dub_solution) const
 {
   lifex::LinAlg::MPI::Vector fem_solution;
@@ -103,13 +104,13 @@ DUBFEMHandler<dim>::dubiner_to_fem(
 
   std::vector<unsigned int> dof_indices(this->n_functions);
 
-  const dealii::FE_SimplexDGP<dim>      fe_dg(this->poly_degree);
-  const std::vector<dealii::Point<dim>> support_points =
+  const dealii::FE_SimplexDGP<lifex::dim>      fe_dg(this->poly_degree);
+  const std::vector<dealii::Point<lifex::dim>> support_points =
     fe_dg.get_unit_support_points();
 
   for (const auto &cell : dof_handler.active_cell_iterators())
     {
-      cell->get_dof_indices(dof_indices);
+      dof_indices = dof_handler.get_dof_indices(cell);
 
       for (unsigned int i = 0; i < this->n_functions; ++i)
         {
@@ -125,13 +126,13 @@ DUBFEMHandler<dim>::dubiner_to_fem(
   return fem_solution;
 }
 
-template <unsigned int dim>
+template <class basis>
 lifex::LinAlg::MPI::Vector
-DUBFEMHandler<dim>::fem_to_dubiner(
+DUBFEMHandler<basis>::fem_to_dubiner(
   const lifex::LinAlg::MPI::Vector &fem_solution) const
 {
-  const dealii::FE_SimplexDGP<dim> fe_dg(this->poly_degree);
-  DGVolumeHandler<dim>             vol_handler(this->poly_degree);
+  const dealii::FE_SimplexDGP<lifex::dim> fe_dg(this->poly_degree);
+  DGVolumeHandler<lifex::dim>             vol_handler(this->poly_degree);
 
   lifex::LinAlg::MPI::Vector dub_solution;
   dub_solution.reinit(fem_solution);
@@ -141,7 +142,7 @@ DUBFEMHandler<dim>::fem_to_dubiner(
 
   for (const auto &cell : dof_handler.active_cell_iterators())
     {
-      cell->get_dof_indices(dof_indices);
+      dof_indices = dof_handler.get_dof_indices(cell);
       vol_handler.reinit(cell);
 
       for (unsigned int i = 0; i < this->n_functions; ++i)
@@ -168,21 +169,25 @@ DUBFEMHandler<dim>::fem_to_dubiner(
   return dub_solution;
 }
 
-template <unsigned int dim>
+template <class basis>
 lifex::LinAlg::MPI::Vector
-DUBFEMHandler<dim>::analytical_to_dubiner(
+DUBFEMHandler<basis>::analytical_to_dubiner(
   lifex::LinAlg::MPI::Vector                           dub_solution,
   const std::shared_ptr<dealii::Function<lifex::dim>> &u_analytical) const
 {
-  const dealii::FE_SimplexDGP<dim> fe_dg(this->poly_degree);
-  DGVolumeHandler<dim>             vol_handler(this->poly_degree);
+
+
+  DGVolumeHandler<lifex::dim>      vol_handler(this->poly_degree);
+
+  dealii::IndexSet owned_dofs = dof_handler.locally_owned_dofs();
 
   std::vector<unsigned int> dof_indices(this->n_functions);
   double                    eval_on_quad;
 
+
   for (const auto &cell : dof_handler.active_cell_iterators())
     {
-      cell->get_dof_indices(dof_indices);
+      dof_indices = dof_handler.get_dof_indices(cell);
       vol_handler.reinit(cell);
 
       for (unsigned int i = 0; i < this->n_functions; ++i)

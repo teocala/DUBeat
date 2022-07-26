@@ -134,7 +134,6 @@ DGVolumeHandler<dim>::reinit(
 {
   cell = new_cell;
   fe_values->reinit(new_cell);
-
   initialized = true;
 }
 
