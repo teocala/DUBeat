@@ -89,6 +89,9 @@ public:
   virtual void
   parse_parameters(lifex::ParamHandler &params) override;
 
+  /// Return the number of degrees of freedom per element.
+  unsigned int get_dof_per_cell() const;
+
   /// Run the simulation.
   virtual void
   run() override;
@@ -276,6 +279,26 @@ ModelDG<basis>::parse_parameters(lifex::ParamHandler &params)
 }
 
 template <class basis>
+unsigned int
+ModelDG<basis>::get_dof_per_cell() const
+{
+  // The analytical formula is:
+  // n_dof_per_cell = (p+1)*(p+2)*...(p+d) / d!,
+  // where p is the space order and d the space dimension..
+
+  unsigned int denominator = 1;
+  unsigned int nominator = 1;
+
+  for (unsigned int i = 1; i <= lifex::dim; i++)
+  {
+    denominator *= i;
+    nominator *= prm_fe_degree+i;
+  }
+
+  return (int)(nominator/denominator);
+}
+
+template <class basis>
 void
 ModelDG<basis>::run()
 {
@@ -333,7 +356,7 @@ ModelDG<basis>::setup_system()
   dealii::DynamicSparsityPattern dsp(relevant_dofs);
 
   // Add (dof, dof_neigh) to dsp, so to the matrix
-  dofs_per_cell = fe->dofs_per_cell;
+  dofs_per_cell = get_dof_per_cell();
   std::vector<lifex::types::global_dof_index> dof_indices(dofs_per_cell);
   std::vector<lifex::types::global_dof_index> dof_indices_neigh(dofs_per_cell);
   for (const auto &cell : dof_handler.active_cell_iterators())

@@ -36,6 +36,8 @@
 
 #include <deal.II/lac/trilinos_vector.h>
 
+#include "source/init.hpp"
+
 #include <cmath>
 #include <vector>
 

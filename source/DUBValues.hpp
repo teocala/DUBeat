@@ -75,8 +75,7 @@ public:
   DUBValues<dim>(const unsigned int degree)
     : poly_degree(degree)
   {
-    const dealii::FE_SimplexDGP<dim> fe_dg(degree);
-    n_functions = fe_dg.dofs_per_cell;
+    n_functions = get_dof_per_cell();
   }
 
   /// Default copy constructor.
@@ -87,6 +86,9 @@ public:
 
   /// Default move constructor.
   DUBValues<dim>(DUBValues<dim> &&DUBValues) = default;
+
+  /// Return the number of degrees of freedom per element.
+  unsigned int get_dof_per_cell() const;
 
   /// Evaluation of the Dubiner basis functions.
   double
@@ -205,6 +207,26 @@ DUBValues<dim>::eval_jacobi_polynomial(const unsigned int n,
 
       return poly;
     }
+}
+
+template <unsigned int dim>
+unsigned int
+DUBValues<dim>::get_dof_per_cell() const
+{
+  // The analytical formula is:
+  // n_dof_per_cell = (p+1)*(p+2)*...(p+d) / d!,
+  // where p is the space order and d the space dimension..
+
+  unsigned int denominator = 1;
+  unsigned int nominator = 1;
+
+  for (unsigned int i = 1; i <= dim; i++)
+  {
+    denominator *= i;
+    nominator *= poly_degree+i;
+  }
+
+  return (int)(nominator/denominator);
 }
 
 /// Evaluation of the function basis in two dimensions.
