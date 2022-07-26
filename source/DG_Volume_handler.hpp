@@ -33,9 +33,9 @@
 #include <deal.II/dofs/dof_handler.h>
 
 #include <deal.II/fe/fe.h>
+#include <deal.II/fe/fe_simplex_p.h>
 #include <deal.II/fe/fe_values.h>
 #include <deal.II/fe/mapping_fe.h>
-#include <deal.II/fe/fe_simplex_p.h>
 
 #include <cmath>
 #include <memory>

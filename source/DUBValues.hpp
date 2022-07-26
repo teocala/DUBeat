@@ -88,7 +88,8 @@ public:
   DUBValues<dim>(DUBValues<dim> &&DUBValues) = default;
 
   /// Return the number of degrees of freedom per element.
-  unsigned int get_dof_per_cell() const;
+  unsigned int
+  get_dof_per_cell() const;
 
   /// Evaluation of the Dubiner basis functions.
   double
@@ -218,15 +219,15 @@ DUBValues<dim>::get_dof_per_cell() const
   // where p is the space order and d the space dimension..
 
   unsigned int denominator = 1;
-  unsigned int nominator = 1;
+  unsigned int nominator   = 1;
 
   for (unsigned int i = 1; i <= dim; i++)
-  {
-    denominator *= i;
-    nominator *= poly_degree+i;
-  }
+    {
+      denominator *= i;
+      nominator *= poly_degree + i;
+    }
 
-  return (int)(nominator/denominator);
+  return (int)(nominator / denominator);
 }
 
 /// Evaluation of the function basis in two dimensions.

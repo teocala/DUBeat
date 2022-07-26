@@ -245,7 +245,8 @@ namespace lifex::examples
                     this->matrix.add(dof_indices, I_t);
 
                     const auto neighcell = cell->neighbor(edge);
-                    dof_indices_neigh = this->dof_handler.get_dof_indices(neighcell);
+                    dof_indices_neigh =
+                      this->dof_handler.get_dof_indices(neighcell);
 
                     std::tie(IN, IN_t) =
                       this->assemble->local_IN(this->prm_penalty_coeff);

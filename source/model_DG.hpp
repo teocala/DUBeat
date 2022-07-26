@@ -43,6 +43,7 @@
 #include "DG_Volume_handler.hpp"
 #include "DG_error_parser.hpp"
 #include "DUB_FEM_handler.hpp"
+#include "DoFHandler_DG.hpp"
 #include "compute_errors_DG.hpp"
 #include "source/core_model.hpp"
 #include "source/geometry/mesh_handler.hpp"
@@ -52,8 +53,6 @@
 #include "source/numerics/linear_solver_handler.hpp"
 #include "source/numerics/preconditioner_handler.hpp"
 #include "source/numerics/tools.hpp"
-
-#include "DoFHandler_DG.hpp"
 
 /**
  * @brief Class representing the resolution of problems using discontinuous
@@ -92,7 +91,8 @@ public:
   parse_parameters(lifex::ParamHandler &params) override;
 
   /// Return the number of degrees of freedom per element.
-  unsigned int get_dofs_per_cell() const;
+  unsigned int
+  get_dofs_per_cell() const;
 
   /// Run the simulation.
   virtual void
@@ -106,12 +106,17 @@ protected:
   virtual void
   setup_system();
 
-  /// Creation of the sparsity pattern to assign to the system matrix before assembling. It has been readapted from the deal.II DoFTools::make_sparsity_pattern() method.
-  void make_sparsity_pattern(const DoFHandler_DG<basis> &dof,
-                        dealii::DynamicSparsityPattern &            sparsity,
-                        const dealii::AffineConstraints<double> &constraints = dealii::AffineConstraints<double>(),
-                        const bool                       keep_constrained_dofs = true,
-                        const dealii::types::subdomain_id        subdomain_id =  dealii::numbers::invalid_subdomain_id);
+  /// Creation of the sparsity pattern to assign to the system matrix before
+  /// assembling. It has been readapted from the deal.II
+  /// DoFTools::make_sparsity_pattern() method.
+  void
+  make_sparsity_pattern(const DoFHandler_DG<basis> &             dof,
+                        dealii::DynamicSparsityPattern &         sparsity,
+                        const dealii::AffineConstraints<double> &constraints =
+                          dealii::AffineConstraints<double>(),
+                        const bool keep_constrained_dofs = true,
+                        const dealii::types::subdomain_id subdomain_id =
+                          dealii::numbers::invalid_subdomain_id);
 
   /// To inizialize the solutions using the deal.II reinit.
   void
@@ -296,15 +301,15 @@ ModelDG<basis>::get_dofs_per_cell() const
   // where p is the space order and d the space dimension..
 
   unsigned int denominator = 1;
-  unsigned int nominator = 1;
+  unsigned int nominator   = 1;
 
   for (unsigned int i = 1; i <= lifex::dim; i++)
-  {
-    denominator *= i;
-    nominator *= prm_fe_degree+i;
-  }
+    {
+      denominator *= i;
+      nominator *= prm_fe_degree + i;
+    }
 
-  return (int)(nominator/denominator);
+  return (int)(nominator / denominator);
 }
 
 template <class basis>
@@ -333,12 +338,12 @@ ModelDG<basis>::run()
 
   // Generation of the graphical output.
   if (prm_fe_degree < 3) // due to the current deal.II availabilities.
-  {
-    conversion_to_fem(solution_ex);
-    solution = solution_owned;
-    conversion_to_fem(solution);
-    output_results();
-  }
+    {
+      conversion_to_fem(solution_ex);
+      solution = solution_owned;
+      conversion_to_fem(solution);
+      output_results();
+    }
 }
 
 template <class basis>
@@ -351,14 +356,15 @@ ModelDG<basis>::setup_system()
 
   dof_handler.reinit(triangulation.get());
   dof_handler.distribute_dofs(prm_fe_degree);
-  dub_fem_values = std::make_shared<DUBFEMHandler<basis>>(prm_fe_degree, dof_handler);
+  dub_fem_values =
+    std::make_shared<DUBFEMHandler<basis>>(prm_fe_degree, dof_handler);
 
   triangulation.get_info().print(prm_subsection_path,
                                  dof_handler.n_dofs(),
                                  true);
 
-  dealii::IndexSet owned_dofs = dof_handler.locally_owned_dofs();
-  dealii::IndexSet relevant_dofs = owned_dofs;
+  dealii::IndexSet               owned_dofs = dof_handler.locally_owned_dofs();
+  dealii::IndexSet               relevant_dofs = owned_dofs;
   dealii::DynamicSparsityPattern dsp(relevant_dofs);
 
 
@@ -370,27 +376,30 @@ ModelDG<basis>::setup_system()
 
   for (const auto &cell : dof_handler.active_cell_iterators())
     {
-        dof_indices = dof_handler.get_dof_indices(cell);
+      dof_indices = dof_handler.get_dof_indices(cell);
 
-        for (const auto &edge : cell->face_indices())
-          {
-            if (!cell->at_boundary(edge))
-              {
-                const auto neighcell = cell->neighbor(edge);
-                dof_indices_neigh = dof_handler.get_dof_indices(neighcell);
-                for (unsigned int i = 0; i < dofs_per_cell; ++i)
-                  {
-                    for (unsigned int j = 0; j < dofs_per_cell; ++j)
-                      {
-                        dsp.add(dof_indices[i], dof_indices_neigh[j]);
-                      }
-                  }
-              }
-          }
+      for (const auto &edge : cell->face_indices())
+        {
+          if (!cell->at_boundary(edge))
+            {
+              const auto neighcell = cell->neighbor(edge);
+              dof_indices_neigh    = dof_handler.get_dof_indices(neighcell);
+              for (unsigned int i = 0; i < dofs_per_cell; ++i)
+                {
+                  for (unsigned int j = 0; j < dofs_per_cell; ++j)
+                    {
+                      dsp.add(dof_indices[i], dof_indices_neigh[j]);
+                    }
+                }
+            }
+        }
     }
 
   make_sparsity_pattern(dof_handler, dsp);
-  lifex::SparsityTools::distribute_sparsity_pattern(dsp,owned_dofs,mpi_comm,relevant_dofs);
+  lifex::SparsityTools::distribute_sparsity_pattern(dsp,
+                                                    owned_dofs,
+                                                    mpi_comm,
+                                                    relevant_dofs);
   lifex::utils::initialize_matrix(matrix, owned_dofs, dsp);
 
   rhs.reinit(owned_dofs, mpi_comm);
@@ -399,11 +408,12 @@ ModelDG<basis>::setup_system()
 
 template <class basis>
 void
-ModelDG<basis>::make_sparsity_pattern(const DoFHandler_DG<basis> &dof,
-                      dealii::DynamicSparsityPattern &            sparsity,
-                      const dealii::AffineConstraints<double> &constraints,
-                      const bool                       keep_constrained_dofs,
-                      const dealii::types::subdomain_id        subdomain_id)
+ModelDG<basis>::make_sparsity_pattern(
+  const DoFHandler_DG<basis> &             dof,
+  dealii::DynamicSparsityPattern &         sparsity,
+  const dealii::AffineConstraints<double> &constraints,
+  const bool                               keep_constrained_dofs,
+  const dealii::types::subdomain_id        subdomain_id)
 {
   Assert(sparsity.n_rows() == n_dofs,
          ExcDimensionMismatch(sparsity.n_rows(), n_dofs));
@@ -433,7 +443,7 @@ ModelDG<basis>::make_sparsity_pattern(const DoFHandler_DG<basis> &dof,
   for (const auto &cell : dof.active_cell_iterators())
     if (((subdomain_id == dealii::numbers::invalid_subdomain_id) ||
          (subdomain_id == cell->subdomain_id())) &&
-          cell->is_locally_owned() )
+        cell->is_locally_owned())
       {
         dofs_on_this_cell.resize(dof.n_dofs_per_cell());
         dofs_on_this_cell = dof.get_dof_indices(cell);
@@ -453,7 +463,7 @@ void
 ModelDG<basis>::initialize_solution(lifex::LinAlg::MPI::Vector &solution_owned,
                                     lifex::LinAlg::MPI::Vector &solution)
 {
-  dealii::IndexSet owned_dofs = dof_handler.locally_owned_dofs();
+  dealii::IndexSet owned_dofs    = dof_handler.locally_owned_dofs();
   dealii::IndexSet relevant_dofs = owned_dofs;
 
   solution_owned.reinit(owned_dofs, mpi_comm);
@@ -540,11 +550,14 @@ ModelDG<basis>::output_results() const
 
   AssertThrow(prm_fe_degree < 3,
               dealii::StandardExceptions::ExcMessage(
-                "You cannot output contour plots, deal.II library does not provide yet DGFEM spaces with polynomial order > 2."));
+                "You cannot output contour plots, deal.II library does not "
+                "provide yet DGFEM spaces with polynomial order > 2."));
 
-  // To output results, we need the deal.II DoFHandler instead of the DUBeat DoFHandler_DG since we use here deal.II functions. On the other hand, the deal.II dof handler is limited to the 2 order polynomials.
+  // To output results, we need the deal.II DoFHandler instead of the DUBeat
+  // DoFHandler_DG since we use here deal.II functions. On the other hand, the
+  // deal.II dof handler is limited to the 2 order polynomials.
   dealii::FE_SimplexDGP<lifex::dim> fe(prm_fe_degree);
-  dealii::DoFHandler<lifex::dim> dof_handler_fem;
+  dealii::DoFHandler<lifex::dim>    dof_handler_fem;
   dof_handler_fem.reinit(triangulation.get());
   dof_handler_fem.distribute_dofs(fe);
 

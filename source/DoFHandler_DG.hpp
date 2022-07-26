@@ -36,21 +36,21 @@
 
 #include <deal.II/lac/trilinos_vector.h>
 
-#include "source/init.hpp"
-
 #include <cmath>
-#include <vector>
 #include <map>
+#include <vector>
 
 #include "DUBValues.hpp"
+#include "source/init.hpp"
 
 /**
  * @brief Class to work with global and local degrees of freedom. It requires a specialization from the deal.II class in order to let higher order polynomials available since the
- * deal.II class, at the moment, cannot distribute dofs with polynomial orders greater than 2.
+ * deal.II class, at the moment, cannot distribute dofs with polynomial orders
+ * greater than 2.
  */
 
-using ActiveSelector =
-   dealii::internal::DoFHandlerImplementation::Iterators<lifex::dim, lifex::dim, false>;
+using ActiveSelector = dealii::internal::DoFHandlerImplementation::
+  Iterators<lifex::dim, lifex::dim, false>;
 using active_cell_iterator = typename ActiveSelector::active_cell_iterator;
 
 
@@ -58,7 +58,6 @@ template <class basis>
 class DoFHandler_DG : public dealii::DoFHandler<lifex::dim>
 {
 private:
-
   /// Polynomial space degree.
   unsigned int degree;
 
@@ -68,7 +67,8 @@ private:
 public:
   /// Constructor.
   DoFHandler_DG<basis>()
-    : dealii::DoFHandler<lifex::dim>(), degree(0)
+    : dealii::DoFHandler<lifex::dim>()
+    , degree(0)
   {}
 
   /// Default copy constructor.
@@ -81,22 +81,32 @@ public:
   DoFHandler_DG<basis>(DoFHandler_DG<basis> &&DoFHandlerDG) = default;
 
   /// Return copy of n_dofs_per_cell.
-  unsigned int n_dofs_per_cell() const;
+  unsigned int
+  n_dofs_per_cell() const;
 
   /// Return copy of n_dofs.
-  unsigned int n_dofs() const;
+  unsigned int
+  n_dofs() const;
 
-  /// Distribute dofs through the elements. It overwrites the method in dealii::DoFHandler in order to let high order polynomials available in the case of Dubiner basis.
-  void distribute_dofs (const dealii::FE_SimplexDGP<lifex::dim> &fe);
+  /// Distribute dofs through the elements. It overwrites the method in
+  /// dealii::DoFHandler in order to let high order polynomials available in the
+  /// case of Dubiner basis.
+  void
+  distribute_dofs(const dealii::FE_SimplexDGP<lifex::dim> &fe);
 
-  /// Same method but avoids to use FiniteElement that might be invalid with high order polynomials.
-  void distribute_dofs (const unsigned int degree);
+  /// Same method but avoids to use FiniteElement that might be invalid with
+  /// high order polynomials.
+  void
+  distribute_dofs(const unsigned int degree);
 
   /// Returns the global dofs referred to the input cell.
-  std::vector<lifex::types::global_dof_index> get_dof_indices(active_cell_iterator cell) const;
+  std::vector<lifex::types::global_dof_index>
+  get_dof_indices(active_cell_iterator cell) const;
 
-  /// Return a set of all the locally owned dofs (for the time being, it is equivalent to all the dofs).
-  dealii::IndexSet locally_owned_dofs() const;
+  /// Return a set of all the locally owned dofs (for the time being, it is
+  /// equivalent to all the dofs).
+  dealii::IndexSet
+  locally_owned_dofs() const;
 };
 
 template <class basis>
@@ -104,22 +114,24 @@ unsigned int
 DoFHandler_DG<basis>::n_dofs_per_cell() const
 {
   AssertThrow(degree > 0,
-              dealii::StandardExceptions::ExcMessage("Dofs have not been distributed yet. Please, use distribute_dofs before."));
+              dealii::StandardExceptions::ExcMessage(
+                "Dofs have not been distributed yet. Please, use "
+                "distribute_dofs before."));
 
   // The analytical formula is:
   // n_dof_per_cell = (p+1)*(p+2)*...(p+d) / d!,
   // where p is the space order and d the space dimension..
 
   unsigned int denominator = 1;
-  unsigned int nominator = 1;
+  unsigned int nominator   = 1;
 
   for (unsigned int i = 1; i <= lifex::dim; i++)
-  {
-    denominator *= i;
-    nominator *= degree+i;
-  }
+    {
+      denominator *= i;
+      nominator *= degree + i;
+    }
 
-  return (int)(nominator/denominator);
+  return (int)(nominator / denominator);
 }
 
 template <class basis>
@@ -127,62 +139,73 @@ unsigned int
 DoFHandler_DG<basis>::n_dofs() const
 {
   AssertThrow(degree > 0,
-              dealii::StandardExceptions::ExcMessage("Dofs have not been distributed yet. Please, use distribute_dofs before."));
+              dealii::StandardExceptions::ExcMessage(
+                "Dofs have not been distributed yet. Please, use "
+                "distribute_dofs before."));
 
   unsigned int n_cells = 0;
 
   for (const auto &cell : this->active_cell_iterators())
-      n_cells ++;
+    n_cells++;
 
-  return n_cells*n_dofs_per_cell();
+  return n_cells * n_dofs_per_cell();
 }
 
 
 template <>
 void
-DoFHandler_DG<dealii::FE_SimplexDGP<lifex::dim>>::distribute_dofs (const dealii::FE_SimplexDGP<lifex::dim> &fe)
+DoFHandler_DG<dealii::FE_SimplexDGP<lifex::dim>>::distribute_dofs(
+  const dealii::FE_SimplexDGP<lifex::dim> &fe)
 {
   AssertThrow(fe.degree < 3,
-              dealii::StandardExceptions::ExcMessage("deal.II library does not provide yet FEM spaces with polynomial order > 2."));
+              dealii::StandardExceptions::ExcMessage(
+                "deal.II library does not provide yet FEM spaces with "
+                "polynomial order > 2."));
   degree = fe.degree;
   dealii::DoFHandler<lifex::dim>::distribute_dofs(fe);
 }
 
 template <>
 void
-DoFHandler_DG<DUBValues<lifex::dim>>::distribute_dofs (const dealii::FE_SimplexDGP<lifex::dim> &fe)
+DoFHandler_DG<DUBValues<lifex::dim>>::distribute_dofs(
+  const dealii::FE_SimplexDGP<lifex::dim> &fe)
 {
   AssertThrow(fe.degree < 3,
-              dealii::StandardExceptions::ExcMessage("deal.II library does not provide yet FEM spaces with polynomial order > 2."));
+              dealii::StandardExceptions::ExcMessage(
+                "deal.II library does not provide yet FEM spaces with "
+                "polynomial order > 2."));
   dealii::DoFHandler<lifex::dim>::distribute_dofs(fe);
   degree = fe.degree;
 
-  std::vector<lifex::types::global_dof_index> dof_indices(this->n_dofs_per_cell());
+  std::vector<lifex::types::global_dof_index> dof_indices(
+    this->n_dofs_per_cell());
   dof_map.clear();
   unsigned int i = 0;
   for (const auto &cell : this->active_cell_iterators())
     {
       cell->get_dof_indices(dof_indices);
-      dof_map.emplace(cell,dof_indices);
+      dof_map.emplace(cell, dof_indices);
     }
-
 }
 
 template <>
 void
-DoFHandler_DG<dealii::FE_SimplexDGP<lifex::dim>>::distribute_dofs (const unsigned int degree)
+DoFHandler_DG<dealii::FE_SimplexDGP<lifex::dim>>::distribute_dofs(
+  const unsigned int degree)
 {
   AssertThrow(degree,
-              dealii::StandardExceptions::ExcMessage("deal.II library does not provide yet DGFEM spaces with polynomial order > 2."));
+              dealii::StandardExceptions::ExcMessage(
+                "deal.II library does not provide yet DGFEM spaces with "
+                "polynomial order > 2."));
   dealii::FE_SimplexDGP<lifex::dim> fe(degree);
   this->distribute_dofs(fe);
 }
 
 template <>
 void
-DoFHandler_DG<DUBValues<lifex::dim>>::distribute_dofs (const unsigned int degree)
+DoFHandler_DG<DUBValues<lifex::dim>>::distribute_dofs(const unsigned int degree)
 {
-  this->degree = degree;
+  this->degree                 = degree;
   unsigned int n_dofs_per_cell = this->n_dofs_per_cell();
   dof_map.clear();
   unsigned int n = 0;
@@ -190,29 +213,33 @@ DoFHandler_DG<DUBValues<lifex::dim>>::distribute_dofs (const unsigned int degree
     {
       std::vector<unsigned int> local_dofs;
 
-      for (unsigned int i=0;i<n_dofs_per_cell;++i)
-        local_dofs.push_back(n+i);
+      for (unsigned int i = 0; i < n_dofs_per_cell; ++i)
+        local_dofs.push_back(n + i);
 
-      dof_map.emplace(cell,local_dofs);
+      dof_map.emplace(cell, local_dofs);
 
       n = n + n_dofs_per_cell;
     }
 }
 
-template<>
+template <>
 std::vector<lifex::types::global_dof_index>
-DoFHandler_DG<dealii::FE_SimplexDGP<lifex::dim>>::get_dof_indices(active_cell_iterator cell) const
+DoFHandler_DG<dealii::FE_SimplexDGP<lifex::dim>>::get_dof_indices(
+  active_cell_iterator cell) const
 {
-  std::vector<lifex::types::global_dof_index> dof_indices(this->n_dofs_per_cell());
+  std::vector<lifex::types::global_dof_index> dof_indices(
+    this->n_dofs_per_cell());
   cell->get_dof_indices(dof_indices);
   return dof_indices;
 }
 
-template<>
+template <>
 std::vector<lifex::types::global_dof_index>
-DoFHandler_DG<DUBValues<lifex::dim>>::get_dof_indices(active_cell_iterator cell) const
+DoFHandler_DG<DUBValues<lifex::dim>>::get_dof_indices(
+  active_cell_iterator cell) const
 {
-  std::vector<lifex::types::global_dof_index> dof_indices(this->n_dofs_per_cell());
+  std::vector<lifex::types::global_dof_index> dof_indices(
+    this->n_dofs_per_cell());
   dof_indices = dof_map.at(cell);
   return dof_indices;
 }
@@ -222,7 +249,7 @@ dealii::IndexSet
 DoFHandler_DG<basis>::locally_owned_dofs() const
 {
   dealii::IndexSet owned_dofs(this->n_dofs());
-  owned_dofs.add_range(0,this->n_dofs());
+  owned_dofs.add_range(0, this->n_dofs());
   return owned_dofs;
 }
 

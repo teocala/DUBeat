@@ -62,9 +62,9 @@ class Compute_Errors_DG
 {
 public:
   /// Constructor.
-  Compute_Errors_DG<basis>(const unsigned int degree,
-                           const double       stability_coeff,
-                           const unsigned int local_dofs,
+  Compute_Errors_DG<basis>(const unsigned int          degree,
+                           const double                stability_coeff,
+                           const unsigned int          local_dofs,
                            const DoFHandler_DG<basis> &dof_hand)
     : dof_handler(dof_hand)
     , n_quad_points(static_cast<int>(std::pow(degree + 2, lifex::dim)))
@@ -448,7 +448,8 @@ Compute_Errors_DG<basis>::compute_error_DG()
                               const auto neighcell = cell->neighbor(edge);
                               const auto neighedge =
                                 cell->neighbor_face_no(edge);
-                              dof_indices_neigh = dof_handler.get_dof_indices(neighcell);
+                              dof_indices_neigh =
+                                dof_handler.get_dof_indices(neighcell);
                               face_handler_neigh.reinit(neighcell, neighedge);
 
                               const unsigned int nq =

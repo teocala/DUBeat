@@ -36,13 +36,12 @@
 
 #include <deal.II/lac/trilinos_vector.h>
 
-#include "source/init.hpp"
-
 #include <cmath>
 #include <vector>
 
 #include "DUBValues.hpp"
 #include "DoFHandler_DG.hpp"
+#include "source/init.hpp"
 
 /**
  * @brief Class to apply the conversions of a discretized solution between
@@ -61,8 +60,8 @@ private:
 
 public:
   /// Constructor.
-  DUBFEMHandler<basis>(const unsigned int             degree,
-                     const DoFHandler_DG<basis> &dof_hand)
+  DUBFEMHandler<basis>(const unsigned int          degree,
+                       const DoFHandler_DG<basis> &dof_hand)
     : DUBValues<lifex::dim>(degree)
     , dof_handler(dof_hand)
     , n_quad_points(static_cast<int>(std::pow(degree + 2, lifex::dim)))
@@ -175,9 +174,7 @@ DUBFEMHandler<basis>::analytical_to_dubiner(
   lifex::LinAlg::MPI::Vector                           dub_solution,
   const std::shared_ptr<dealii::Function<lifex::dim>> &u_analytical) const
 {
-
-
-  DGVolumeHandler<lifex::dim>      vol_handler(this->poly_degree);
+  DGVolumeHandler<lifex::dim> vol_handler(this->poly_degree);
 
   dealii::IndexSet owned_dofs = dof_handler.locally_owned_dofs();
 
