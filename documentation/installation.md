@@ -10,8 +10,7 @@ The library provides the following two methods:
 1. Standard DGFEM.
 2. DG with Dubiner basis.
 
-They both work in either 2 or 3 dimensions depending on the lifex configuration (specifying `lifex::dim`). Instead, the discretization polynomial order is restricted to the current [deal.II][] availability and, as for now, it can be at most 2.
-
+They both work in either 2 or 3 dimensions depending on the lifex configuration (i.e., specifying `lifex::dim`).
 
 
 ### Dependencies
@@ -81,6 +80,11 @@ Results can be viewed in two ways:
   to generate the [Doxygen][] documentation under the `documentation` folder.
 - Use instead
   ```bash
+  make indent
+  ```
+  to automatically indent all the files using our customized [Clang-Format] setup.
+- Still in the main folder, run
+  ```bash
   make clean
   ```
   to remove the previously generated execution files. In addition, you can write
@@ -88,11 +92,6 @@ Results can be viewed in two ways:
   make distclean
   ```
   to perform a complete cleaning, i.e. removing all generated files such as parameter files, documentation and solution files.
-- Still in the main folder, run
-  ```bash
-  ./extra/indent/indent_all
-  ```
-  to automatically indent all the files using our customized [Clang-Format] setup.
 
 
 ### Personalize your problem

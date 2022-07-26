@@ -43,8 +43,10 @@ HEADERS=$(wildcard *.hpp)
 #
 exe_sources=$(filter $(DIR)/main%.cpp,$(SRCS))
 EXEC=$(exe_sources:.cpp=)
-
+# doxyfile name
 DOXYFILE = ./Doxyfile
+# indent command directory
+INDENT = ./extra/indent
 
 #==========================
 .PHONY = all doc clean distclean
@@ -64,6 +66,9 @@ distclean:
 
 doc:
 	doxygen $(DOXYFILE)
+
+indent:
+	$(INDENT)/indent_all
 
 $(EXEC): $(OBJS)
 

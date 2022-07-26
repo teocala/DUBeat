@@ -43,17 +43,16 @@
 #include "DUBValues.hpp"
 #include "source/init.hpp"
 
-/**
- * @brief Class to work with global and local degrees of freedom. It requires a specialization from the deal.II class in order to let higher order polynomials available since the
- * deal.II class, at the moment, cannot distribute dofs with polynomial orders
- * greater than 2.
- */
 
 using ActiveSelector = dealii::internal::DoFHandlerImplementation::
   Iterators<lifex::dim, lifex::dim, false>;
 using active_cell_iterator = typename ActiveSelector::active_cell_iterator;
 
-
+/**
+ * @brief Class to work with global and local degrees of freedom. It requires a specialization from the deal.II class in order to let higher order polynomials available since the
+ * deal.II class, at the moment, cannot distribute dofs with polynomial orders
+ * greater than 2.
+ */
 template <class basis>
 class DoFHandler_DG : public dealii::DoFHandler<lifex::dim>
 {

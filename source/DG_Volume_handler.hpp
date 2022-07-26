@@ -58,7 +58,9 @@ protected:
   typename dealii::DoFHandler<dim>::active_cell_iterator cell;
 
   /// Internal DGFEM basis class. This internal member permits to exploit
-  /// useful already implemented operations.
+  /// useful already implemented operations. Polynomial order is set to 1 always
+  /// because it executes only geometric operations not related to the number of
+  /// dofs.
   const std::unique_ptr<dealii::FE_SimplexDGP<dim>> fe_dg;
 
   /// Mapping of the discretized space.
@@ -78,7 +80,7 @@ public:
   /// Constructor.
   DGVolumeHandler<dim>(const unsigned int degree)
     : n_quad_points_1D(degree + 2)
-    , fe_dg(std::make_unique<dealii::FE_SimplexDGP<dim>>(degree))
+    , fe_dg(std::make_unique<dealii::FE_SimplexDGP<dim>>(1))
     , mapping(std::make_unique<dealii::MappingFE<dim>>(*fe_dg))
     , QGLpoints(n_quad_points_1D)
     , fe_values(std::make_unique<dealii::FEValues<dim>>(
