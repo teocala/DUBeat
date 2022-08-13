@@ -83,16 +83,18 @@ public:
 
 protected:
   /// Override for declaration of additional parameters.
+  virtual
   void
   declare_parameters(lifex::ParamHandler &params) const override;
 
   /// Override to parse additional parameters.
+  virtual
   void
   parse_parameters(lifex::ParamHandler &params) override;
 
   /// Setup for the time-dependent problems at time-step 0.
   virtual void
-  time_initializaton();
+  time_initialization();
 
   /// To perform the time increment.
   virtual void
@@ -231,7 +233,7 @@ ModelDG_t<basis>::parse_parameters(lifex::ParamHandler &params)
 
 template <class basis>
 void
-ModelDG_t<basis>::time_initializaton()
+ModelDG_t<basis>::time_initialization()
 {
   // Set initial time to the exact analytical solution.
   this->u_ex->set_time(prm_time_init);
@@ -299,7 +301,7 @@ ModelDG_t<basis>::run()
   this->setup_system();
   this->initialize_solution(this->solution_owned, this->solution);
   this->initialize_solution(this->solution_ex_owned, this->solution_ex);
-  this->time_initializaton();
+  this->time_initialization();
 
   while (this->time < this->prm_time_final)
     {

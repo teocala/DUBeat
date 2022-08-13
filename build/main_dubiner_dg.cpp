@@ -27,6 +27,7 @@
 #include "../models/heat_dg.hpp"
 #include "../models/laplace_dg.hpp"
 #include "../models/monodomain_fitzhugh_dg.hpp"
+#include "../models/monodomain_ttp06_dg .hpp"
 #include "source/init.hpp"
 
 /// This file is an example of main execution script. The model below can be
@@ -42,7 +43,7 @@ main(int argc, char **argv)
       // Choose the model from the models folder and the basis from:
       // Dubiner basis:    DUBValues<lifex::dim>
       // FEM basis:        dealii::FE_SimplexDGP<lifex::dim>
-      lifex::examples::Laplace_DG<DUBValues<lifex::dim>> model;
+      lifex::examples::Monodomain_ttp06_DG<DUBValues<lifex::dim>> model;
 
       model.main_run_generate();
     }

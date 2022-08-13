@@ -24,8 +24,8 @@
  * @author Matteo Calafà <matteo.calafa@mail.polimi.it>.
  */
 
-#ifndef MONODOMAIN_FITZHUGH_DG_HPP_
-#define MONODOMAIN_FITZHUGH_DG_HPP_
+#ifndef MONODOMAIN_ttp06_DG_HPP_
+#define MONODOMAIN_ttp06_DG_HPP_
 
 #include <math.h>
 
@@ -47,10 +47,11 @@
 #include "source/numerics/linear_solver_handler.hpp"
 #include "source/numerics/preconditioner_handler.hpp"
 #include "source/numerics/tools.hpp"
+#include "source/ionic/ttp06.hpp"
 
 namespace lifex::examples
 {
-  namespace monodomain_fitzhugh_DG
+  namespace monodomain_ttp06_DG
   {
     /**
      * @brief Exact solution of the trans-membrane potential.
@@ -279,99 +280,7 @@ namespace lifex::examples
           }
       }
     };
-
-    /**
-     * @brief Exact solution of the gating variable.
-     */
-    class ExactSolution_w : public utils::FunctionDirichlet
-    {
-    private:
-      /// Parameter ODE.
-      double epsilon;
-
-      /// Parameter ODE.
-      double gamma;
-
-    public:
-      /// Constructor.
-      ExactSolution_w(double epsilon, double gamma)
-        : utils::FunctionDirichlet()
-        , epsilon(epsilon)
-        , gamma(gamma)
-      {}
-
-      /// Evaluate the exact solution in a point.
-      virtual double
-      value(const Point<dim> &p,
-            const unsigned int /*component*/ = 0) const override
-      {
-        if (dim == 2)
-          return epsilon / (epsilon * gamma - 5) * std::sin(2 * M_PI * p[0]) *
-                 std::sin(2 * M_PI * p[1]) * std::exp(-5 * this->get_time());
-        else
-          return epsilon / (epsilon * gamma - 5) * std::sin(2 * M_PI * p[0]) *
-                 std::sin(2 * M_PI * p[1]) * std::sin(2 * M_PI * p[2]) *
-                 std::exp(-5 * this->get_time());
-      }
-    };
-
-    /**
-     * @brief Gradient of the gating variable.
-     */
-    class GradExactSolution_w : public Function<dim>
-    {
-    private:
-      /// Parameter ODE
-      double epsilon;
-
-      /// Parameter ODE
-      double gamma;
-
-    public:
-      /// Constructor.
-      GradExactSolution_w(double epsilon, double gamma)
-        : Function<dim>()
-        , epsilon(epsilon)
-        , gamma(gamma)
-      {}
-
-      /// Evaluate the gradient of the exact solution in a point.
-      virtual double
-      value(const Point<dim> & p,
-            const unsigned int component = 0) const override
-      {
-        if (dim == 2)
-          {
-            if (component == 0) // x
-              return 2 * M_PI * epsilon / (epsilon * gamma - 5) *
-                     std::cos(2 * M_PI * p[0]) * std::sin(2 * M_PI * p[1]) *
-                     std::exp(-5 * this->get_time());
-            else // y
-              return 2 * M_PI * epsilon / (epsilon * gamma - 5) *
-                     std::sin(2 * M_PI * p[0]) * std::cos(2 * M_PI * p[1]) *
-                     std::exp(-5 * this->get_time());
-          }
-        else // dim=3
-          {
-            if (component == 0) // x
-              return 2 * M_PI * epsilon / (epsilon * gamma - 5) *
-                     std::cos(2 * M_PI * p[0]) * std::sin(2 * M_PI * p[1]) *
-                     std::sin(2 * M_PI * p[2]) *
-                     std::exp(-5 * this->get_time());
-            if (component == 1) // y
-              return 2 * M_PI * epsilon / (epsilon * gamma - 5) *
-                     std::sin(2 * M_PI * p[0]) * std::cos(2 * M_PI * p[1]) *
-                     std::sin(2 * M_PI * p[2]) *
-                     std::exp(-5 * this->get_time());
-            else // z
-              return 2 * M_PI * epsilon / (epsilon * gamma - 5) *
-                     std::sin(2 * M_PI * p[0]) * std::sin(2 * M_PI * p[1]) *
-                     std::cos(2 * M_PI * p[2]) *
-                     std::exp(-5 * this->get_time());
-          }
-      }
-    };
-  } // namespace monodomain_fitzhugh_DG
+  } // namespace monodomain_ttp06_DG
 
   /**
    * @brief  Class to solve the monodomain equation with Fitzhugh-Nagumo ionic model for the cardiac electrophysiology
@@ -443,12 +352,12 @@ namespace lifex::examples
    */
 
   template <class basis>
-  class Monodomain_fitzhugh_DG : public ModelDG_t<basis>
+  class Monodomain_ttp06_DG : public ModelDG_t<basis>
   {
   public:
     /// Constructor.
-    Monodomain_fitzhugh_DG<basis>()
-      : ModelDG_t<basis>("Monodomain Fitzhugh")
+    Monodomain_ttp06_DG<basis>()
+      : ModelDG_t<basis>("Monodomain ttp06")
       , ChiM(1e5)
       , Sigma(0.12)
       , Cm(1e-2)
@@ -457,17 +366,14 @@ namespace lifex::examples
       , gamma(0.1)
       , a(13e-3)
     {
-      this->u_ex = std::make_shared<monodomain_fitzhugh_DG::ExactSolution>();
+      this->u_ex = std::make_shared<monodomain_ttp06_DG::ExactSolution>();
       this->grad_u_ex =
-        std::make_shared<monodomain_fitzhugh_DG::GradExactSolution>();
-      this->f_ex = std::make_shared<monodomain_fitzhugh_DG::RightHandSide>(
+        std::make_shared<monodomain_ttp06_DG::GradExactSolution>();
+      this->f_ex = std::make_shared<monodomain_ttp06_DG::RightHandSide>(
         ChiM, Sigma, Cm, kappa, epsilon, gamma, a);
-      this->g_n = std::make_shared<monodomain_fitzhugh_DG::BCNeumann>(Sigma);
-      w_ex = std::make_shared<monodomain_fitzhugh_DG::ExactSolution_w>(epsilon,
-                                                                       gamma);
-      grad_w_ex =
-        std::make_shared<monodomain_fitzhugh_DG::GradExactSolution_w>(epsilon,
-                                                                      gamma);
+      this->g_n = std::make_shared<monodomain_ttp06_DG::BCNeumann>(Sigma);
+
+      ionic_model = std::make_shared<lifex::TTP06> ("Monodomain ttp06", true);
     }
 
   private:
@@ -485,24 +391,20 @@ namespace lifex::examples
     double gamma;
     /// ODe parameter.
     double a;
-    /// Solution gating variable, without ghost entries.
-    lifex::LinAlg::MPI::Vector solution_owned_w;
-    /// Solution gating variable, with ghost entries.
-    lifex::LinAlg::MPI::Vector solution_w;
-    /// Solution exact gating variable, without ghost entries.
-    lifex::LinAlg::MPI::Vector solution_ex_owned_w;
-    /// Solution exact gating variable, without ghost entries.
-    lifex::LinAlg::MPI::Vector solution_ex_w;
-    /// Pointer to exact solution function gating variable.
-    std::shared_ptr<lifex::utils::FunctionDirichlet> w_ex;
-    /// Pointer to exact gradient solution Function gating variable
-    std::shared_ptr<dealii::Function<lifex::dim>> grad_w_ex;
+    // /// Solution gating variable, without ghost entries.
+    std::map<unsigned int, lifex::LinAlg::MPI::Vector> solution_owned_w;
+    // /// Solution gating variable, with ghost entries.
+    std::map<unsigned int, lifex::LinAlg::MPI::Vector> solution_w;
     /// BDF time advancing handler.
-    lifex::utils::BDFHandler<lifex::LinAlg::MPI::Vector> bdf_handler_w;
+    std::map<unsigned int, lifex::utils::BDFHandler<lifex::LinAlg::MPI::Vector>> bdf_handler_w;
     /// BDF solution, with ghost entries.
-    lifex::LinAlg::MPI::Vector solution_bdf_w;
+    std::map<unsigned int, lifex::LinAlg::MPI::Vector>  solution_bdf_w;
     /// BDF extrapolated solution, with ghost entries.
-    lifex::LinAlg::MPI::Vector solution_ext_w;
+    std::map<unsigned int, lifex::LinAlg::MPI::Vector>  solution_ext_w;
+    /// Ionic model
+    std::shared_ptr<lifex::TTP06> ionic_model;
+    /// Applied current for fix time
+    lifex::LinAlg::MPI::Vector I_app;
 
     /// Override for the simulation run.
     void
@@ -523,15 +425,20 @@ namespace lifex::examples
 
   template <class basis>
   void
-  Monodomain_fitzhugh_DG<basis>::run()
+  Monodomain_ttp06_DG<basis>::run()
   {
     this->create_mesh();
     this->setup_system();
 
+    ionic_model->setup_system_0d();
+
     this->initialize_solution(this->solution_owned, this->solution);
     this->initialize_solution(this->solution_ex_owned, this->solution_ex);
-    this->initialize_solution(this->solution_owned_w, this->solution_w);
-    this->initialize_solution(this->solution_ex_owned_w, this->solution_ex_w);
+
+    for(unsigned int i = 0; i < 18; ++i)
+    {
+        this->initialize_solution(this->solution_owned_w[i], this->solution_w[i]);
+    }
 
     time_initialization();
 
@@ -545,7 +452,13 @@ namespace lifex::examples
               << std::setprecision(6) << this->time << std::endl;
 
         this->update_time();
+
         this->solution_ext = this->bdf_handler.get_sol_extrapolation();
+
+        for(unsigned int i = 0; i < 18; ++i)
+        {
+          this->solution_ext_w[i] = bdf_handler_w.at(i).get_sol_extrapolation();
+        }
 
         this->assemble_system();
 
@@ -557,10 +470,6 @@ namespace lifex::examples
                                        this->solution_ex_owned,
                                        this->u_ex,
                                        "u");
-        this->intermediate_error_print(this->solution_owned_w,
-                                       this->solution_ex_owned_w,
-                                       this->w_ex,
-                                       "w");
       }
 
 
@@ -569,11 +478,6 @@ namespace lifex::examples
                          this->u_ex,
                          this->grad_u_ex,
                          "u");
-    this->compute_errors(this->solution_owned_w,
-                         this->solution_ex_owned_w,
-                         this->w_ex,
-                         this->grad_w_ex,
-                         "w");
 
     // Generation of the graphical output.
     if (this->prm_fe_degree < 3) // due to the current deal.II availabilities.
@@ -589,62 +493,83 @@ namespace lifex::examples
 
   template <class basis>
   void
-  Monodomain_fitzhugh_DG<basis>::update_time()
+  Monodomain_ttp06_DG<basis>::update_time()
   {
     this->u_ex->set_time(this->time);
     this->f_ex->set_time(this->time);
     this->g_n->set_time(this->time);
     this->grad_u_ex->set_time(this->time);
 
-    w_ex->set_time(this->time);
-    grad_w_ex->set_time(this->time);
-
     this->bdf_handler.time_advance(this->solution_owned, true);
     this->solution_bdf = this->bdf_handler.get_sol_bdf();
-    bdf_handler_w.time_advance(solution_owned_w, true);
-    solution_bdf_w = this->bdf_handler_w.get_sol_bdf();
+
+    for(unsigned int i = 0; i < 18; ++i)
+    {
+      bdf_handler_w.at(i).time_advance(solution_owned_w.at(i), true);
+      solution_bdf_w[i] = this->bdf_handler_w.at(i).get_sol_bdf();
+    }
 
     // Update solution_ex_owned from the updated u_ex.
     this->discretize_analytical_solution(this->u_ex, this->solution_ex_owned);
-    this->discretize_analytical_solution(this->w_ex, this->solution_ex_owned_w);
+    this->discretize_analytical_solution(this->f_ex, I_app);
   }
 
   template <class basis>
   void
-  Monodomain_fitzhugh_DG<basis>::time_initialization()
+  Monodomain_ttp06_DG<basis>::time_initialization()
   {
     this->u_ex->set_time(this->prm_time_init);
     this->discretize_analytical_solution(this->u_ex, this->solution_ex_owned);
     this->solution_ex = this->solution_ex_owned;
     this->solution = this->solution_owned = this->solution_ex_owned;
 
-    w_ex->set_time(this->prm_time_init);
-    this->discretize_analytical_solution(this->w_ex, this->solution_ex_owned_w);
-    solution_ex_w = solution_ex_owned_w;
-    solution_w = solution_owned_w = solution_ex_owned_w;
-
     const std::vector<lifex::LinAlg::MPI::Vector> sol_init(
       this->prm_bdf_order, this->solution_owned);
 
     this->bdf_handler.initialize(this->prm_bdf_order, sol_init);
 
-    const std::vector<lifex::LinAlg::MPI::Vector> sol_init_w(
-      this->prm_bdf_order, solution_owned_w);
+    for(unsigned int i = 0; i < 18; ++i)
+    {
+      solution_w[i] = solution_owned_w[i] =  ionic_model->setup_initial_conditions()[i];
 
-    bdf_handler_w.initialize(this->prm_bdf_order, sol_init_w);
+      const std::vector<lifex::LinAlg::MPI::Vector> sol_init_w(
+        this->prm_bdf_order, solution_owned_w.at(i));
+
+      bdf_handler_w[i].initialize(this->prm_bdf_order, sol_init_w);
+    }
   }
 
   template <class basis>
   void
-  Monodomain_fitzhugh_DG<basis>::assemble_system()
+  Monodomain_ttp06_DG<basis>::assemble_system()
   {
     const double &alpha_bdf = this->bdf_handler.get_alpha();
 
-    solution_owned_w *= -gamma;
-    solution_owned_w.add(1, this->solution_owned);
-    solution_owned_w *= epsilon;
-    solution_owned_w.add(1 / this->prm_time_step, this->solution_bdf_w);
-    solution_owned_w *= this->prm_time_step / alpha_bdf;
+    for(unsigned int p = 0; p < this->dof_handler.n_dofs(); ++p)
+    {
+      std::vector<double> tmp_w_bdf;
+      std::vector<double> tmp_w_ext;
+      std::vector<double> w;
+
+      for(unsigned int k = 0; k < 18; ++k)
+      {
+        tmp_w_bdf.push_back(solution_bdf_w.at(k)[p]);
+        tmp_w_ext.push_back(solution_ext_w.at(k)[p]);
+      }
+
+      w = ionic_model->solve_time_step_0d(this->solution[p],
+      this->prm_bdf_order,
+      tmp_w_bdf,
+      tmp_w_ext,
+      0,
+      1,
+      I_app[p]).first;
+
+      for(unsigned int k = 0; k < 18; ++k)
+      {
+        solution_w.at(k)[p] = w[k];
+      }
+    }
 
     solution_w = solution_owned_w;
 
@@ -673,17 +598,15 @@ namespace lifex::examples
     FullMatrix<double> IN_t(this->dofs_per_cell, this->dofs_per_cell);
     // See DG_Assemble::local_SN().
     FullMatrix<double> SN(this->dofs_per_cell, this->dofs_per_cell);
-    // See DG_Assemble::local_non_linear_fitzhugh().
-    FullMatrix<double> C(this->dofs_per_cell, this->dofs_per_cell);
 
     Vector<double>                       cell_rhs(this->dofs_per_cell);
+    Vector<double>                       cell_rhs_ttp06(this->dofs_per_cell);
     Vector<double>                       cell_rhs_edge(this->dofs_per_cell);
     Vector<double>                       u0_rhs(this->dofs_per_cell);
     Vector<double>                       w0_rhs(this->dofs_per_cell);
     std::vector<types::global_dof_index> dof_indices(this->dofs_per_cell);
 
     dealii::IndexSet owned_dofs = this->dof_handler.locally_owned_dofs();
-    ;
 
     for (const auto &cell : this->dof_handler.active_cell_iterators())
       {
@@ -699,13 +622,13 @@ namespace lifex::examples
             M *= alpha_bdf;
             M *= ChiM;
             M *= Cm;
-            C = this->assemble->local_non_linear_fitzhugh(this->solution_owned,
-                                                          a,
-                                                          dof_indices);
-            C *= kappa;
-            C *= ChiM;
 
             cell_rhs = this->assemble->local_rhs(this->f_ex);
+
+            cell_rhs_ttp06 = this->assemble->local_ttp06(ionic_model, this->solution, this->solution_ext,
+            solution_w, dof_indices);
+            cell_rhs_ttp06 *= ChiM;
+            cell_rhs_ttp06 *= (-1);
 
             u0_rhs =
               this->assemble->local_u0_M_rhs(this->solution_bdf, dof_indices);
@@ -713,14 +636,9 @@ namespace lifex::examples
             u0_rhs *= ChiM;
             u0_rhs *= Cm;
 
-            w0_rhs =
-              this->assemble->local_w0_M_rhs(solution_owned_w, dof_indices);
-            w0_rhs *= ChiM;
-            w0_rhs *= (-1);
-
             this->matrix.add(dof_indices, V);
             this->matrix.add(dof_indices, M);
-            this->matrix.add(dof_indices, C);
+            this->rhs.add(dof_indices, cell_rhs);
             this->rhs.add(dof_indices, cell_rhs);
             this->rhs.add(dof_indices, u0_rhs);
             this->rhs.add(dof_indices, w0_rhs);
@@ -773,4 +691,4 @@ namespace lifex::examples
   }
 } // namespace lifex::examples
 
-#endif /* MONODOMAIN_FITZHUGH_DG_HPP_*/
+#endif /* MONODOMAIN_ttp06_DG_HPP_*/
