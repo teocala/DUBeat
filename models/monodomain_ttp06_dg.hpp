@@ -643,7 +643,7 @@ namespace lifex::examples
             this->matrix.add(dof_indices, V);
             this->matrix.add(dof_indices, M);
             this->rhs.add(dof_indices, cell_rhs);
-            this->rhs.add(dof_indices, cell_rhs);
+            this->rhs.add(dof_indices, cell_rhs_ttp06);
             this->rhs.add(dof_indices, u0_rhs);
             this->rhs.add(dof_indices, w0_rhs);
 
