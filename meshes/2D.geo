@@ -24,7 +24,7 @@
 SetFactory("OpenCASCADE");
 
 // Parameter to modify ( = Cube edge / element edge ratio)
-N = 2;
+N = 1;
 
 Rectangle(1) = {0, 0, 0, 1, 1, 0};
 //+

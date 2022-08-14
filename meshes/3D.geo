@@ -22,7 +22,7 @@
 // This .geo file can be used to generate on gmsh a simple cube mesh with a specific refinement level.
 
 // Parameter to modify ( = Cube edge / element edge ratio)
-N = 2;
+N = 1;
 
 SetFactory("OpenCASCADE");
 //+
