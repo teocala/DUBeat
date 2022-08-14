@@ -44,8 +44,13 @@
 #include "source/init.hpp"
 
 /**
- * @brief Class to apply the conversions of a discretized solution between
- * Dubiner basis and FEM basis representations.
+ * @brief
+ * Class used to discretize analytical solutions as linear combinations of DGFEM
+ * or Dubiner basis. It also provides conversions for solution vectors with
+ * respect to the DGFEM basis to the Dubiner basis and viceversa. This class is
+ * necessary, for instance, to discretize initial analytical solutions for
+ * time-dependent problems or to obtain solution vectors for contour plots at
+ * the end of the system solving.
  */
 template <class basis>
 class DUBFEMHandler : public DUBValues<lifex::dim>
@@ -76,13 +81,13 @@ public:
   /// Default move constructor.
   DUBFEMHandler<basis>(DUBFEMHandler<basis> &&DUBFEMHandler) = default;
 
-  /// Conversion of a discretized solution from Dubiner coefficients to FEM
-  /// coefficients.
+  /// Conversion of a discretized solution vector from Dubiner coefficients to
+  /// FEM coefficients.
   lifex::LinAlg::MPI::Vector
   dubiner_to_fem(const lifex::LinAlg::MPI::Vector &dub_solution) const;
 
-  /// Conversion of a discretized solution from FEM coefficients to Dubiner
-  /// coefficients.
+  /// Conversion of a discretized solution vector from FEM coefficients to
+  /// Dubiner coefficients.
   lifex::LinAlg::MPI::Vector
   fem_to_dubiner(const lifex::LinAlg::MPI::Vector &fem_solution) const;
 
@@ -107,6 +112,8 @@ DUBFEMHandler<basis>::dubiner_to_fem(
   const std::vector<dealii::Point<lifex::dim>> support_points =
     fe_dg.get_unit_support_points();
 
+  // To perfom the conversion to FEM, we just need to evaluate the linear
+  // combination of Dubiner functions over the dof points.
   for (const auto &cell : dof_handler.active_cell_iterators())
     {
       dof_indices = dof_handler.get_dof_indices(cell);
@@ -139,6 +146,12 @@ DUBFEMHandler<basis>::fem_to_dubiner(
   std::vector<unsigned int> dof_indices(this->n_functions);
   double                    eval_on_quad;
 
+
+  // To perform the conversion to Dubiner, we just need to perform a (numerical)
+  // L2 scalar product between the discretized solution and the Dubiner
+  // functions. More precisely, thanks to the L2-orthonormality of the Dubiner
+  // basis, the i-th coefficient w.r.t. the Dubiner basis is the L2 scalar
+  // product between the solution and the i-th Dubiner function.
   for (const auto &cell : dof_handler.active_cell_iterators())
     {
       dof_indices = dof_handler.get_dof_indices(cell);
@@ -181,7 +194,9 @@ DUBFEMHandler<basis>::analytical_to_dubiner(
   std::vector<unsigned int> dof_indices(this->n_functions);
   double                    eval_on_quad;
 
-
+  // Here, we apply the same idea as in fem_to_dubiner. The only difference is
+  // that here we can directly evaluate the solution on the quadrature point
+  // since the solution is analytical.
   for (const auto &cell : dof_handler.active_cell_iterators())
     {
       dof_indices = dof_handler.get_dof_indices(cell);

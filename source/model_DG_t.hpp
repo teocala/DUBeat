@@ -83,13 +83,11 @@ public:
 
 protected:
   /// Override for declaration of additional parameters.
-  virtual
-  void
+  virtual void
   declare_parameters(lifex::ParamHandler &params) const override;
 
   /// Override to parse additional parameters.
-  virtual
-  void
+  virtual void
   parse_parameters(lifex::ParamHandler &params) override;
 
   /// Setup for the time-dependent problems at time-step 0.

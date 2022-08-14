@@ -34,8 +34,8 @@
 #include <utility>
 #include <vector>
 
-/// This routine computes the n Gauss-Legendre nodes and weights on a given
-/// interval (a,b)
+/// This routine computes the Gauss-Legendre nodes and weights on a given
+/// interval (a,b).
 extern std::pair<std::vector<dealii::Point<1>>, std::vector<double>>
 gauleg(const double       left_position,
        const double       right_position,
@@ -90,8 +90,10 @@ gauleg(const double       left_position,
 }
 
 /**
- * @brief Class representing the Gauss Legendre quadrature formula on simplex
- * elements.
+ * @brief
+ * Class representing the Gauss-Legendre quadrature formula on simplex
+ * elements. Not implemented yet in deal.II, DUBeat adds it to the deal.II
+ * quadrature methods.
  */
 template <unsigned int dim>
 class QGaussLegendreSimplex : public dealii::Quadrature<dim>

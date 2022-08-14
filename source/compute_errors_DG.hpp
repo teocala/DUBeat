@@ -313,10 +313,15 @@ Compute_Errors_DG<basis>::compute_error_L2()
 
           dof_indices = dof_handler.get_dof_indices(cell);
 
+          // Computation of the L^2 norm error as the sum of the squared
+          // differences on the quadrature points.
           for (unsigned int q = 0; q < n_quad_points; ++q)
             {
               local_approx = 0;
 
+              // The following loop is necessary to evaluate the discretized
+              // solution on a quadrature point as a linear combination of the
+              // analytical basis functions evaluated on that point.
               for (unsigned int i = 0; i < dofs_per_cell; ++i)
                 {
                   local_approx +=
@@ -359,6 +364,8 @@ Compute_Errors_DG<basis>::compute_error_H1()
 
           dof_indices = dof_handler.get_dof_indices(cell);
 
+          // Loop for the computation of the H1 semi-norm error, i.e. the L^2
+          // norm of the gradient of the error.
           for (unsigned int q = 0; q < n_quad_points; ++q)
             {
               local_grad_exact      = 0;
@@ -367,9 +374,15 @@ Compute_Errors_DG<basis>::compute_error_H1()
 
               for (unsigned int j = 0; j < lifex::dim; ++j)
                 {
+                  // Evaluation of the gradient of the exact solution on the
+                  // quadrature point.
                   local_grad_exact[j] =
                     grad_u_ex->value(vol_handler.quadrature_real(q), j);
 
+                  // Evaluation of the gradient of the discretized solution on
+                  // the quadrature point. Once again, we need to exploit the
+                  // linearity of the discretized solution with respect to the
+                  // analytical basis functions.
                   for (unsigned int i = 0; i < dofs_per_cell; ++i)
                     {
                       local_approx_gradient[j] +=
@@ -388,6 +401,8 @@ Compute_Errors_DG<basis>::compute_error_H1()
         }
     }
 
+  // The full H^1 norm error is composed by the sum of the L^2 norm and the H^1
+  // semi-norm.
   errors[2] = sqrt(errors[1] * errors[1] + error_semi_H1);
 }
 
@@ -428,6 +443,8 @@ Compute_Errors_DG<basis>::compute_error_DG()
               std::vector<lifex::types::global_dof_index> dof_indices_neigh(
                 dofs_per_cell);
 
+              // Loop for the computation of the second component of the DG
+              // error, the one corresponding to the integral on the faces.
               for (unsigned int q = 0; q < n_quad_points_face; ++q)
                 {
                   for (unsigned int i = 0; i < dofs_per_cell; ++i)
@@ -474,7 +491,9 @@ Compute_Errors_DG<basis>::compute_error_DG()
         }
     }
   double error_semi_H1 = errors[2] * errors[2] - errors[1] * errors[1];
-  errors[3]            = sqrt(error_semi_H1 + error_DG);
+  // The full DG norm error is composed by the sum of the previous computed
+  // integral and the H^1 semi-norm.
+  errors[3] = sqrt(error_semi_H1 + error_DG);
 }
 
 #endif /* ComputeErrorsDG_HPP_*/

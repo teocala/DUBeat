@@ -37,7 +37,7 @@
 
 namespace error_parser
 {
-  /// Return the today's date.
+  /// Return the current date and time.
   std::string
   get_date()
   {
@@ -88,6 +88,7 @@ namespace error_parser
     const std::string filename = "errors_" + title + "_" + std::to_string(dim) +
                                  "D_" + solution_name + ".data";
 
+    // If datafile does not exist, initialize it before.
     if (!std::filesystem::exists(filename))
       initialize_datafile(dim, title, solution_name);
 

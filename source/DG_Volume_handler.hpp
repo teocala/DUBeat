@@ -44,36 +44,39 @@
 #include "QGaussLegendreSimplex.hpp"
 
 /**
- * @brief Class for the main operations on a discontinuous Galerkin element.
+ * @brief Class for the main operations on a discontinuous Galerkin volume element.
  */
 template <unsigned int dim>
 class DGVolumeHandler
 {
 protected:
-  /// Number of quadrature points on one dimension.
-  /// Default is polynomial degree + 2
+  /// Number of quadrature points in one dimensional elements.
+  /// Default is polynomial degree + 2.
   const unsigned int n_quad_points_1D;
 
   /// Actual DG cell.
   typename dealii::DoFHandler<dim>::active_cell_iterator cell;
 
   /// Internal DGFEM basis class. This internal member permits to exploit
-  /// useful already implemented operations. Polynomial order is set to 1 always
-  /// because it executes only geometric operations not related to the number of
-  /// dofs.
+  /// useful already implemented operations. Polynomial order is always set to 1
+  /// because the class executes only geometric operations not related to the
+  /// degrees of freedom.
   const std::unique_ptr<dealii::FE_SimplexDGP<dim>> fe_dg;
 
-  /// Mapping of the discretized space.
+  /// Mapping of the discretized space, needed for geometrical
+  /// reference-to-actual operations.
   const std::unique_ptr<dealii::MappingFE<dim>> mapping;
 
   /// Quadrature formula for volume elements.
   const QGaussLegendreSimplex<dim> QGLpoints;
 
   /// Internal FEM basis class. This internal member permits to exploit useful
-  /// already implemented operations.
+  /// already implemented operations. As for fe_dg, the polynomial order is
+  /// always 1 because it is only needed for geometric operations not related to
+  /// the degrees of freedom.
   std::unique_ptr<dealii::FEValues<dim>> fe_values;
 
-  /// A bool to inform if the class is initialized or not.
+  /// A condition to inform if the class is initialized on an element or not.
   bool initialized = false;
 
 public:
@@ -117,7 +120,7 @@ public:
   virtual double
   quadrature_weight(const unsigned int quadrature_point_no) const;
 
-  /// Inverse of the Jacobian of the reference to actual transformation.
+  /// Inverse of the Jacobian of the reference-to-actual transformation.
   dealii::Tensor<2, dim>
   get_jacobian_inverse() const;
 
@@ -190,6 +193,7 @@ DGVolumeHandler<dim>::get_jacobian_inverse() const
   const dealii::DerivativeForm<1, dim, dim> jac_inv =
     fe_values->inverse_jacobian(0);
 
+  // We now copy jac_inv in BJinv.
   for (unsigned int i = 0; i < dim; ++i)
     {
       for (unsigned int j = 0; j < dim; ++j)

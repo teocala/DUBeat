@@ -39,7 +39,11 @@
 #include <utility>
 
 /**
- * @brief Class representing the Dubiner function basis.
+ * @brief
+ * Class representing the Dubiner basis functions definitions. The main utility
+ * is the evaluations of these functions and their gradients on the reference
+ * cell. Instead, for their evaluations on the real cells see DGVolumeHandler
+ * and DGFaceHandler.
  */
 template <unsigned int dim>
 class DUBValues

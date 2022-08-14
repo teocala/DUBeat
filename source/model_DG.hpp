@@ -55,7 +55,8 @@
 #include "source/numerics/tools.hpp"
 
 /**
- * @brief Class representing the resolution of problems using discontinuous
+ * @brief
+ * Class representing the resolution of problems using discontinuous
  * Galerkin methods.
  */
 template <class basis>
@@ -127,11 +128,11 @@ protected:
   virtual void
   assemble_system() = 0;
 
-  /// Creation of mesh, default path.
+  /// Load the mesh from the default path.
   void
   create_mesh();
 
-  /// Creation of mesh.
+  /// Load the mesh from a user-defined path.
   void
   create_mesh(std::string mesh_path);
 
@@ -139,7 +140,8 @@ protected:
   void
   solve_system();
 
-  /// To compute errors at the end of system solving.
+  /// To compute errors at the end of system solving, it exploits the
+  /// Compute_Errors_DG class.
   void
   compute_errors(const lifex::LinAlg::MPI::Vector &solution_owned,
                  const lifex::LinAlg::MPI::Vector &solution_ex_owned,
@@ -480,7 +482,9 @@ ModelDG<basis>::create_mesh()
               dealii::StandardExceptions::ExcMessage(
                 "This mesh file/directory does not exist."));
 
-  // Tetrahedral meshes can currently be imported only from file
+  // deal.II does not provide runtime generation of tetrahedral meshes, hence
+  // they can currently be imported only from file. This version of create_mesh
+  // picks the mesh file from the default path.
   triangulation.initialize_from_file(mesh_path, 1);
   triangulation.set_element_type(lifex::utils::MeshHandler::ElementType::Tet);
   triangulation.create_mesh();
@@ -494,7 +498,9 @@ ModelDG<basis>::create_mesh(std::string mesh_path)
               dealii::StandardExceptions::ExcMessage(
                 "This mesh file/directory does not exist."));
 
-  // Tetrahedral meshes can currently be imported only from file
+  // deal.II does not provide runtime generation of tetrahedral meshes, hence
+  // they can currently be imported only from file. This version of create_mesh
+  // picks the mesh file from a user-defined path.
   triangulation.initialize_from_file(mesh_path, 1);
   triangulation.set_element_type(lifex::utils::MeshHandler::ElementType::Tet);
   triangulation.create_mesh();
@@ -548,14 +554,14 @@ ModelDG<basis>::output_results() const
 {
   lifex::DataOut<lifex::dim> data_out;
 
+  // To output results, we need the deal.II DoFHandler instead of the DUBeat
+  // DoFHandler_DG since we are required here to use deal.II functions. On the
+  // other hand, the deal.II DofHandler is limited to the 2nd order polynomials.
   AssertThrow(prm_fe_degree < 3,
               dealii::StandardExceptions::ExcMessage(
                 "You cannot output contour plots, deal.II library does not "
                 "provide yet DGFEM spaces with polynomial order > 2."));
 
-  // To output results, we need the deal.II DoFHandler instead of the DUBeat
-  // DoFHandler_DG since we use here deal.II functions. On the other hand, the
-  // deal.II dof handler is limited to the 2 order polynomials.
   dealii::FE_SimplexDGP<lifex::dim> fe(prm_fe_degree);
   dealii::DoFHandler<lifex::dim>    dof_handler_fem;
   dof_handler_fem.reinit(triangulation.get());

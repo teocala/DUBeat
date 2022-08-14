@@ -49,9 +49,17 @@ using ActiveSelector = dealii::internal::DoFHandlerImplementation::
 using active_cell_iterator = typename ActiveSelector::active_cell_iterator;
 
 /**
- * @brief Class to work with global and local degrees of freedom. It requires a specialization from the deal.II class in order to let higher order polynomials available since the
- * deal.II class, at the moment, cannot distribute dofs with polynomial orders
- * greater than 2.
+ * @brief
+ * Class to work with global and local degrees of freedom and their mapping.
+ * DUBValues exploits this class instead of the deal.II DoFHandler class because
+ * the latter, at the moment, cannot distribute dofs on tethraedra with
+ * polynomial orders greater than 2. This implementation permits to overcome
+ * this issue thanks to the use of an internal dof_map and the definition of
+ * Dubiner basis of every order (even >2) from DUBValues. On the other hand, it
+ * is not possible to do the same with DGFEM because the basis functions, in
+ * this case, come directly from the deal.II FiniteElement classes. From the
+ * previous observations, it is so clear that Dubiner basis can be used with
+ * every order while DGFEM with order at most 2.
  */
 template <class basis>
 class DoFHandler_DG : public dealii::DoFHandler<lifex::dim>
@@ -88,13 +96,13 @@ public:
   n_dofs() const;
 
   /// Distribute dofs through the elements. It overwrites the method in
-  /// dealii::DoFHandler in order to let high order polynomials available in the
-  /// case of Dubiner basis.
+  /// dealii::DoFHandler in order to let higher order polynomials available in
+  /// the case of Dubiner basis.
   void
   distribute_dofs(const dealii::FE_SimplexDGP<lifex::dim> &fe);
 
-  /// Same method but avoids to use FiniteElement that might be invalid with
-  /// high order polynomials.
+  /// Same method but avoids to use FiniteElement classes that might be invalid
+  /// with higher order polynomials.
   void
   distribute_dofs(const unsigned int degree);
 
@@ -103,7 +111,7 @@ public:
   get_dof_indices(active_cell_iterator cell) const;
 
   /// Return a set of all the locally owned dofs (for the time being, it is
-  /// equivalent to all the dofs).
+  /// equivalent to return all the dofs).
   dealii::IndexSet
   locally_owned_dofs() const;
 };
@@ -147,10 +155,14 @@ DoFHandler_DG<basis>::n_dofs() const
   for (const auto &cell : this->active_cell_iterators())
     n_cells++;
 
+  // The global nuber of dofs is the number of dofs per cell times the total
+  // number of cells since every cell has the same number of dofs.
   return n_cells * n_dofs_per_cell();
 }
 
 
+/// Specialized version for DGFEM, it does not use dof_map but exploits instead
+/// the deal.II original distribute_dofs. Limited to order 2.
 template <>
 void
 DoFHandler_DG<dealii::FE_SimplexDGP<lifex::dim>>::distribute_dofs(
@@ -164,6 +176,9 @@ DoFHandler_DG<dealii::FE_SimplexDGP<lifex::dim>>::distribute_dofs(
   dealii::DoFHandler<lifex::dim>::distribute_dofs(fe);
 }
 
+/// Specialized version for Dubiner basis, this version uses instead the
+/// internal dof_map. Because of the input argument, the space order is still
+/// limited to 2.
 template <>
 void
 DoFHandler_DG<DUBValues<lifex::dim>>::distribute_dofs(
@@ -182,11 +197,14 @@ DoFHandler_DG<DUBValues<lifex::dim>>::distribute_dofs(
   unsigned int i = 0;
   for (const auto &cell : this->active_cell_iterators())
     {
+      // In the dof_map, for every cell we assign the global dofs.
       cell->get_dof_indices(dof_indices);
       dof_map.emplace(cell, dof_indices);
     }
 }
 
+/// Specialized version for DGFEM, it exploits the original distribute_dofs and
+/// so it is limited to space order at most 2.
 template <>
 void
 DoFHandler_DG<dealii::FE_SimplexDGP<lifex::dim>>::distribute_dofs(
@@ -200,6 +218,11 @@ DoFHandler_DG<dealii::FE_SimplexDGP<lifex::dim>>::distribute_dofs(
   this->distribute_dofs(fe);
 }
 
+
+/// Specialized version for Dubiner basis. Since the input is the polynomial
+/// order and it works only with the internal dof_map (no FiniteElement
+/// classes), this version of distribute_dofs is the only one to accept every
+/// polynomial order.
 template <>
 void
 DoFHandler_DG<DUBValues<lifex::dim>>::distribute_dofs(const unsigned int degree)
@@ -221,6 +244,8 @@ DoFHandler_DG<DUBValues<lifex::dim>>::distribute_dofs(const unsigned int degree)
     }
 }
 
+/// Specialized version for DGFEM. Hence, it exploits the original deal.II
+/// methods.
 template <>
 std::vector<lifex::types::global_dof_index>
 DoFHandler_DG<dealii::FE_SimplexDGP<lifex::dim>>::get_dof_indices(
@@ -232,6 +257,9 @@ DoFHandler_DG<dealii::FE_SimplexDGP<lifex::dim>>::get_dof_indices(
   return dof_indices;
 }
 
+
+/// Specialized version for Dubiner basis. Hence, the dof_indices are obtained
+/// directly from the internal dof_map.
 template <>
 std::vector<lifex::types::global_dof_index>
 DoFHandler_DG<DUBValues<lifex::dim>>::get_dof_indices(
@@ -248,6 +276,7 @@ dealii::IndexSet
 DoFHandler_DG<basis>::locally_owned_dofs() const
 {
   dealii::IndexSet owned_dofs(this->n_dofs());
+  // For the time being, this function returns all the dofs.
   owned_dofs.add_range(0, this->n_dofs());
   return owned_dofs;
 }

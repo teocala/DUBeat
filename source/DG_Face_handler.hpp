@@ -51,7 +51,7 @@ private:
   /// Index of the actual face.
   unsigned int edge;
 
-  /// Tolerance.
+  /// Default tolerance.
   const double tol = 1e-10;
 
   /// Quadrature formula for face elements.
@@ -95,11 +95,12 @@ public:
   dealii::Point<dim>
   quadrature_ref(const unsigned int q) const override;
 
-  /// Quadrature weight associated to a quadrature node.
+  /// Quadrature weight associated to a quadrature node, needed for numerical
+  /// integration.
   double
   quadrature_weight(const unsigned int quadrature_point_no) const override;
 
-  /// If needed, to manually obtain the associated quadrature point in the
+  /// To manually obtain the associated quadrature point index in the
   /// neighbor element on the shared face.
   int
   corresponding_neigh_index(
@@ -197,6 +198,8 @@ DGFaceHandler<dim>::corresponding_neigh_index(
     {
       const dealii::Point<dim> P_nq = DGFaceHandler_neigh.quadrature_real(nq);
 
+      // If the distance between P_nq and P_q is negligible, then we have found
+      // the corresponding quadrature point on the neighbor element.
       if ((P_nq - P_q).norm() < tol)
         {
           quad = nq;
@@ -230,7 +233,7 @@ DGFaceHandler<2>::get_measure() const
 
 /// Specialization to measure the area of the face for a three dimensional
 /// tethraedron (i.e., area of a triangle). The method exploits the Erone's
-/// formula. Note that dealII does not have so far a version for triangles.
+/// formula since deal.II does not have so far a version for triangles.
 template <>
 double
 DGFaceHandler<3>::get_measure() const
@@ -238,14 +241,17 @@ DGFaceHandler<3>::get_measure() const
   AssertThrow(this->initialized,
               dealii::StandardExceptions::ExcNotInitialized());
 
-  const auto   face     = this->cell->face(edge);
+  const auto face = this->cell->face(edge);
+
+  // Semi-perimeter of the triangle.
   const double semi_per = (face->line(0)->measure() + face->line(1)->measure() +
                            face->line(2)->measure()) /
                           2;
 
+  // Erone's formula.
   return std::sqrt(semi_per * (semi_per - face->line(0)->measure()) *
                    (semi_per - face->line(1)->measure()) *
-                   (semi_per - face->line(2)->measure())); // Erone's formula
+                   (semi_per - face->line(2)->measure()));
 }
 
 #endif /* DGFaceHandler_HPP_*/

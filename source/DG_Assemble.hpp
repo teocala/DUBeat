@@ -40,11 +40,11 @@
 #include "DG_Face_handler.hpp"
 #include "DG_Volume_handler.hpp"
 #include "DUB_FEM_handler.hpp"
-#include "source/ionic/ttp06.hpp"
 #include "source/core_model.hpp"
 #include "source/geometry/mesh_handler.hpp"
 #include "source/init.hpp"
 #include "source/io/data_writer.hpp"
+#include "source/ionic/ttp06.hpp"
 #include "source/numerics/bc_handler.hpp"
 #include "source/numerics/linear_solver_handler.hpp"
 #include "source/numerics/preconditioner_handler.hpp"
@@ -249,9 +249,12 @@ public:
 
   /// Assembly of the local vector of the TTP06 ionic model
   dealii::Vector<double>
-  local_ttp06(const std::shared_ptr<lifex::TTP06> ionic_model, const lifex::LinAlg::MPI::Vector & u,
-  const lifex::LinAlg::MPI::Vector & u_ext, const std::map<unsigned int, lifex::LinAlg::MPI::Vector> & w,
-const std::vector<dealii::types::global_dof_index> &dof_indices) const;
+  local_ttp06(
+    const std::shared_ptr<lifex::TTP06>                       ionic_model,
+    const lifex::LinAlg::MPI::Vector &                        u,
+    const lifex::LinAlg::MPI::Vector &                        u_ext,
+    const std::map<unsigned int, lifex::LinAlg::MPI::Vector> &w,
+    const std::vector<dealii::types::global_dof_index> &dof_indices) const;
 
   /// Destructor.
   virtual ~DGAssemble() = default;
@@ -771,8 +774,12 @@ DGAssemble<basis>::local_non_linear_fitzhugh(
 
 template <class basis>
 dealii::Vector<double>
-DGAssemble<basis>::local_ttp06(const std::shared_ptr<lifex::TTP06> ionic_model, const lifex::LinAlg::MPI::Vector & u,
-const lifex::LinAlg::MPI::Vector & u_ext, const std::map<unsigned int, lifex::LinAlg::MPI::Vector> & w, const std::vector<dealii::types::global_dof_index> &dof_indices) const
+DGAssemble<basis>::local_ttp06(
+  const std::shared_ptr<lifex::TTP06>                       ionic_model,
+  const lifex::LinAlg::MPI::Vector &                        u,
+  const lifex::LinAlg::MPI::Vector &                        u_ext,
+  const std::map<unsigned int, lifex::LinAlg::MPI::Vector> &w,
+  const std::vector<dealii::types::global_dof_index> &      dof_indices) const
 {
   dealii::Vector<double> cell_rhs(dofs_per_cell);
 
@@ -780,22 +787,25 @@ const lifex::LinAlg::MPI::Vector & u_ext, const std::map<unsigned int, lifex::Li
     vol_handler.get_jacobian_inverse();
   const double det = 1 / determinant(BJinv);
 
-  for(unsigned int q = 0; q < n_quad_points; ++q)
-  {
-    for(unsigned int i = 0; i < dofs_per_cell; ++i)
+  for (unsigned int q = 0; q < n_quad_points; ++q)
     {
-      std::vector<double> tmp_w;
+      for (unsigned int i = 0; i < dofs_per_cell; ++i)
+        {
+          std::vector<double> tmp_w;
 
-      for(unsigned int k = 0; k < 18; ++k)
-      {
-        tmp_w.push_back(w.at(k)[dof_indices[i]]);
-      }
+          for (unsigned int k = 0; k < 18; ++k)
+            {
+              tmp_w.push_back(w.at(k)[dof_indices[i]]);
+            }
 
-      cell_rhs(i) += ionic_model->Iion(u[dof_indices[i]], u_ext[dof_indices[i]], tmp_w,1,0).first
-      * basis_ptr->shape_value(i, vol_handler.quadrature_ref(q))
-      * vol_handler.quadrature_weight(q) * det;
+          cell_rhs(i) +=
+            ionic_model
+              ->Iion(u[dof_indices[i]], u_ext[dof_indices[i]], tmp_w, 1, 0)
+              .first *
+            basis_ptr->shape_value(i, vol_handler.quadrature_ref(q)) *
+            vol_handler.quadrature_weight(q) * det;
+        }
     }
-  }
 
   return cell_rhs;
 }
