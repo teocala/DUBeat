@@ -403,8 +403,11 @@ namespace lifex::examples
     std::map<unsigned int, lifex::LinAlg::MPI::Vector>  solution_ext_w;
     /// Ionic model
     std::shared_ptr<lifex::TTP06> ionic_model;
-    /// Applied current for fix time
+    /// Applied current for fixed time without ghost entries
+    lifex::LinAlg::MPI::Vector I_app_owned;
+    /// Applied current for fixed time with ghost entries
     lifex::LinAlg::MPI::Vector I_app;
+
 
     /// Override for the simulation run.
     void
@@ -434,6 +437,7 @@ namespace lifex::examples
 
     this->initialize_solution(this->solution_owned, this->solution);
     this->initialize_solution(this->solution_ex_owned, this->solution_ex);
+    this->initialize_solution(I_app_owned, I_app);
 
     for(unsigned int i = 0; i < 18; ++i)
     {
