@@ -51,7 +51,7 @@ using active_cell_iterator = typename ActiveSelector::active_cell_iterator;
 /**
  * @brief
  * Class to work with global and local degrees of freedom and their mapping.
- * DUBValues exploits this class instead of the deal.II DoFHandler class because
+ * DUBeat exploits this class instead of the deal.II DoFHandler class because
  * the latter, at the moment, cannot distribute dofs on tethraedra with
  * polynomial orders greater than 2. This implementation permits to overcome
  * this issue thanks to the use of an internal dof_map and the definition of
