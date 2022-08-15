@@ -67,7 +67,9 @@ public:
   ModelDG(std::string model_name)
     : CoreModel(model_name)
     , model_name(model_name)
-    , triangulation(prm_subsection_path, mpi_comm)
+    , triangulation(
+        std::make_shared<lifex::utils::MeshHandler>(prm_subsection_path,
+                                                    mpi_comm))
     , linear_solver(prm_subsection_path + " / Linear solver",
                     {"CG", "GMRES", "BiCGStab"},
                     "GMRES")
@@ -111,8 +113,8 @@ protected:
   /// assembling. It has been readapted from the deal.II
   /// DoFTools::make_sparsity_pattern() method.
   void
-  make_sparsity_pattern(const DoFHandler_DG<basis> &             dof,
-                        dealii::DynamicSparsityPattern &         sparsity,
+  make_sparsity_pattern(const DoFHandler_DG<basis>              &dof,
+                        dealii::DynamicSparsityPattern          &sparsity,
                         const dealii::AffineConstraints<double> &constraints =
                           dealii::AffineConstraints<double>(),
                         const bool keep_constrained_dofs = true,
@@ -177,7 +179,7 @@ protected:
   void
   discretize_analytical_solution(
     const std::shared_ptr<dealii::Function<lifex::dim>> &u_analytical,
-    lifex::LinAlg::MPI::Vector &                         sol_owned);
+    lifex::LinAlg::MPI::Vector                          &sol_owned);
 
   /// Name of the class/problem.
   const std::string model_name;
@@ -190,7 +192,7 @@ protected:
   /// DG stabilty coefficient.
   double prm_stability_coeff;
   /// Triangulation (internal use for useful already implemented methods).
-  lifex::utils::MeshHandler triangulation;
+  std::shared_ptr<lifex::utils::MeshHandler> triangulation;
   /// Number of degrees of freedom per cell.
   unsigned int dofs_per_cell;
   /// DoFHandler (internal use for useful already implemented methods).
@@ -356,14 +358,14 @@ ModelDG<basis>::setup_system()
     std::make_unique<dealii::FE_SimplexDGP<lifex::dim>>(prm_fe_degree);
   assemble = std::make_unique<DGAssemble<basis>>(prm_fe_degree);
 
-  dof_handler.reinit(triangulation.get());
+  dof_handler.reinit(triangulation->get());
   dof_handler.distribute_dofs(prm_fe_degree);
   dub_fem_values =
     std::make_shared<DUBFEMHandler<basis>>(prm_fe_degree, dof_handler);
 
-  triangulation.get_info().print(prm_subsection_path,
-                                 dof_handler.n_dofs(),
-                                 true);
+  triangulation->get_info().print(prm_subsection_path,
+                                  dof_handler.n_dofs(),
+                                  true);
 
   dealii::IndexSet               owned_dofs = dof_handler.locally_owned_dofs();
   dealii::IndexSet               relevant_dofs = owned_dofs;
@@ -411,8 +413,8 @@ ModelDG<basis>::setup_system()
 template <class basis>
 void
 ModelDG<basis>::make_sparsity_pattern(
-  const DoFHandler_DG<basis> &             dof,
-  dealii::DynamicSparsityPattern &         sparsity,
+  const DoFHandler_DG<basis>              &dof,
+  dealii::DynamicSparsityPattern          &sparsity,
   const dealii::AffineConstraints<double> &constraints,
   const bool                               keep_constrained_dofs,
   const dealii::types::subdomain_id        subdomain_id)
@@ -485,9 +487,9 @@ ModelDG<basis>::create_mesh()
   // deal.II does not provide runtime generation of tetrahedral meshes, hence
   // they can currently be imported only from file. This version of create_mesh
   // picks the mesh file from the default path.
-  triangulation.initialize_from_file(mesh_path, 1);
-  triangulation.set_element_type(lifex::utils::MeshHandler::ElementType::Tet);
-  triangulation.create_mesh();
+  triangulation->initialize_from_file(mesh_path, 1);
+  triangulation->set_element_type(lifex::utils::MeshHandler::ElementType::Tet);
+  triangulation->create_mesh();
 }
 
 template <class basis>
@@ -501,9 +503,9 @@ ModelDG<basis>::create_mesh(std::string mesh_path)
   // deal.II does not provide runtime generation of tetrahedral meshes, hence
   // they can currently be imported only from file. This version of create_mesh
   // picks the mesh file from a user-defined path.
-  triangulation.initialize_from_file(mesh_path, 1);
-  triangulation.set_element_type(lifex::utils::MeshHandler::ElementType::Tet);
-  triangulation.create_mesh();
+  triangulation->initialize_from_file(mesh_path, 1);
+  triangulation->set_element_type(lifex::utils::MeshHandler::ElementType::Tet);
+  triangulation->create_mesh();
 }
 
 template <class basis>
@@ -518,11 +520,11 @@ ModelDG<basis>::solve_system()
 template <class basis>
 void
 ModelDG<basis>::compute_errors(
-  const lifex::LinAlg::MPI::Vector &                   solution_owned,
-  const lifex::LinAlg::MPI::Vector &                   solution_ex_owned,
+  const lifex::LinAlg::MPI::Vector                    &solution_owned,
+  const lifex::LinAlg::MPI::Vector                    &solution_ex_owned,
   const std::shared_ptr<dealii::Function<lifex::dim>> &u_ex,
   const std::shared_ptr<dealii::Function<lifex::dim>> &grad_u_ex,
-  const char *                                         solution_name) const
+  const char                                          *solution_name) const
 {
   Compute_Errors_DG<basis> error_calculator(prm_fe_degree,
                                             prm_stability_coeff,
@@ -564,7 +566,7 @@ ModelDG<basis>::output_results() const
 
   dealii::FE_SimplexDGP<lifex::dim> fe(prm_fe_degree);
   dealii::DoFHandler<lifex::dim>    dof_handler_fem;
-  dof_handler_fem.reinit(triangulation.get());
+  dof_handler_fem.reinit(triangulation->get());
   dof_handler_fem.distribute_dofs(fe);
 
   data_out.add_data_vector(dof_handler_fem, solution, "u");
@@ -660,7 +662,7 @@ template <>
 void
 ModelDG<dealii::FE_SimplexDGP<lifex::dim>>::discretize_analytical_solution(
   const std::shared_ptr<dealii::Function<lifex::dim>> &u_analytical,
-  lifex::LinAlg::MPI::Vector &                         sol_owned)
+  lifex::LinAlg::MPI::Vector                          &sol_owned)
 {
   dealii::VectorTools::interpolate(dof_handler, *u_analytical, sol_owned);
 }
@@ -671,7 +673,7 @@ template <>
 void
 ModelDG<DUBValues<lifex::dim>>::discretize_analytical_solution(
   const std::shared_ptr<dealii::Function<lifex::dim>> &u_analytical,
-  lifex::LinAlg::MPI::Vector &                         sol_owned)
+  lifex::LinAlg::MPI::Vector                          &sol_owned)
 {
   sol_owned = dub_fem_values->analytical_to_dubiner(sol_owned, u_analytical);
 }

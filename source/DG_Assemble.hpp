@@ -127,7 +127,7 @@ public:
   /// Reinitialize object on the current new_edge of the new_cell.
   void
   reinit(const typename dealii::DoFHandler<lifex::dim>::active_cell_iterator
-           &                new_cell,
+                           &new_cell,
          const unsigned int new_edge);
 
   /// Reinitialize object on the current new_cell.
@@ -222,7 +222,7 @@ public:
   /// where @f$u^n@f$ is the solution at a generic previous step @f$ n@f$.
   dealii::Vector<double>
   local_u0_M_rhs(
-    const lifex::LinAlg::MPI::Vector &                  u0,
+    const lifex::LinAlg::MPI::Vector                   &u0,
     const std::vector<dealii::types::global_dof_index> &dof_indices) const;
 
   /// Assembly of the right hand side term associated to the previous time-step
@@ -233,7 +233,7 @@ public:
   /// @f$ n@f$.
   dealii::Vector<double>
   local_w0_M_rhs(
-    const lifex::LinAlg::MPI::Vector &                  u0,
+    const lifex::LinAlg::MPI::Vector                   &u0,
     const std::vector<dealii::types::global_dof_index> &dof_indices) const;
 
   /// Assembly of the non-linear local matrix of the Fitzhugh-Nagumo model:
@@ -243,7 +243,7 @@ public:
   /// and @f$u^n@f$ is the solution at a generic previous step @f$ n@f$.
   dealii::FullMatrix<double>
   local_non_linear_fitzhugh(
-    const lifex::LinAlg::MPI::Vector &                  u0,
+    const lifex::LinAlg::MPI::Vector                   &u0,
     const double                                        a,
     const std::vector<dealii::types::global_dof_index> &dof_indices) const;
 
@@ -253,12 +253,7 @@ public:
   /// <a href="https://doi.org/10.1152/ajpheart.00109.2006.">Ten-Tusscher
   /// Panvilov ionic model</a>.
   dealii::Vector<double>
-  local_ttp06(
-    const std::shared_ptr<lifex::TTP06>                       ionic_model,
-    const lifex::LinAlg::MPI::Vector &                        u,
-    const lifex::LinAlg::MPI::Vector &                        u_ext,
-    const std::map<unsigned int, lifex::LinAlg::MPI::Vector> &w,
-    const std::vector<dealii::types::global_dof_index> &dof_indices) const;
+  local_ttp06(const std::shared_ptr<lifex::TTP06> ionic_model) const;
 
   /// Destructor.
   virtual ~DGAssemble() = default;
@@ -669,7 +664,7 @@ DGAssemble<basis>::local_IN(const double theta) const
 template <class basis>
 dealii::Vector<double>
 DGAssemble<basis>::local_u0_M_rhs(
-  const lifex::LinAlg::MPI::Vector &                  u0,
+  const lifex::LinAlg::MPI::Vector                   &u0,
   const std::vector<dealii::types::global_dof_index> &dof_indices) const
 {
   std::vector<double> u_bdf_loc(n_quad_points);
@@ -707,7 +702,7 @@ DGAssemble<basis>::local_u0_M_rhs(
 template <class basis>
 dealii::Vector<double>
 DGAssemble<basis>::local_w0_M_rhs(
-  const lifex::LinAlg::MPI::Vector &                  u0,
+  const lifex::LinAlg::MPI::Vector                   &u0,
   const std::vector<dealii::types::global_dof_index> &dof_indices) const
 {
   dealii::Vector<double>              cell_rhs(dofs_per_cell);
@@ -735,7 +730,7 @@ DGAssemble<basis>::local_w0_M_rhs(
 template <class basis>
 dealii::FullMatrix<double>
 DGAssemble<basis>::local_non_linear_fitzhugh(
-  const lifex::LinAlg::MPI::Vector &                  u0,
+  const lifex::LinAlg::MPI::Vector                   &u0,
   const double                                        a,
   const std::vector<dealii::types::global_dof_index> &dof_indices) const
 {
@@ -779,11 +774,7 @@ DGAssemble<basis>::local_non_linear_fitzhugh(
 template <class basis>
 dealii::Vector<double>
 DGAssemble<basis>::local_ttp06(
-  const std::shared_ptr<lifex::TTP06>                       ionic_model,
-  const lifex::LinAlg::MPI::Vector &                        u,
-  const lifex::LinAlg::MPI::Vector &                        u_ext,
-  const std::map<unsigned int, lifex::LinAlg::MPI::Vector> &w,
-  const std::vector<dealii::types::global_dof_index> &      dof_indices) const
+  const std::shared_ptr<lifex::TTP06> ionic_model) const
 {
   dealii::Vector<double> cell_rhs(dofs_per_cell);
 
@@ -791,21 +782,17 @@ DGAssemble<basis>::local_ttp06(
     vol_handler.get_jacobian_inverse();
   const double det = 1 / determinant(BJinv);
 
+  std::vector<double> Iion_loc(n_quad_points);
+  std::vector<double> dIion_du_loc(n_quad_points);
+
+  std::tie(Iion_loc, dIion_du_loc) = ionic_model->Iion_ICI();
+
   for (unsigned int q = 0; q < n_quad_points; ++q)
     {
       for (unsigned int i = 0; i < dofs_per_cell; ++i)
         {
-          std::vector<double> tmp_w;
-
-          for (unsigned int k = 0; k < 18; ++k)
-            {
-              tmp_w.push_back(w.at(k)[dof_indices[i]]);
-            }
-
           cell_rhs(i) +=
-            ionic_model
-              ->Iion(u[dof_indices[i]], u_ext[dof_indices[i]], tmp_w, 1, 0)
-              .first *
+            Iion_loc[q] *
             basis_ptr->shape_value(i, vol_handler.quadrature_ref(q)) *
             vol_handler.quadrature_weight(q) * det;
         }

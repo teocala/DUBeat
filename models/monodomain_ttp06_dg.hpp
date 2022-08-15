@@ -24,8 +24,8 @@
  * @author Matteo Calafà <matteo.calafa@mail.polimi.it>.
  */
 
-#ifndef MONODOMAIN_ttp06_DG_HPP_
-#define MONODOMAIN_ttp06_DG_HPP_
+#ifndef MONODOMAIN_TTP06_DG_HPP_
+#define MONODOMAIN_TTP06_DG_HPP_
 
 #include <math.h>
 
@@ -37,17 +37,21 @@
 #include "../source/DG_Volume_handler.hpp"
 #include "../source/DUBValues.hpp"
 #include "../source/DUB_FEM_handler.hpp"
+#include "../source/QGaussLegendreSimplex.hpp"
 #include "../source/model_DG.hpp"
 #include "../source/model_DG_t.hpp"
 #include "source/core_model.hpp"
+#include "source/fiber_generation.hpp"
 #include "source/geometry/mesh_handler.hpp"
+#include "source/helpers/applied_current.hpp"
+#include "source/helpers/ischemic_region.hpp"
 #include "source/init.hpp"
 #include "source/io/data_writer.hpp"
+#include "source/ionic/ttp06.hpp"
 #include "source/numerics/bc_handler.hpp"
 #include "source/numerics/linear_solver_handler.hpp"
 #include "source/numerics/preconditioner_handler.hpp"
 #include "source/numerics/tools.hpp"
-#include "source/ionic/ttp06.hpp"
 
 namespace lifex::examples
 {
@@ -70,97 +74,9 @@ namespace lifex::examples
             const unsigned int /*component*/ = 0) const override
       {
         if (dim == 2)
-          return std::sin(2 * M_PI * p[0]) * std::sin(2 * M_PI * p[1]) *
-                 std::exp(-5 * this->get_time());
+          return 0 * p[0] * p[1] * this->get_time();
         else
-          return std::sin(2 * M_PI * p[0] + M_PI / 4) *
-                 std::sin(2 * M_PI * p[1] + M_PI / 4) *
-                 std::sin(2 * M_PI * p[2] + M_PI / 4) *
-                 std::exp(-5 * this->get_time());
-      }
-    };
-
-    /**
-     * @brief Source term: applied current.
-     */
-    class RightHandSide : public Function<dim>
-    {
-    private:
-      /// Parameter monodomain equation.
-      double ChiM;
-
-      /// Diffusion scalar parameter.
-      double Sigma;
-
-      /// Membrane capacity.
-      double Cm;
-
-      /// Factor for the nonlinear reaction in Fitzhugh Nagumo model.
-      double kappa;
-
-      /// Parameter ODE.
-      double epsilon;
-
-      /// Parameter ODE.
-      double gamma;
-
-      /// Parameter ODE.
-      double a;
-
-    public:
-      /// Constructor.
-      RightHandSide(double ChiM,
-                    double Sigma,
-                    double Cm,
-                    double kappa,
-                    double epsilon,
-                    double gamma,
-                    double a)
-        : Function<dim>()
-        , ChiM(ChiM)
-        , Sigma(Sigma)
-        , Cm(Cm)
-        , kappa(kappa)
-        , epsilon(epsilon)
-        , gamma(gamma)
-        , a(a)
-      {}
-
-      /// Evaluate the source term in a point.
-      virtual double
-      value(const Point<dim> &p,
-            const unsigned int /*component*/ = 0) const override
-      {
-        if (dim == 2)
-          return std::sin(2 * M_PI * p[0]) * std::sin(2 * M_PI * p[1]) *
-                 std::exp(-5 * this->get_time()) *
-                 (-ChiM * Cm * 5 + Sigma * 8 * pow(M_PI, 2) +
-                  ChiM * kappa *
-                    (std::sin(2 * M_PI * p[0]) * std::sin(2 * M_PI * p[1]) *
-                       std::exp(-5 * this->get_time()) -
-                     a) *
-                    (std::sin(2 * M_PI * p[0]) * std::sin(2 * M_PI * p[1]) *
-                       std::exp(-5 * this->get_time()) -
-                     1) +
-                  ChiM * (epsilon / (epsilon * gamma - 5)));
-        else
-          return std::sin(2 * M_PI * p[0] + M_PI / 4) *
-                 std::sin(2 * M_PI * p[1] + M_PI / 4) *
-                 std::sin(2 * M_PI * p[2] + M_PI / 4) *
-                 std::exp(-5 * this->get_time()) *
-                 (-ChiM * Cm * 5 + Sigma * 12 * pow(M_PI, 2) +
-                  ChiM * kappa *
-                    (std::sin(2 * M_PI * p[0] + M_PI / 4) *
-                       std::sin(2 * M_PI * p[1] + M_PI / 4) *
-                       std::sin(2 * M_PI * p[2] + M_PI / 4) *
-                       std::exp(-5 * this->get_time()) -
-                     a) *
-                    (std::sin(2 * M_PI * p[0] + M_PI / 4) *
-                       std::sin(2 * M_PI * p[1] + M_PI / 4) *
-                       std::sin(2 * M_PI * p[2] + M_PI / 4) *
-                       std::exp(-5 * this->get_time()) -
-                     1) +
-                  ChiM * (epsilon / (epsilon * gamma - 5)));
+          return 0 * (p[0]) * (p[1]) * (p[2]) * (this->get_time());
       }
     };
 
@@ -169,15 +85,10 @@ namespace lifex::examples
      */
     class BCNeumann : public Function<dim>
     {
-    private:
-      /// Diffusion scalar parameter.
-      double Sigma;
-
     public:
       /// Constrcutor.
-      BCNeumann(double Sigma)
+      BCNeumann()
         : Function<dim>()
-        , Sigma(Sigma)
       {}
 
       /// Evaluate the Neumann boundary condition function in a point.
@@ -186,50 +97,9 @@ namespace lifex::examples
             const unsigned int /*component*/ = 0) const override
       {
         if (dim == 2)
-          return Sigma *
-                 (-2 * M_PI * std::sin(2 * M_PI * p[0]) *
-                    std::cos(2 * M_PI * p[1]) *
-                    std::exp(-5 * this->get_time()) * (std::abs(p[1]) < 1e-10) +
-                  2 * M_PI * std::cos(2 * M_PI * p[0]) *
-                    std::sin(2 * M_PI * p[1]) *
-                    std::exp(-5 * this->get_time()) *
-                    (std::abs(p[0] - 1) < 1e-10) +
-                  2 * M_PI * std::sin(2 * M_PI * p[0]) *
-                    std::cos(2 * M_PI * p[1]) *
-                    std::exp(-5 * this->get_time()) *
-                    (std::abs(p[1] - 1) < 1e-10) -
-                  2 * M_PI * std::cos(2 * M_PI * p[0]) *
-                    std::sin(2 * M_PI * p[1]) *
-                    std::exp(-5 * this->get_time()) * (std::abs(p[0]) < 1e-10));
+          return 0 * p[0] * p[1] * this->get_time();
         else
-          return Sigma *
-                 (2 * M_PI * std::cos(2 * M_PI * p[0] + M_PI / 4) *
-                    std::sin(2 * M_PI * p[1] + M_PI / 4) *
-                    std::sin(2 * M_PI * p[2] + M_PI / 4) *
-                    std::exp(-5 * this->get_time()) *
-                    (std::abs(p[0] - 1) < 1e-10) -
-                  2 * M_PI * std::cos(2 * M_PI * p[0] + M_PI / 4) *
-                    std::sin(2 * M_PI * p[1] + M_PI / 4) *
-                    std::sin(2 * M_PI * p[2] + M_PI / 4) *
-                    std::exp(-5 * this->get_time()) * (std::abs(p[0]) < 1e-10) +
-                  2 * M_PI * std::sin(2 * M_PI * p[0] + M_PI / 4) *
-                    std::cos(2 * M_PI * p[1] + M_PI / 4) *
-                    std::sin(2 * M_PI * p[2] + M_PI / 4) *
-                    std::exp(-5 * this->get_time()) *
-                    (std::abs(p[1] - 1) < 1e-10) -
-                  2 * M_PI * std::sin(2 * M_PI * p[0] + M_PI / 4) *
-                    std::cos(2 * M_PI * p[1] + M_PI / 4) *
-                    std::sin(2 * M_PI * p[2] + M_PI / 4) *
-                    std::exp(-5 * this->get_time()) * (std::abs(p[1]) < 1e-10) +
-                  2 * M_PI * std::sin(2 * M_PI * p[0] + M_PI / 4) *
-                    std::sin(2 * M_PI * p[1] + M_PI / 4) *
-                    std::cos(2 * M_PI * p[2] + M_PI / 4) *
-                    std::exp(-5 * this->get_time()) *
-                    (std::abs(p[2] - 1) < 1e-10) -
-                  2 * M_PI * std::sin(2 * M_PI * p[0] + M_PI / 4) *
-                    std::sin(2 * M_PI * p[1] + M_PI / 4) *
-                    std::cos(2 * M_PI * p[2] + M_PI / 4) *
-                    std::exp(-5 * this->get_time()) * (std::abs(p[2]) < 1e-10));
+          return 0 * p[0] * p[1] * p[2] * this->get_time();
       }
     };
 
@@ -246,37 +116,24 @@ namespace lifex::examples
 
       /// Evaluate the gradient of the exact solution in a point.
       virtual double
-      value(const Point<dim> & p,
+      value(const Point<dim>  &p,
             const unsigned int component = 0) const override
       {
         if (dim == 2)
           {
             if (component == 0) // x
-              return 2 * M_PI * std::cos(2 * M_PI * p[0]) *
-                     std::sin(2 * M_PI * p[1]) *
-                     std::exp(-5 * this->get_time());
+              return 0 * p[0] * p[1] * this->get_time();
             else // y
-              return 2 * M_PI * std::sin(2 * M_PI * p[0]) *
-                     std::cos(2 * M_PI * p[1]) *
-                     std::exp(-5 * this->get_time());
+              return 0 * p[0] * p[1] * p[2] * this->get_time();
           }
         else // dim=3
           {
             if (component == 0) // x.
-              return 2 * M_PI * std::cos(2 * M_PI * p[0] + M_PI / 4) *
-                     std::sin(2 * M_PI * p[1] + M_PI / 4) *
-                     std::sin(2 * M_PI * p[2] + M_PI / 4) *
-                     std::exp(-5 * this->get_time());
+              return 0 * p[0] * p[1] * p[2] * this->get_time();
             if (component == 1) // y.
-              return 2 * M_PI * std::sin(2 * M_PI * p[0] + M_PI / 4) *
-                     std::cos(2 * M_PI * p[1] + M_PI / 4) *
-                     std::sin(2 * M_PI * p[2] + M_PI / 4) *
-                     std::exp(-5 * this->get_time());
+              return 0 * p[0] * p[1] * p[2] * this->get_time();
             else // z.
-              return 2 * M_PI * std::sin(2 * M_PI * p[0] + M_PI / 4) *
-                     std::sin(2 * M_PI * p[1] + M_PI / 4) *
-                     std::cos(2 * M_PI * p[2] + M_PI / 4) *
-                     std::exp(-5 * this->get_time());
+              return 0 * p[0] * p[1] * p[2] * this->get_time();
           }
       }
     };
@@ -357,23 +214,22 @@ namespace lifex::examples
   public:
     /// Constructor.
     Monodomain_ttp06_DG<basis>()
-      : ModelDG_t<basis>("Monodomain ttp06")
+      : ModelDG_t<basis>("Monodomain TTP06")
       , ChiM(1e5)
       , Sigma(0.12)
       , Cm(1e-2)
-      , kappa(19.5)
-      , epsilon(1.2)
-      , gamma(0.1)
-      , a(13e-3)
+      , ionic_model(
+          std::make_shared<lifex::TTP06>("Monodomain TTP06 / Ionic model",
+                                         false))
+      , fiber_generation("Fiber generation", false)
+      , ischemic_region_generation("Monodomain TTP06 / Ischemic region")
+      , I_app(std::make_shared<lifex::AppliedCurrent>(
+          "Monodomain TTP06 / Applied current"))
     {
       this->u_ex = std::make_shared<monodomain_ttp06_DG::ExactSolution>();
       this->grad_u_ex =
         std::make_shared<monodomain_ttp06_DG::GradExactSolution>();
-      this->f_ex = std::make_shared<monodomain_ttp06_DG::RightHandSide>(
-        ChiM, Sigma, Cm, kappa, epsilon, gamma, a);
-      this->g_n = std::make_shared<monodomain_ttp06_DG::BCNeumann>(Sigma);
-
-      ionic_model = std::make_shared<lifex::TTP06> ("Monodomain ttp06", true);
+      this->g_n = std::make_shared<monodomain_ttp06_DG::BCNeumann>();
     }
 
   private:
@@ -383,30 +239,26 @@ namespace lifex::examples
     double Sigma;
     /// Membrane capacity.
     double Cm;
-    /// Factor for the nonlinear reaction in Fitzhugh Nagumo model.
-    double kappa;
-    /// ODE parameter.
-    double epsilon;
-    /// ODE parameter.
-    double gamma;
-    /// ODe parameter.
-    double a;
-    // /// Solution gating variable, without ghost entries.
-    std::map<unsigned int, lifex::LinAlg::MPI::Vector> solution_owned_w;
-    // /// Solution gating variable, with ghost entries.
-    std::map<unsigned int, lifex::LinAlg::MPI::Vector> solution_w;
-    /// BDF time advancing handler.
-    std::map<unsigned int, lifex::utils::BDFHandler<lifex::LinAlg::MPI::Vector>> bdf_handler_w;
-    /// BDF solution, with ghost entries.
-    std::map<unsigned int, lifex::LinAlg::MPI::Vector>  solution_bdf_w;
-    /// BDF extrapolated solution, with ghost entries.
-    std::map<unsigned int, lifex::LinAlg::MPI::Vector>  solution_ext_w;
     /// Ionic model
     std::shared_ptr<lifex::TTP06> ionic_model;
-    /// Applied current for fixed time without ghost entries
-    lifex::LinAlg::MPI::Vector I_app_owned;
-    /// Applied current for fixed time with ghost entries
-    lifex::LinAlg::MPI::Vector I_app;
+    /// FIber generation
+    lifex::FiberGeneration fiber_generation;
+    /// Transmural vector (0 in the endocardium, 1 in the epicardium).
+    LinAlg::MPI::Vector endo_epi_vec;
+    /// Ischemic region for both idealized and patient-specific cases.
+    lifex::IschemicRegion ischemic_region_generation;
+    /// Quadrature evaluation of ischemic region.
+    std::unique_ptr<lifex::QuadratureIschemicRegion> ischemic_region_fun;
+    /// Applied current
+    std::shared_ptr<lifex::AppliedCurrent> I_app;
+
+    /// Override for the simulation run.
+    void
+    run() override;
+
+    /// Assembly of the Monodomain system.
+    void
+    assemble_system() override;
 
     /// Override for declaration of additional parameters.
     void
@@ -416,31 +268,48 @@ namespace lifex::examples
     void
     parse_parameters(lifex::ParamHandler &params) override;
 
-    /// Override for the simulation run.
+    /// Setup for the ionic model
     void
-    run() override;
+    setup_ionic_model();
 
-    /// Override to update time for both u and w.
+    /// To perform the time increment.
     void
     update_time() override;
 
-    /// Override to initialize both u and w.
+    /// Setup for the time-dependent problems at time-step 0.
     void
     time_initialization() override;
-
-    /// Assembly of the Monodomain system.
-    void
-    assemble_system() override;
   };
 
   template <class basis>
   void
-  Monodomain_ttp06_DG<basis>::declare_parameters(lifex::ParamHandler &params) const
+  Monodomain_ttp06_DG<basis>::update_time()
+  {
+    // Update time for all the known analytical functions.
+    this->u_ex->set_time(this->time);
+    I_app->set_time(this->time);
+    this->g_n->set_time(this->time);
+    this->grad_u_ex->set_time(this->time);
+
+    this->bdf_handler.time_advance(this->solution_owned, true);
+    this->solution_bdf = this->bdf_handler.get_sol_bdf();
+
+    // Update solution_ex_owned from the updated u_ex.
+    this->discretize_analytical_solution(this->u_ex, this->solution_ex_owned);
+  }
+
+  template <class basis>
+  void
+  Monodomain_ttp06_DG<basis>::declare_parameters(
+    lifex::ParamHandler &params) const
   {
     // Default parameters.
     this->linear_solver.declare_parameters(params);
     this->preconditioner.declare_parameters(params);
     ionic_model->declare_parameters(params);
+    fiber_generation.declare_parameters(params);
+    ischemic_region_generation.declare_parameters(params);
+    I_app->declare_parameters(params);
 
     // Extra parameters.
     params.enter_subsection("Mesh and space discretization");
@@ -500,10 +369,14 @@ namespace lifex::examples
   {
     // Parse input file.
     params.parse();
+
     // Read input parameters.
     this->linear_solver.parse_parameters(params);
     this->preconditioner.parse_parameters(params);
     ionic_model->parse_parameters(params);
+    fiber_generation.parse_parameters(params);
+    ischemic_region_generation.parse_parameters(params);
+    I_app->parse_parameters(params);
 
     // Extra parameters.
     params.enter_subsection("Mesh and space discretization");
@@ -513,11 +386,12 @@ namespace lifex::examples
 
     params.enter_subsection("Discontinuous Galerkin");
     this->prm_penalty_coeff = params.get_double("Penalty coefficient");
-    AssertThrow(this->prm_penalty_coeff == 1. || this->prm_penalty_coeff == 0. ||
-                  this->prm_penalty_coeff == -1.,
-                dealii::StandardExceptions::ExcMessage(
-                  "Penalty coefficient must be 1 (SIP method) or 0 (IIP method) "
-                  "or -1 (NIP method)."));
+    AssertThrow(
+      this->prm_penalty_coeff == 1. || this->prm_penalty_coeff == 0. ||
+        this->prm_penalty_coeff == -1.,
+      dealii::StandardExceptions::ExcMessage(
+        "Penalty coefficient must be 1 (SIP method) or 0 (IIP method) "
+        "or -1 (NIP method)."));
 
     this->prm_stability_coeff = params.get_double("Stability coefficient");
     params.leave_subsection();
@@ -536,23 +410,85 @@ namespace lifex::examples
 
   template <class basis>
   void
+  Monodomain_ttp06_DG<basis>::time_initialization()
+  {
+    // Set initial time to the exact analytical solution.
+    this->u_ex->set_time(this->prm_time_init);
+
+    // Solution_owned and solution_ex_owned at the initial time are the
+    // discretization of the analytical u_ex.
+    this->discretize_analytical_solution(this->u_ex, this->solution_ex_owned);
+
+    this->solution_owned = this->solution =
+      ionic_model->setup_initial_transmembrane_potential();
+
+    // Initialization of the initial solution.
+    const std::vector<lifex::LinAlg::MPI::Vector> sol_init(
+      this->prm_bdf_order, this->solution_owned);
+
+    // Initialization of the BDFHandler
+    this->bdf_handler.initialize(this->prm_bdf_order, sol_init);
+  }
+
+  template <class basis>
+  void
+  Monodomain_ttp06_DG<basis>::setup_ionic_model()
+  {
+    std::shared_ptr<QGaussLegendreSimplex<lifex::dim>> quadrature_formula(
+      std::make_shared<QGaussLegendreSimplex<lifex::dim>>(this->prm_fe_degree +
+                                                          2));
+
+    fiber_generation.set_mesh_and_fe_space(this->triangulation,
+                                           this->prm_fe_degree);
+    fiber_generation.run();
+
+    dealii::IndexSet owned_dofs    = this->dof_handler.locally_owned_dofs();
+    dealii::IndexSet relevant_dofs = owned_dofs;
+    endo_epi_vec.reinit(owned_dofs, relevant_dofs, this->mpi_comm);
+    endo_epi_vec = fiber_generation.get_endo_epi();
+
+    ischemic_region_generation.generate(this->prm_fe_degree,
+                                        this->triangulation);
+    ischemic_region_generation.postprocess_volumetric(
+      fiber_generation.get_endo_epi_owned());
+    ischemic_region_fun = std::make_unique<lifex::QuadratureIschemicRegion>(
+      ischemic_region_generation, *quadrature_formula);
+    ischemic_region_fun->init();
+
+    const lifex::LinAlg::MPI::Vector &ischemic_region_vec =
+      ischemic_region_generation.get_ischemic_region();
+
+    std::map<dealii::types::material_id, std::string> map_id_volume;
+    map_id_volume[0] = "Epicardium";
+
+    ionic_model->initialize_3d(this->triangulation,
+                               this->prm_fe_degree,
+                               quadrature_formula,
+                               I_app,
+                               this->prm_bdf_order,
+                               map_id_volume,
+                               "Epicardium");
+    ionic_model->setup_system(true);
+
+    ionic_model->set_ischemic_region(
+      &ischemic_region_vec,
+      ischemic_region_generation.get_prm_scar_tolerance());
+    ionic_model->set_endo_epi(&endo_epi_vec);
+  }
+
+  template <class basis>
+  void
   Monodomain_ttp06_DG<basis>::run()
   {
     this->create_mesh();
     this->setup_system();
 
-    ionic_model->setup_system_0d();
+    setup_ionic_model();
 
     this->initialize_solution(this->solution_owned, this->solution);
     this->initialize_solution(this->solution_ex_owned, this->solution_ex);
-    this->initialize_solution(I_app_owned, I_app);
 
-    for(unsigned int i = 0; i < 18; ++i)
-    {
-        this->initialize_solution(this->solution_owned_w[i], this->solution_w[i]);
-    }
-
-    time_initialization();
+    this->time_initialization();
 
     while (this->time < this->prm_time_final)
       {
@@ -564,13 +500,7 @@ namespace lifex::examples
               << std::setprecision(6) << this->time << std::endl;
 
         this->update_time();
-
         this->solution_ext = this->bdf_handler.get_sol_extrapolation();
-
-        for(unsigned int i = 0; i < 18; ++i)
-        {
-          this->solution_ext_w[i] = bdf_handler_w.at(i).get_sol_extrapolation();
-        }
 
         this->assemble_system();
 
@@ -605,85 +535,16 @@ namespace lifex::examples
 
   template <class basis>
   void
-  Monodomain_ttp06_DG<basis>::update_time()
-  {
-    this->u_ex->set_time(this->time);
-    this->f_ex->set_time(this->time);
-    this->g_n->set_time(this->time);
-    this->grad_u_ex->set_time(this->time);
-
-    this->bdf_handler.time_advance(this->solution_owned, true);
-    this->solution_bdf = this->bdf_handler.get_sol_bdf();
-
-    for(unsigned int i = 0; i < 18; ++i)
-    {
-      bdf_handler_w.at(i).time_advance(solution_owned_w.at(i), true);
-      solution_bdf_w[i] = this->bdf_handler_w.at(i).get_sol_bdf();
-    }
-
-    // Update solution_ex_owned from the updated u_ex.
-    this->discretize_analytical_solution(this->u_ex, this->solution_ex_owned);
-    this->discretize_analytical_solution(this->f_ex, I_app);
-  }
-
-  template <class basis>
-  void
-  Monodomain_ttp06_DG<basis>::time_initialization()
-  {
-    this->u_ex->set_time(this->prm_time_init);
-    this->discretize_analytical_solution(this->u_ex, this->solution_ex_owned);
-    this->solution_ex = this->solution_ex_owned;
-    this->solution = this->solution_owned = this->solution_ex_owned;
-
-    const std::vector<lifex::LinAlg::MPI::Vector> sol_init(
-      this->prm_bdf_order, this->solution_owned);
-
-    this->bdf_handler.initialize(this->prm_bdf_order, sol_init);
-
-    for(unsigned int i = 0; i < 18; ++i)
-    {
-      solution_w[i] = solution_owned_w[i] =  ionic_model->setup_initial_conditions()[i];
-
-      const std::vector<lifex::LinAlg::MPI::Vector> sol_init_w(
-        this->prm_bdf_order, solution_owned_w.at(i));
-
-      bdf_handler_w[i].initialize(this->prm_bdf_order, sol_init_w);
-    }
-  }
-
-  template <class basis>
-  void
   Monodomain_ttp06_DG<basis>::assemble_system()
   {
+    ionic_model->solve_time_step(this->solution,
+                                 this->prm_time_step,
+                                 this->time);
+    ionic_model->assemble_Iion_ICI(this->solution, this->solution_ext);
+    ischemic_region_fun->init();
+    ionic_model->init();
+
     const double &alpha_bdf = this->bdf_handler.get_alpha();
-
-    for(unsigned int p = 0; p < this->dof_handler.n_dofs(); ++p)
-    {
-      std::vector<double> tmp_w_bdf;
-      std::vector<double> tmp_w_ext;
-      std::vector<double> w;
-
-      for(unsigned int k = 0; k < 18; ++k)
-      {
-        tmp_w_bdf.push_back(solution_bdf_w.at(k)[p]);
-        tmp_w_ext.push_back(solution_ext_w.at(k)[p]);
-      }
-
-      w = ionic_model->solve_time_step_0d(this->solution[p],
-      this->prm_bdf_order,
-      tmp_w_bdf,
-      tmp_w_ext,
-      0,
-      1,
-      I_app[p]).first;
-
-      for(unsigned int k = 0; k < 18; ++k)
-      {
-        solution_w.at(k)[p] = w[k];
-      }
-    }
-
-    solution_w = solution_owned_w;
 
     this->matrix = 0;
     this->rhs    = 0;
@@ -719,6 +580,7 @@ namespace lifex::examples
     std::vector<types::global_dof_index> dof_indices(this->dofs_per_cell);
 
     dealii::IndexSet owned_dofs = this->dof_handler.locally_owned_dofs();
+    ;
 
     for (const auto &cell : this->dof_handler.active_cell_iterators())
       {
@@ -726,6 +588,8 @@ namespace lifex::examples
           {
             this->assemble->reinit(cell);
             dof_indices = this->dof_handler.get_dof_indices(cell);
+            ischemic_region_fun->reinit(cell);
+            ionic_model->reinit(cell);
 
             V = this->assemble->local_V();
             V *= Sigma;
@@ -735,10 +599,9 @@ namespace lifex::examples
             M *= ChiM;
             M *= Cm;
 
-            cell_rhs = this->assemble->local_rhs(this->f_ex);
-            
-            cell_rhs_ttp06 = this->assemble->local_ttp06(ionic_model, this->solution, this->solution_ext,
-            solution_w, dof_indices);
+            cell_rhs = this->assemble->local_rhs(I_app);
+
+            cell_rhs_ttp06 = this->assemble->local_ttp06(ionic_model);
             cell_rhs_ttp06 *= ChiM;
             cell_rhs_ttp06 *= (-1);
 
@@ -750,10 +613,9 @@ namespace lifex::examples
 
             this->matrix.add(dof_indices, V);
             this->matrix.add(dof_indices, M);
-            this->rhs.add(dof_indices, cell_rhs);
             this->rhs.add(dof_indices, cell_rhs_ttp06);
+            this->rhs.add(dof_indices, cell_rhs);
             this->rhs.add(dof_indices, u0_rhs);
-            this->rhs.add(dof_indices, w0_rhs);
 
             for (const auto &edge : cell->face_indices())
               {
@@ -803,4 +665,4 @@ namespace lifex::examples
   }
 } // namespace lifex::examples
 
-#endif /* MONODOMAIN_ttp06_DG_HPP_*/
+#endif /* MONODOMAIN_TTP06_DG_HPP_*/
