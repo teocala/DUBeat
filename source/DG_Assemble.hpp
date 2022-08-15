@@ -247,7 +247,11 @@ public:
     const double                                        a,
     const std::vector<dealii::types::global_dof_index> &dof_indices) const;
 
-  /// Assembly of the local vector of the TTP06 ionic model
+  /// Assembly of the local vector of the TTP06 ionic model:
+  /// @f[ION(i)=\int_{\mathcal{K}} I_{ion} \varphi_i \, dx @f]
+  /// where @f$I_{ion}()@f$ is the ionic current computed following the
+  /// <a href="https://doi.org/10.1152/ajpheart.00109.2006.">Ten-Tusscher
+  /// Panvilov ionic model</a>.
   dealii::Vector<double>
   local_ttp06(
     const std::shared_ptr<lifex::TTP06>                       ionic_model,

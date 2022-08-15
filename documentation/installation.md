@@ -14,13 +14,8 @@ They both work in either 2 or 3 dimensions depending on the lifex configuration 
 
 
 ### Dependencies
-`DUBeat 1.0.0` relies almost exclusively on the [lifex][] `1.5.0` installation and its dependencies. Check its [download and install][] page to verify you satisfy all its requirements.
-In particular, the library has been implemented using:
-- [CMake][] = `3.16.3`
-- [Doxygen][] = `1.8.17`
-- [Graphviz][] = `2.42.2`
-
-and other libraries included in the lifex `mk` module, `2022.0` version. This module can be downloaded from [here][] and we refer again to the [download and install][] page for its installation. In particular, this package contains:
+`DUBeat 1.0.0` relies almost exclusively on the [lifex][] `1.5.0` installation and its dependencies. Check its [download and install][] page to verify you satisfy all the requirements and install it.  
+More precisely, the library has been implemented using [CMake][] `3.16.3` and the libraries included in the lifex `mk` module, `2022.0` version. This module can be downloaded from [here][] and we refer again to the lifex [download and install][] page for more information about its installation. In particular, this package contains:
 - [ADOL-C][] = `2.7.2`
 - [Boost][] = `1.76.0`
 - [deal.II][] = `9.3.1`
@@ -28,6 +23,14 @@ and other libraries included in the lifex `mk` module, `2022.0` version. This mo
 - [PETSc][] = `3.15.1`
 - [TBB][] = `2021.3.0`
 - [Trilinos][] = `13.0.1`
+
+In addition to the core libraries, other packages need to be installed for supplementary reasons:
+- [Python][] ≥ `3.9.6` for the creation of convergence plot figures (see generate_convergence_plots.py).
+- [Doxygen][] ≥ `1.8.17` for the generation of the library documentation.
+- [Graphviz][] ≥ `2.42.2` for the automatic creation of figures included in the documentation.
+- [Clang-Format][] ≥ `10.0.0` for the automatic indentation of the library codes
+- [gmsh][] ≥ `4.0.4` for the generation of mesh files.
+- [ParaView][] ≥ `5.9.1` for the analysis and view of numerical solutions.
 
 
 
@@ -69,7 +72,7 @@ To run from this template, you have to follow the five next steps:
 
 ### See your results
 Results can be viewed in two ways:
-- By default, you should see on the screen the numerical errors with the exact solution. In addition, the `DG_error_parser` class will write the errors on a `.data` file. Finally, you can use the `generate_convergence_plots.py` script to create plots of the errors for different mesh refinements starting from a `.data` file.
+- By default, you should see on the screen the numerical errors with the exact solution. In addition, the DG_error_parser.hpp script will write the errors on a `.data` file. Finally, you can use the generate_convergence_plots.py script to create plots of the errors for different mesh refinements starting from a `.data` file.
 - The code generates two solution files, open `solution.xdmf` with [ParaView][] to see the contour plots of the numerical and exact solutions.
 
 ### Documentation, indentation and cleaning
@@ -82,7 +85,7 @@ Results can be viewed in two ways:
   ```bash
   make indent
   ```
-  to automatically indent all the files using our customized [Clang-Format] setup.
+  to automatically indent all the files using our customized [Clang-Format][] setup.
 - Still in the main folder, run
   ```bash
   make clean
@@ -96,10 +99,10 @@ Results can be viewed in two ways:
 
 ### Personalize your problem
 - Other applications/problems can be easily implemented. Just implement your own model header as in the `models` folder!
-  Notice that the addition of a new type of DG matrix needs to be supplemented in the `DG_Assemble.hpp` methods.
+  Notice that the addition of a new type of DG matrix needs to be supplemented in the DG_Assemble.hpp methods.
 - As for now, simplices meshes can not be built runtime in [deal.II][]. Therefore, some example meshes are provided in the folder `meshes` and used in the default version.
-  In case you need to use your own `.msh` files, you need to use the `create_mesh` method in `Model_DG` that accepts a user mesh path.
-- If you need to add new scripts/folders, remember to add them to the `make` and `indent` configurations.
+  In case you need to use your own `.msh` files, you need to use the version of the `create_mesh` method in ModelDG that accepts a user-defined mesh path.
+- If you need to add new scripts or folders, remember to add them to the `make` and `indent` configurations.
 
 
 
@@ -107,8 +110,10 @@ Results can be viewed in two ways:
 [dedicated page]: https://docs.github.com/en/authentication/connecting-to-github-with-ssh
 [download and install]: https://lifex.gitlab.io/lifex/download-and-install.html
 [ParaView]: https://www.paraview.org/
+[Python]: https://www.python.org/
 [Doxygen]: https://doxygen.nl/
 [Graphviz]: https://graphviz.org/
+[gmsh]: https://gmsh.info/
 [CMake]: https://cmake.org/
 [here]: https://github.com/elauksap/mk/releases/download/v2022.0/mk-2022.0-lifex.tar.gz
 [Clang-Format]: https://clang.llvm.org/docs/ClangFormat.html
