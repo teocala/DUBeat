@@ -47,7 +47,7 @@
 #include "source/helpers/ischemic_region.hpp"
 #include "source/init.hpp"
 #include "source/io/data_writer.hpp"
-#include "source/ionic/ttp06.hpp"
+#include "source/ionic/ttp06_dg.hpp"
 #include "source/numerics/bc_handler.hpp"
 #include "source/numerics/linear_solver_handler.hpp"
 #include "source/numerics/preconditioner_handler.hpp"
@@ -215,12 +215,12 @@ namespace lifex::examples
     /// Constructor.
     Monodomain_ttp06_DG<basis>()
       : ModelDG_t<basis>("Monodomain TTP06")
-      , ChiM(1e5)
-      , Sigma(0.12)
+      , ChiM(14000)
+      , Sigma(0.1334) // 0.1334 longitudinal, 0.0176 transversal
       , Cm(1e-2)
-      , ionic_model(
-          std::make_shared<lifex::TTP06>("Monodomain TTP06 / Ionic model",
-                                         false))
+      , ionic_model(std::make_shared<lifex::TTP06_DG<basis>>(
+          "Monodomain TTP06 / Ionic model",
+          false))
       , fiber_generation("Fiber generation", false)
       , ischemic_region_generation("Monodomain TTP06 / Ischemic region")
       , I_app(std::make_shared<lifex::AppliedCurrent>(
@@ -240,7 +240,7 @@ namespace lifex::examples
     /// Membrane capacity.
     double Cm;
     /// Ionic model
-    std::shared_ptr<lifex::TTP06> ionic_model;
+    std::shared_ptr<lifex::TTP06_DG<basis>> ionic_model;
     /// FIber generation
     lifex::FiberGeneration fiber_generation;
     /// Transmural vector (0 in the endocardium, 1 in the epicardium).
@@ -589,7 +589,7 @@ namespace lifex::examples
             this->assemble->reinit(cell);
             dof_indices = this->dof_handler.get_dof_indices(cell);
             ischemic_region_fun->reinit(cell);
-            ionic_model->reinit(cell);
+            ionic_model->reinit_new(cell);
 
             V = this->assemble->local_V();
             V *= Sigma;

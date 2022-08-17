@@ -194,7 +194,7 @@ DoFHandler_DG<DUBValues<lifex::dim>>::distribute_dofs(
   std::vector<lifex::types::global_dof_index> dof_indices(
     this->n_dofs_per_cell());
   dof_map.clear();
-  unsigned int i = 0;
+
   for (const auto &cell : this->active_cell_iterators())
     {
       // In the dof_map, for every cell we assign the global dofs.

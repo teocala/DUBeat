@@ -46,4 +46,4 @@ mkPetscLib?=/u/sw/toolchains/gcc-glibc/11.2.0/pkgs/petsc/3.15.1/lib
 
 
 CPPFLAGS+= -DLIN_ALG_TRILINOS -I$(mkDealiiInc) -I$(ionicInc) -I$(lifexInc) -I$(mkAdolcInc) -I$(mkTrilinosInc) -I$(mkBoostInc) -I$(mkTbbInc) -I$(mkP4estInc) -I$(mkPetscInc)
-LDLIBS+=-L$(mkDealiiLib) -ldeal_II -L$(lifexLib) -Wl,-rpath=$(lifexLib) -llifex_core -llifex_physics_ionic -llifex_physics_fibergeneration -llifex_helper_ischemic_region -llifex_helper_applied_current -L$(mkAdolcLib) -L$(mkTrilinosLib) -lepetra -lteuchoscore -lteuchoscomm -L$(mkBoostLib) -L$(mkTbbLib) -ltbb -L$(mkP4estLib) -L$(mkPetscLib) -lstdc++ -ldl -lm
+LDLIBS+=-L$(mkDealiiLib) -ldeal_II -L$(lifexLib) -Wl,-rpath=$(lifexLib) -llifex_core -llifex_physics_ionic -llifex_physics_fibergeneration -llifex_helper_ischemic_region -llifex_helper_applied_current -L$(mkAdolcLib) -L$(mkTrilinosLib) -lepetra -lteuchoscore -lteuchoscomm -L$(mkBoostLib) -L$(mkTbbLib) -ltbb -L$(mkP4estLib) -L$(mkPetscLib) -lstdc++ -ldl -lm -lkokkoscore

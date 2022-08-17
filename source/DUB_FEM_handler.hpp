@@ -106,7 +106,7 @@ DUBFEMHandler<basis>::dubiner_to_fem(
   lifex::LinAlg::MPI::Vector fem_solution;
   fem_solution.reinit(dub_solution);
 
-  std::vector<unsigned int> dof_indices(this->n_functions);
+  std::vector<unsigned int> dof_indices(this->dofs_per_cell);
 
   const dealii::FE_SimplexDGP<lifex::dim>      fe_dg(this->poly_degree);
   const std::vector<dealii::Point<lifex::dim>> support_points =
@@ -118,9 +118,9 @@ DUBFEMHandler<basis>::dubiner_to_fem(
     {
       dof_indices = dof_handler.get_dof_indices(cell);
 
-      for (unsigned int i = 0; i < this->n_functions; ++i)
+      for (unsigned int i = 0; i < this->dofs_per_cell; ++i)
         {
-          for (unsigned int j = 0; j < this->n_functions; ++j)
+          for (unsigned int j = 0; j < this->dofs_per_cell; ++j)
             {
               fem_solution[dof_indices[i]] +=
                 dub_solution[dof_indices[j]] *
@@ -143,7 +143,7 @@ DUBFEMHandler<basis>::fem_to_dubiner(
   lifex::LinAlg::MPI::Vector dub_solution;
   dub_solution.reinit(fem_solution);
 
-  std::vector<unsigned int> dof_indices(this->n_functions);
+  std::vector<unsigned int> dof_indices(this->dofs_per_cell);
   double                    eval_on_quad;
 
 
@@ -157,13 +157,13 @@ DUBFEMHandler<basis>::fem_to_dubiner(
       dof_indices = dof_handler.get_dof_indices(cell);
       vol_handler.reinit(cell);
 
-      for (unsigned int i = 0; i < this->n_functions; ++i)
+      for (unsigned int i = 0; i < this->dofs_per_cell; ++i)
         {
           for (unsigned int q = 0; q < n_quad_points; ++q)
             {
               eval_on_quad = 0;
 
-              for (unsigned int j = 0; j < this->n_functions; ++j)
+              for (unsigned int j = 0; j < this->dofs_per_cell; ++j)
                 {
                   eval_on_quad +=
                     fem_solution[dof_indices[j]] *
@@ -191,7 +191,7 @@ DUBFEMHandler<basis>::analytical_to_dubiner(
 
   dealii::IndexSet owned_dofs = dof_handler.locally_owned_dofs();
 
-  std::vector<unsigned int> dof_indices(this->n_functions);
+  std::vector<unsigned int> dof_indices(this->dofs_per_cell);
   double                    eval_on_quad;
 
   // Here, we apply the same idea as in fem_to_dubiner. The only difference is
@@ -202,7 +202,7 @@ DUBFEMHandler<basis>::analytical_to_dubiner(
       dof_indices = dof_handler.get_dof_indices(cell);
       vol_handler.reinit(cell);
 
-      for (unsigned int i = 0; i < this->n_functions; ++i)
+      for (unsigned int i = 0; i < this->dofs_per_cell; ++i)
         {
           dub_solution[dof_indices[i]] = 0;
           for (unsigned int q = 0; q < n_quad_points; ++q)

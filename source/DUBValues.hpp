@@ -52,9 +52,6 @@ protected:
   /// Polynomial degree used.
   const unsigned int poly_degree;
 
-  /// Number of degrees of freedom.
-  unsigned int n_functions;
-
   /// Tolerance used for some operations, default value is @f$10^{-10}@f$.
   const double tol = 1e-10;
 
@@ -79,8 +76,11 @@ public:
   DUBValues<dim>(const unsigned int degree)
     : poly_degree(degree)
   {
-    n_functions = get_dof_per_cell();
+    dofs_per_cell = get_dofs_per_cell();
   }
+
+  /// Number of degrees of freedom.
+  unsigned int dofs_per_cell;
 
   /// Default copy constructor.
   DUBValues<dim>(DUBValues<dim> &DUBValues) = default;
@@ -93,7 +93,7 @@ public:
 
   /// Return the number of degrees of freedom per element.
   unsigned int
-  get_dof_per_cell() const;
+  get_dofs_per_cell() const;
 
   /// Evaluation of the Dubiner basis functions.
   double
@@ -216,7 +216,7 @@ DUBValues<dim>::eval_jacobi_polynomial(const unsigned int n,
 
 template <unsigned int dim>
 unsigned int
-DUBValues<dim>::get_dof_per_cell() const
+DUBValues<dim>::get_dofs_per_cell() const
 {
   // The analytical formula is:
   // n_dof_per_cell = (p+1)*(p+2)*...(p+d) / d!,
@@ -240,7 +240,7 @@ double
 DUBValues<2>::shape_value(const unsigned int      function_no,
                           const dealii::Point<2> &quadrature_point) const
 {
-  AssertThrow(function_no < n_functions,
+  AssertThrow(function_no < dofs_per_cell,
               dealii::StandardExceptions::ExcMessage(
                 "function_no outside the limit."));
 
@@ -271,7 +271,7 @@ double
 DUBValues<3>::shape_value(const unsigned int      function_no,
                           const dealii::Point<3> &quadrature_point) const
 {
-  AssertThrow(function_no < n_functions,
+  AssertThrow(function_no < dofs_per_cell,
               dealii::StandardExceptions::ExcMessage(
                 "function_no outside the limit."));
 
@@ -309,7 +309,7 @@ dealii::Tensor<1, 2>
 DUBValues<2>::shape_grad(const unsigned int      function_no,
                          const dealii::Point<2> &quadrature_point) const
 {
-  AssertThrow(function_no < n_functions,
+  AssertThrow(function_no < dofs_per_cell,
               dealii::StandardExceptions::ExcMessage(
                 "function_no outside the limit."));
 
@@ -374,7 +374,7 @@ dealii::Tensor<1, 3>
 DUBValues<3>::shape_grad(const unsigned int      function_no,
                          const dealii::Point<3> &quadrature_point) const
 {
-  AssertThrow(function_no < n_functions,
+  AssertThrow(function_no < dofs_per_cell,
               dealii::StandardExceptions::ExcMessage(
                 "function_no outside the limit."));
 

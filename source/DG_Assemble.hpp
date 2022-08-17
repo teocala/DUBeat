@@ -44,7 +44,7 @@
 #include "source/geometry/mesh_handler.hpp"
 #include "source/init.hpp"
 #include "source/io/data_writer.hpp"
-#include "source/ionic/ttp06.hpp"
+#include "source/ionic/ttp06_dg.hpp"
 #include "source/numerics/bc_handler.hpp"
 #include "source/numerics/linear_solver_handler.hpp"
 #include "source/numerics/preconditioner_handler.hpp"
@@ -253,7 +253,7 @@ public:
   /// <a href="https://doi.org/10.1152/ajpheart.00109.2006.">Ten-Tusscher
   /// Panvilov ionic model</a>.
   dealii::Vector<double>
-  local_ttp06(const std::shared_ptr<lifex::TTP06> ionic_model) const;
+  local_ttp06(const std::shared_ptr<lifex::TTP06_DG<basis>> ionic_model) const;
 
   /// Destructor.
   virtual ~DGAssemble() = default;
@@ -774,7 +774,7 @@ DGAssemble<basis>::local_non_linear_fitzhugh(
 template <class basis>
 dealii::Vector<double>
 DGAssemble<basis>::local_ttp06(
-  const std::shared_ptr<lifex::TTP06> ionic_model) const
+  const std::shared_ptr<lifex::TTP06_DG<basis>> ionic_model) const
 {
   dealii::Vector<double> cell_rhs(dofs_per_cell);
 

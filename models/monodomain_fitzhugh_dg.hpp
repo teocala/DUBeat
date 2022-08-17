@@ -245,7 +245,7 @@ namespace lifex::examples
 
       /// Evaluate the gradient of the exact solution in a point.
       virtual double
-      value(const Point<dim> & p,
+      value(const Point<dim>  &p,
             const unsigned int component = 0) const override
       {
         if (dim == 2)
@@ -337,7 +337,7 @@ namespace lifex::examples
 
       /// Evaluate the gradient of the exact solution in a point.
       virtual double
-      value(const Point<dim> & p,
+      value(const Point<dim>  &p,
             const unsigned int component = 0) const override
       {
         if (dim == 2)
