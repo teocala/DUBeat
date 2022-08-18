@@ -30,9 +30,9 @@
 #include <memory>
 #include <vector>
 
-#include "../source/DG_Assemble.hpp"
-#include "../source/DG_Face_handler.hpp"
-#include "../source/DG_Volume_handler.hpp"
+#include "../source/assemble_DG.hpp"
+#include "../source/face_handler_DG.hpp"
+#include "../source/volume_handler_DG.hpp"
 #include "../source/DUBValues.hpp"
 #include "../source/DUB_FEM_handler.hpp"
 #include "../source/model_DG.hpp"
@@ -158,11 +158,11 @@ namespace DUBeat::models
    */
 
   template <class basis>
-  class Laplace_DG : public ModelDG<basis>
+  class LaplaceDG : public ModelDG<basis>
   {
   public:
     /// Constructor.
-    Laplace_DG<basis>()
+    LaplaceDG<basis>()
       : ModelDG<basis>("Laplace")
     {
       this->u_ex      = std::make_shared<laplace_DG::ExactSolution>();
@@ -178,7 +178,7 @@ namespace DUBeat::models
   /// Assembly of the linear system.
   template <class basis>
   void
-  Laplace_DG<basis>::assemble_system()
+  LaplaceDG<basis>::assemble_system()
   {
     this->matrix = 0;
     this->rhs    = 0;

@@ -24,8 +24,8 @@
  * @author Matteo Calafà <matteo.calafa@mail.polimi.it>.
  */
 
-#ifndef LIFEX_PHYSICS_DG_IONIC_HPP_
-#define LIFEX_PHYSICS_DG_IONIC_HPP_
+#ifndef LIFEX_PHYSICS_IONIC_DG_HPP_
+#define LIFEX_PHYSICS_IONIC_DG_HPP_
 
 #include <map>
 #include <memory>
@@ -33,8 +33,8 @@
 #include <utility>
 #include <vector>
 
-#include "../../DUBeat/source/DG_DoFHandler.hpp"
-#include "../../DUBeat/source/DG_Volume_handler.hpp"
+#include "../../DUBeat/source/dof_handler_DG.hpp"
+#include "../../DUBeat/source/volume_handler_DG.hpp"
 #include "core/source/core_model.hpp"
 #include "core/source/generic_factory.hpp"
 #include "core/source/geometry/mesh_handler.hpp"
@@ -116,7 +116,7 @@ namespace lifex
    */
 
   template <class basis>
-  class Ionic_DG : public CoreModel, public QuadratureEvaluationFEMScalar
+  class IonicDG : public CoreModel, public QuadratureEvaluationFEMScalar
   {
   public:
     /**
@@ -128,7 +128,7 @@ namespace lifex
      *                         coupled to a 3D electrophysiology model and
      *                         initialized through @ref initialize_3d.
      */
-    Ionic_DG(const size_t      &n_variables_,
+    IonicDG(const size_t      &n_variables_,
              const std::string &subsection,
              const bool        &standalone_)
       : CoreModel(subsection)
@@ -137,7 +137,7 @@ namespace lifex
       , n_variables(n_variables_)
       , prm_bdf_order(1)
       , csv_writer(mpi_rank == 0)
-      , dof_handler(std::make_unique<DGDoFHandler<basis>>())
+      , dof_handler(std::make_unique<DoFHandlerDG<basis>>())
       , I_app_function(nullptr)
       , do_0d_simulation_before_initialization(false)
     {
@@ -151,7 +151,7 @@ namespace lifex
     }
 
     /// Virtual destructor.
-    virtual ~Ionic_DG() = default;
+    virtual ~IonicDG() = default;
 
     /**
      * Initializer for 3D simulations.
@@ -566,10 +566,10 @@ namespace lifex
     std::unique_ptr<basis> fe;
 
     /// Volume handler DG
-    std::unique_ptr<DGVolumeHandler<dim>> vol_handler;
+    std::unique_ptr<VolumeHandlerDG<dim>> vol_handler;
 
     /// DoF handler.
-    std::unique_ptr<DGDoFHandler<basis>> dof_handler;
+    std::unique_ptr<DoFHandlerDG<basis>> dof_handler;
 
     /// Vector of BDF solutions, for each ionic variable.
     std::vector<LinAlg::MPI::Vector> w_bdf;
@@ -670,7 +670,7 @@ namespace lifex
 
   template <class basis>
   void
-  Ionic_DG<basis>::reinit_new(
+  IonicDG<basis>::reinit_new(
     const DoFHandler<dim>::active_cell_iterator &cell_other)
   {
     this->cell = this->cell_next;
@@ -697,7 +697,7 @@ namespace lifex
 
   template <class basis>
   void
-  Ionic_DG<basis>::initialize_3d(
+  IonicDG<basis>::initialize_3d(
     const std::shared_ptr<const utils::MeshHandler> &triangulation_,
     const unsigned int                              &fe_degree_,
     const std::shared_ptr<const Quadrature<dim>>    &quadrature_formula_,
@@ -711,7 +711,7 @@ namespace lifex
     triangulation = triangulation_;
 
     fe          = std::make_unique<basis>(fe_degree_);
-    vol_handler = std::make_unique<DGVolumeHandler<dim>>(fe_degree_);
+    vol_handler = std::make_unique<VolumeHandlerDG<dim>>(fe_degree_);
 
     fe_degree = fe_degree_;
 
@@ -743,7 +743,7 @@ namespace lifex
 
   template <class basis>
   void
-  Ionic_DG<basis>::declare_parameters(ParamHandler &params) const
+  IonicDG<basis>::declare_parameters(ParamHandler &params) const
   {
     params.enter_subsection_path(subsection_path);
     {
@@ -859,7 +859,7 @@ namespace lifex
 
   template <class basis>
   void
-  Ionic_DG<basis>::parse_parameters(ParamHandler &params)
+  IonicDG<basis>::parse_parameters(ParamHandler &params)
   {
     params.enter_subsection_path(subsection_path);
     {
@@ -913,7 +913,7 @@ namespace lifex
 
   template <class basis>
   void
-  Ionic_DG<basis>::declare_parameters_0d(ParamHandler &params) const
+  IonicDG<basis>::declare_parameters_0d(ParamHandler &params) const
   {
     AssertThrow(standalone, ExcStandaloneOnly());
 
@@ -948,7 +948,7 @@ namespace lifex
 
   template <class basis>
   void
-  Ionic_DG<basis>::parse_parameters_0d(ParamHandler &params)
+  IonicDG<basis>::parse_parameters_0d(ParamHandler &params)
   {
     AssertThrow(standalone, ExcStandaloneOnly());
 
@@ -969,7 +969,7 @@ namespace lifex
   template <class basis>
   template <class VectorType>
   void
-  Ionic_DG<basis>::solve_time_step(const VectorType &u,
+  IonicDG<basis>::solve_time_step(const VectorType &u,
                                    const double     &time_step_,
                                    const double     &time_)
   {
@@ -1065,7 +1065,7 @@ namespace lifex
 
   template <class basis>
   void
-  Ionic_DG<basis>::solve_electrophysiology_time_step_0d(const bool &verbose)
+  IonicDG<basis>::solve_electrophysiology_time_step_0d(const bool &verbose)
   {
     double              dIion_du_val;
     double              Iion_val;
@@ -1118,7 +1118,7 @@ namespace lifex
 
   template <class basis>
   void
-  Ionic_DG<basis>::setup_system(const bool &initialize_ICI)
+  IonicDG<basis>::setup_system(const bool &initialize_ICI)
   {
     AssertThrow(dof_handler != nullptr, ExcNotInitialized());
 
@@ -1227,7 +1227,7 @@ namespace lifex
 
   template <class basis>
   void
-  Ionic_DG<basis>::setup_system_0d()
+  IonicDG<basis>::setup_system_0d()
   {
     TimerOutput::Scope timer_section(timer_output,
                                      subsection_label + " / Setup system 0D");
@@ -1276,7 +1276,7 @@ namespace lifex
 
   template <class basis>
   void
-  Ionic_DG<basis>::run_0d(const bool &verbose)
+  IonicDG<basis>::run_0d(const bool &verbose)
   {
     unsigned int timestep_number = 1;
 
@@ -1313,7 +1313,7 @@ namespace lifex
 
   template <class basis>
   void
-  Ionic_DG<basis>::assemble_Iion_ICI(const LinAlg::MPI::Vector &u,
+  IonicDG<basis>::assemble_Iion_ICI(const LinAlg::MPI::Vector &u,
                                      const LinAlg::MPI::Vector &u_ext)
 
   {
@@ -1332,7 +1332,7 @@ namespace lifex
   template <class basis>
   template <class VectorType>
   void
-  Ionic_DG<basis>::assemble_Iion_ICI_tpl(const VectorType &u,
+  IonicDG<basis>::assemble_Iion_ICI_tpl(const VectorType &u,
                                          const VectorType &u_ext,
                                          VectorType       &Iion_ICI_vec_owned,
                                          VectorType &dIion_du_ICI_vec_owned)
@@ -1365,7 +1365,7 @@ namespace lifex
 
   template <class basis>
   std::pair<std::vector<double>, std::vector<double>>
-  Ionic_DG<basis>::Iion_ICI()
+  IonicDG<basis>::Iion_ICI()
   {
     AssertThrow(dof_handler != nullptr, ExcNotInitialized());
 
@@ -1431,7 +1431,7 @@ namespace lifex
 
   template <class basis>
   std::pair<std::vector<double>, std::vector<double>>
-  Ionic_DG<basis>::Iion_ICI_hybrid(const LinAlg::MPI::Vector &u,
+  IonicDG<basis>::Iion_ICI_hybrid(const LinAlg::MPI::Vector &u,
                                    const LinAlg::MPI::Vector &u_ext)
   {
     AssertThrow(dof_handler != nullptr, ExcNotInitialized());
@@ -1522,7 +1522,7 @@ namespace lifex
 
   template <class basis>
   std::pair<std::vector<double>, std::vector<double>>
-  Ionic_DG<basis>::Iion_SVI(const std::vector<double> &u_loc,
+  IonicDG<basis>::Iion_SVI(const std::vector<double> &u_loc,
                             const std::vector<double> &u_ext_loc)
   {
     AssertThrow(dof_handler != nullptr, ExcNotInitialized());
@@ -1596,7 +1596,7 @@ namespace lifex
 
   template <class basis>
   std::pair<std::vector<double>, std::vector<double>>
-  Ionic_DG<basis>::Iion_quadrature(const std::vector<double> &u_loc,
+  IonicDG<basis>::Iion_quadrature(const std::vector<double> &u_loc,
                                    const std::vector<double> &u_ext_loc)
   {
     AssertThrow(dof_handler != nullptr, ExcNotInitialized());
@@ -1697,14 +1697,14 @@ namespace lifex
 
   template <class basis>
   double
-  Ionic_DG<basis>::compute_calcium(const std::vector<double> &w) const
+  IonicDG<basis>::compute_calcium(const std::vector<double> &w) const
   {
     return prm_calcium_rescale * compute_calcium_raw(w);
   }
 
   template <class basis>
   void
-  Ionic_DG<basis>::output_results_0d()
+  IonicDG<basis>::output_results_0d()
   {
     if (time < prm_first_time_to_export - prm_time_step * 1e-2)
       return;
@@ -1738,7 +1738,7 @@ namespace lifex
 
   template <class basis>
   void
-  Ionic_DG<basis>::declare_entries_csv(utils::CSVWriter  &csv_writer,
+  IonicDG<basis>::declare_entries_csv(utils::CSVWriter  &csv_writer,
                                        const std::string &output_mode) const
   {
     csv_writer.declare_entries({"calcium_min" + volume_label_output,
@@ -1760,4 +1760,4 @@ namespace lifex
   }
 } // namespace lifex
 
-#endif /* LIFEX_PHYSICS_DG_IONIC_HPP_ */
+#endif /* LIFEX_PHYSICS_IONIC_DG_HPP_ */

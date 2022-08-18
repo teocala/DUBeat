@@ -24,8 +24,8 @@
  * @author Matteo Calafà <matteo.calafa@mail.polimi.it>.
  */
 
-#ifndef ModelDG_t_HPP_
-#define ModelDG_t_HPP_
+#ifndef MODEL_DG_T_HPP_
+#define MODEL_DG_T_HPP_
 
 #include <deal.II/base/parameter_handler.h>
 
@@ -37,9 +37,9 @@
 #include <string>
 #include <vector>
 
-#include "DG_Assemble.hpp"
-#include "DG_Face_handler.hpp"
-#include "DG_Volume_handler.hpp"
+#include "assemble_DG.hpp"
+#include "face_handler_DG.hpp"
+#include "volume_handler_DG.hpp"
 #include "DUBValues.hpp"
 #include "DUB_FEM_handler.hpp"
 #include "model_DG.hpp"
@@ -340,4 +340,4 @@ ModelDG_t<basis>::run()
     }
 }
 
-#endif /* ModelDG_t_HPP_*/
+#endif /* MODEL_DG_T_HPP_*/

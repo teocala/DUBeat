@@ -42,8 +42,8 @@
  * @brief
  * Class representing the Dubiner basis functions definitions. The main utility
  * is the evaluations of these functions and their gradients on the reference
- * cell. Instead, for their evaluations on the real cells see DGVolumeHandler
- * and DGFaceHandler.
+ * cell. Instead, for their evaluations on the real cells see VolumeHandlerDG
+ * and FaceHandlerDG.
  */
 template <unsigned int dim>
 class DUBValues

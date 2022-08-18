@@ -24,8 +24,8 @@
  * @author Matteo Calafà <matteo.calafa@mail.polimi.it>.
  */
 
-#ifndef DGFaceHandler_HPP_
-#define DGFaceHandler_HPP_
+#ifndef FACE_HANDLER_DG_HPP_
+#define FACE_HANDLER_DG_HPP_
 
 #include <deal.II/base/quadrature_lib.h>
 #include <deal.II/base/tensor.h>
@@ -37,7 +37,7 @@
 #include <memory>
 #include <utility>
 
-#include "DG_Volume_handler.hpp"
+#include "volume_handler_DG.hpp"
 #include "QGaussLegendreSimplex.hpp"
 
 /**
@@ -45,7 +45,7 @@
  * Galerkin element.
  */
 template <unsigned int dim>
-class DGFaceHandler : public DGVolumeHandler<dim>
+class FaceHandlerDG : public VolumeHandlerDG<dim>
 {
 private:
   /// Index of the actual face.
@@ -62,8 +62,8 @@ private:
 
 public:
   /// Constructor.
-  DGFaceHandler<dim>(const unsigned int degree)
-    : DGVolumeHandler<dim>(degree)
+  FaceHandlerDG<dim>(const unsigned int degree)
+    : VolumeHandlerDG<dim>(degree)
     , QGLpoints_face(this->n_quad_points_1D)
     , fe_face_values(std::make_unique<dealii::FEFaceValues<dim>>(
         *(this->mapping),
@@ -74,13 +74,13 @@ public:
   {}
 
   /// Default copy constructor.
-  DGFaceHandler<dim>(DGFaceHandler<dim> &DGFaceHandler) = default;
+  FaceHandlerDG<dim>(FaceHandlerDG<dim> &FaceHandlerDG) = default;
 
   /// Default const copy constructor.
-  DGFaceHandler<dim>(const DGFaceHandler<dim> &DGFaceHandler) = default;
+  FaceHandlerDG<dim>(const FaceHandlerDG<dim> &FaceHandlerDG) = default;
 
   /// Default move constructor.
-  DGFaceHandler<dim>(DGFaceHandler<dim> &&DGFaceHandler) = default;
+  FaceHandlerDG<dim>(FaceHandlerDG<dim> &&FaceHandlerDG) = default;
 
   /// Reinit objects on the current new_cell and new_edge.
   void
@@ -105,7 +105,7 @@ public:
   int
   corresponding_neigh_index(
     const unsigned int        q,
-    const DGFaceHandler<dim> &DGFaceHandler_neigh) const;
+    const FaceHandlerDG<dim> &FaceHandlerDG_neigh) const;
 
   /// Outward normal vector on the current element and face.
   dealii::Tensor<1, dim>
@@ -116,12 +116,12 @@ public:
   get_measure() const;
 
   /// Destructor.
-  virtual ~DGFaceHandler() = default;
+  virtual ~FaceHandlerDG() = default;
 };
 
 template <unsigned int dim>
 void
-DGFaceHandler<dim>::reinit(
+FaceHandlerDG<dim>::reinit(
   const typename dealii::DoFHandler<dim>::active_cell_iterator &new_cell,
   const unsigned int                                            new_edge)
 {
@@ -134,7 +134,7 @@ DGFaceHandler<dim>::reinit(
 
 template <unsigned int dim>
 dealii::Point<dim>
-DGFaceHandler<dim>::quadrature_real(const unsigned int q) const
+FaceHandlerDG<dim>::quadrature_real(const unsigned int q) const
 {
   AssertThrow(this->initialized,
               dealii::StandardExceptions::ExcNotInitialized());
@@ -148,7 +148,7 @@ DGFaceHandler<dim>::quadrature_real(const unsigned int q) const
 
 template <unsigned int dim>
 dealii::Point<dim>
-DGFaceHandler<dim>::quadrature_ref(const unsigned int q) const
+FaceHandlerDG<dim>::quadrature_ref(const unsigned int q) const
 {
   AssertThrow(this->initialized,
               dealii::StandardExceptions::ExcNotInitialized());
@@ -163,7 +163,7 @@ DGFaceHandler<dim>::quadrature_ref(const unsigned int q) const
 
 template <unsigned int dim>
 double
-DGFaceHandler<dim>::quadrature_weight(
+FaceHandlerDG<dim>::quadrature_weight(
   const unsigned int quadrature_point_no) const
 {
   AssertThrow(this->initialized,
@@ -178,9 +178,9 @@ DGFaceHandler<dim>::quadrature_weight(
 
 template <unsigned int dim>
 int
-DGFaceHandler<dim>::corresponding_neigh_index(
+FaceHandlerDG<dim>::corresponding_neigh_index(
   const unsigned int        q,
-  const DGFaceHandler<dim> &DGFaceHandler_neigh) const
+  const FaceHandlerDG<dim> &FaceHandlerDG_neigh) const
 {
   AssertThrow(this->initialized,
               dealii::StandardExceptions::ExcNotInitialized());
@@ -196,7 +196,7 @@ DGFaceHandler<dim>::corresponding_neigh_index(
   int quad = -1;
   for (unsigned int nq = 0; nq < n_quad_points_face; ++nq)
     {
-      const dealii::Point<dim> P_nq = DGFaceHandler_neigh.quadrature_real(nq);
+      const dealii::Point<dim> P_nq = FaceHandlerDG_neigh.quadrature_real(nq);
 
       // If the distance between P_nq and P_q is negligible, then we have found
       // the corresponding quadrature point on the neighbor element.
@@ -211,7 +211,7 @@ DGFaceHandler<dim>::corresponding_neigh_index(
 
 template <unsigned int dim>
 dealii::Tensor<1, dim>
-DGFaceHandler<dim>::get_normal() const
+FaceHandlerDG<dim>::get_normal() const
 {
   AssertThrow(this->initialized,
               dealii::StandardExceptions::ExcNotInitialized());
@@ -223,7 +223,7 @@ DGFaceHandler<dim>::get_normal() const
 /// segment).
 template <>
 double
-DGFaceHandler<2>::get_measure() const
+FaceHandlerDG<2>::get_measure() const
 {
   AssertThrow(this->initialized,
               dealii::StandardExceptions::ExcNotInitialized());
@@ -236,7 +236,7 @@ DGFaceHandler<2>::get_measure() const
 /// formula since deal.II does not have so far a version for triangles.
 template <>
 double
-DGFaceHandler<3>::get_measure() const
+FaceHandlerDG<3>::get_measure() const
 {
   AssertThrow(this->initialized,
               dealii::StandardExceptions::ExcNotInitialized());
@@ -254,4 +254,4 @@ DGFaceHandler<3>::get_measure() const
                    (semi_per - face->line(2)->measure()));
 }
 
-#endif /* DGFaceHandler_HPP_*/
+#endif /* FACE_HANDLER_DG_HPP_*/

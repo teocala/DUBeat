@@ -24,8 +24,8 @@
  * @author Matteo Calafà <matteo.calafa@mail.polimi.it>.
  */
 
-#ifndef DOFHANDLERDG_HPP_
-#define DOFHANDLERDG_HPP_
+#ifndef DOF_HANDLER_DG_HPP_
+#define DOF_HANDLER_DG_HPP_
 
 #include <deal.II/base/quadrature.h>
 
@@ -62,7 +62,7 @@ using active_cell_iterator = typename ActiveSelector::active_cell_iterator;
  * every order while DGFEM with order at most 2.
  */
 template <class basis>
-class DGDoFHandler : public dealii::DoFHandler<lifex::dim>
+class DoFHandlerDG : public dealii::DoFHandler<lifex::dim>
 {
 private:
   /// Polynomial space degree.
@@ -73,19 +73,19 @@ private:
 
 public:
   /// Constructor.
-  DGDoFHandler<basis>()
+  DoFHandlerDG<basis>()
     : dealii::DoFHandler<lifex::dim>()
     , degree(0)
   {}
 
   /// Default copy constructor.
-  DGDoFHandler<basis>(DGDoFHandler<basis> &DoFHandlerDG) = default;
+  DoFHandlerDG<basis>(DoFHandlerDG<basis> &DoFHandlerDG) = default;
 
   /// Default const copy constructor.
-  DGDoFHandler<basis>(const DGDoFHandler<basis> &DOFHandlerDG) = default;
+  DoFHandlerDG<basis>(const DoFHandlerDG<basis> &DOFHandlerDG) = default;
 
   /// Default move constructor.
-  DGDoFHandler<basis>(DGDoFHandler<basis> &&DoFHandlerDG) = default;
+  DoFHandlerDG<basis>(DoFHandlerDG<basis> &&DoFHandlerDG) = default;
 
   /// Return copy of n_dofs_per_cell.
   unsigned int
@@ -118,7 +118,7 @@ public:
 
 template <class basis>
 unsigned int
-DGDoFHandler<basis>::n_dofs_per_cell() const
+DoFHandlerDG<basis>::n_dofs_per_cell() const
 {
   AssertThrow(degree > 0,
               dealii::StandardExceptions::ExcMessage(
@@ -143,7 +143,7 @@ DGDoFHandler<basis>::n_dofs_per_cell() const
 
 template <class basis>
 unsigned int
-DGDoFHandler<basis>::n_dofs() const
+DoFHandlerDG<basis>::n_dofs() const
 {
   AssertThrow(degree > 0,
               dealii::StandardExceptions::ExcMessage(
@@ -165,7 +165,7 @@ DGDoFHandler<basis>::n_dofs() const
 /// the deal.II original distribute_dofs. Limited to order 2.
 template <>
 void
-DGDoFHandler<dealii::FE_SimplexDGP<lifex::dim>>::distribute_dofs(
+DoFHandlerDG<dealii::FE_SimplexDGP<lifex::dim>>::distribute_dofs(
   const dealii::FE_SimplexDGP<lifex::dim> &fe)
 {
   AssertThrow(fe.degree < 3,
@@ -181,7 +181,7 @@ DGDoFHandler<dealii::FE_SimplexDGP<lifex::dim>>::distribute_dofs(
 /// limited to 2.
 template <>
 void
-DGDoFHandler<DUBValues<lifex::dim>>::distribute_dofs(
+DoFHandlerDG<DUBValues<lifex::dim>>::distribute_dofs(
   const dealii::FE_SimplexDGP<lifex::dim> &fe)
 {
   AssertThrow(fe.degree < 3,
@@ -207,7 +207,7 @@ DGDoFHandler<DUBValues<lifex::dim>>::distribute_dofs(
 /// so it is limited to space order at most 2.
 template <>
 void
-DGDoFHandler<dealii::FE_SimplexDGP<lifex::dim>>::distribute_dofs(
+DoFHandlerDG<dealii::FE_SimplexDGP<lifex::dim>>::distribute_dofs(
   const unsigned int degree)
 {
   AssertThrow(degree,
@@ -225,7 +225,7 @@ DGDoFHandler<dealii::FE_SimplexDGP<lifex::dim>>::distribute_dofs(
 /// polynomial order.
 template <>
 void
-DGDoFHandler<DUBValues<lifex::dim>>::distribute_dofs(const unsigned int degree)
+DoFHandlerDG<DUBValues<lifex::dim>>::distribute_dofs(const unsigned int degree)
 {
   this->degree                 = degree;
   unsigned int n_dofs_per_cell = this->n_dofs_per_cell();
@@ -248,7 +248,7 @@ DGDoFHandler<DUBValues<lifex::dim>>::distribute_dofs(const unsigned int degree)
 /// methods.
 template <>
 std::vector<lifex::types::global_dof_index>
-DGDoFHandler<dealii::FE_SimplexDGP<lifex::dim>>::get_dof_indices(
+DoFHandlerDG<dealii::FE_SimplexDGP<lifex::dim>>::get_dof_indices(
   active_cell_iterator cell) const
 {
   std::vector<lifex::types::global_dof_index> dof_indices(
@@ -262,7 +262,7 @@ DGDoFHandler<dealii::FE_SimplexDGP<lifex::dim>>::get_dof_indices(
 /// directly from the internal dof_map.
 template <>
 std::vector<lifex::types::global_dof_index>
-DGDoFHandler<DUBValues<lifex::dim>>::get_dof_indices(
+DoFHandlerDG<DUBValues<lifex::dim>>::get_dof_indices(
   active_cell_iterator cell) const
 {
   std::vector<lifex::types::global_dof_index> dof_indices(
@@ -273,7 +273,7 @@ DGDoFHandler<DUBValues<lifex::dim>>::get_dof_indices(
 
 template <class basis>
 dealii::IndexSet
-DGDoFHandler<basis>::locally_owned_dofs() const
+DoFHandlerDG<basis>::locally_owned_dofs() const
 {
   dealii::IndexSet owned_dofs(this->n_dofs());
   // For the time being, this function returns all the dofs.
@@ -282,4 +282,4 @@ DGDoFHandler<basis>::locally_owned_dofs() const
 }
 
 
-#endif /* DOFHANDLERDG_HPP_*/
+#endif /* DOF_HANDLER_DG_HPP_*/

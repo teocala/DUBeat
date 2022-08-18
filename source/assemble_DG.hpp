@@ -24,8 +24,8 @@
  * @author Matteo Calafà <matteo.calafa@mail.polimi.it>.
  */
 
-#ifndef DGAssemble_HPP_
-#define DGAssemble_HPP_
+#ifndef ASSEMBLE_DG_HPP_
+#define ASSEMBLE_DG_HPP_
 
 #include <deal.II/base/parameter_handler.h>
 
@@ -37,9 +37,9 @@
 #include <utility>
 #include <vector>
 
-#include "DG_Face_handler.hpp"
-#include "DG_Volume_handler.hpp"
-#include "DG_ttp06.hpp"
+#include "face_handler_DG.hpp"
+#include "volume_handler_DG.hpp"
+#include "ttp06_DG.hpp"
 #include "DUB_FEM_handler.hpp"
 #include "source/core_model.hpp"
 #include "source/geometry/mesh_handler.hpp"
@@ -66,20 +66,20 @@
  * element face.
  */
 template <class basis>
-class DGAssemble
+class AssembleDG
 {
 private:
   /// Basis function class.
   const std::unique_ptr<basis> basis_ptr;
 
   /// Volume element handler.
-  DGVolumeHandler<lifex::dim> vol_handler;
+  VolumeHandlerDG<lifex::dim> vol_handler;
 
   /// Face element handler.
-  DGFaceHandler<lifex::dim> face_handler;
+  FaceHandlerDG<lifex::dim> face_handler;
 
   /// Face element handler of the neighbor face.
-  DGFaceHandler<lifex::dim> face_handler_neigh;
+  FaceHandlerDG<lifex::dim> face_handler_neigh;
 
   /// Degree of freedom for each cell.
   unsigned int dofs_per_cell;
@@ -101,11 +101,11 @@ private:
 
 public:
   /// Constructor.
-  DGAssemble<basis>(const unsigned int degree)
+  AssembleDG<basis>(const unsigned int degree)
     : basis_ptr(std::make_unique<basis>(degree))
-    , vol_handler(DGVolumeHandler<lifex::dim>(degree))
-    , face_handler(DGFaceHandler<lifex::dim>(degree))
-    , face_handler_neigh(DGFaceHandler<lifex::dim>(degree))
+    , vol_handler(VolumeHandlerDG<lifex::dim>(degree))
+    , face_handler(FaceHandlerDG<lifex::dim>(degree))
+    , face_handler_neigh(FaceHandlerDG<lifex::dim>(degree))
     , n_quad_points_1D(degree + 2)
     , n_quad_points(static_cast<int>(std::pow(n_quad_points_1D, lifex::dim)))
     , n_quad_points_face(
@@ -116,13 +116,13 @@ public:
   }
 
   /// Default copy constructor.
-  DGAssemble<basis>(DGAssemble<basis> &) = default;
+  AssembleDG<basis>(AssembleDG<basis> &) = default;
 
   /// Default const copy constructor.
-  DGAssemble<basis>(const DGAssemble<basis> &) = default;
+  AssembleDG<basis>(const AssembleDG<basis> &) = default;
 
   /// Default move constructor.
-  DGAssemble<basis>(DGAssemble<basis> &&) = default;
+  AssembleDG<basis>(AssembleDG<basis> &&) = default;
 
   /// Reinitialize object on the current new_edge of the new_cell.
   void
@@ -249,15 +249,15 @@ public:
   /// <a href="https://doi.org/10.1152/ajpheart.00109.2006.">Ten-Tusscher
   /// Panvilov ionic model</a>.
   dealii::Vector<double>
-  local_ttp06(const std::shared_ptr<lifex::TTP06_DG<basis>> ionic_model) const;
+  local_ttp06(const std::shared_ptr<lifex::TTP06DG<basis>> ionic_model) const;
 
   /// Destructor.
-  virtual ~DGAssemble() = default;
+  virtual ~AssembleDG() = default;
 };
 
 template <class basis>
 void
-DGAssemble<basis>::reinit(
+AssembleDG<basis>::reinit(
   const typename dealii::DoFHandler<lifex::dim>::active_cell_iterator &new_cell,
   const unsigned int                                                   new_edge)
 {
@@ -275,7 +275,7 @@ DGAssemble<basis>::reinit(
 
 template <class basis>
 void
-DGAssemble<basis>::reinit(
+AssembleDG<basis>::reinit(
   const typename dealii::DoFHandler<lifex::dim>::active_cell_iterator &new_cell)
 {
   cell = new_cell;
@@ -284,7 +284,7 @@ DGAssemble<basis>::reinit(
 
 template <class basis>
 dealii::FullMatrix<double>
-DGAssemble<basis>::local_V() const
+AssembleDG<basis>::local_V() const
 {
   dealii::FullMatrix<double>          V(dofs_per_cell, dofs_per_cell);
   const dealii::Tensor<2, lifex::dim> BJinv =
@@ -312,7 +312,7 @@ DGAssemble<basis>::local_V() const
 
 template <class basis>
 dealii::FullMatrix<double>
-DGAssemble<basis>::local_M() const
+AssembleDG<basis>::local_M() const
 {
   dealii::FullMatrix<double>          M(dofs_per_cell, dofs_per_cell);
   const dealii::Tensor<2, lifex::dim> BJinv =
@@ -338,7 +338,7 @@ DGAssemble<basis>::local_M() const
 
 template <class basis>
 dealii::Vector<double>
-DGAssemble<basis>::local_rhs(
+AssembleDG<basis>::local_rhs(
   const std::shared_ptr<dealii::Function<lifex::dim>> &f_ex) const
 {
   AssertThrow(f_ex != nullptr,
@@ -366,7 +366,7 @@ DGAssemble<basis>::local_rhs(
 
 template <class basis>
 dealii::Vector<double>
-DGAssemble<basis>::local_rhs_edge_dirichlet(
+AssembleDG<basis>::local_rhs_edge_dirichlet(
   const double                                            stability_coefficient,
   const std::shared_ptr<lifex::utils::FunctionDirichlet> &u_ex) const
 {
@@ -410,7 +410,7 @@ DGAssemble<basis>::local_rhs_edge_dirichlet(
 
 template <class basis>
 dealii::Vector<double>
-DGAssemble<basis>::local_rhs_edge_neumann(
+AssembleDG<basis>::local_rhs_edge_neumann(
   const std::shared_ptr<dealii::Function<lifex::dim>> &g) const
 {
   AssertThrow(g != nullptr,
@@ -439,7 +439,7 @@ DGAssemble<basis>::local_rhs_edge_neumann(
 
 template <class basis>
 dealii::FullMatrix<double>
-DGAssemble<basis>::local_S(const double stability_coefficient) const
+AssembleDG<basis>::local_S(const double stability_coefficient) const
 {
   const double face_measure      = face_handler.get_measure();
   const double unit_face_measure = (4.0 - lifex::dim) / 2;
@@ -471,7 +471,7 @@ DGAssemble<basis>::local_S(const double stability_coefficient) const
 
 template <class basis>
 dealii::FullMatrix<double>
-DGAssemble<basis>::local_SN(const double stability_coefficient) const
+AssembleDG<basis>::local_SN(const double stability_coefficient) const
 {
   const double face_measure      = face_handler.get_measure();
   const double unit_face_measure = (4.0 - lifex::dim) / 2;
@@ -507,7 +507,7 @@ DGAssemble<basis>::local_SN(const double stability_coefficient) const
 
 template <class basis>
 std::pair<dealii::FullMatrix<double>, dealii::FullMatrix<double>>
-DGAssemble<basis>::local_I(const double theta) const
+AssembleDG<basis>::local_I(const double theta) const
 {
   AssertThrow(theta == 1. || theta == 0. || theta == -1.,
               dealii::StandardExceptions::ExcMessage(
@@ -550,7 +550,7 @@ DGAssemble<basis>::local_I(const double theta) const
 
 template <class basis>
 std::pair<dealii::FullMatrix<double>, dealii::FullMatrix<double>>
-DGAssemble<basis>::local_IB(const double theta) const
+AssembleDG<basis>::local_IB(const double theta) const
 {
   AssertThrow(theta == 1. || theta == 0. || theta == -1.,
               dealii::StandardExceptions::ExcMessage(
@@ -592,7 +592,7 @@ DGAssemble<basis>::local_IB(const double theta) const
 
 template <class basis>
 std::pair<dealii::FullMatrix<double>, dealii::FullMatrix<double>>
-DGAssemble<basis>::local_IN(const double theta) const
+AssembleDG<basis>::local_IN(const double theta) const
 {
   AssertThrow(theta == 1. || theta == 0. || theta == -1.,
               dealii::StandardExceptions::ExcMessage(
@@ -639,7 +639,7 @@ DGAssemble<basis>::local_IN(const double theta) const
 
 template <class basis>
 dealii::Vector<double>
-DGAssemble<basis>::local_u0_M_rhs(
+AssembleDG<basis>::local_u0_M_rhs(
   const lifex::LinAlg::MPI::Vector                   &u0,
   const std::vector<dealii::types::global_dof_index> &dof_indices) const
 {
@@ -677,7 +677,7 @@ DGAssemble<basis>::local_u0_M_rhs(
 
 template <class basis>
 dealii::Vector<double>
-DGAssemble<basis>::local_w0_M_rhs(
+AssembleDG<basis>::local_w0_M_rhs(
   const lifex::LinAlg::MPI::Vector                   &u0,
   const std::vector<dealii::types::global_dof_index> &dof_indices) const
 {
@@ -705,7 +705,7 @@ DGAssemble<basis>::local_w0_M_rhs(
 
 template <class basis>
 dealii::FullMatrix<double>
-DGAssemble<basis>::local_non_linear_fitzhugh(
+AssembleDG<basis>::local_non_linear_fitzhugh(
   const lifex::LinAlg::MPI::Vector                   &u0,
   const double                                        a,
   const std::vector<dealii::types::global_dof_index> &dof_indices) const
@@ -749,8 +749,8 @@ DGAssemble<basis>::local_non_linear_fitzhugh(
 
 template <class basis>
 dealii::Vector<double>
-DGAssemble<basis>::local_ttp06(
-  const std::shared_ptr<lifex::TTP06_DG<basis>> ionic_model) const
+AssembleDG<basis>::local_ttp06(
+  const std::shared_ptr<lifex::TTP06DG<basis>> ionic_model) const
 {
   dealii::Vector<double> cell_rhs(dofs_per_cell);
 
@@ -778,4 +778,4 @@ DGAssemble<basis>::local_ttp06(
 }
 
 
-#endif /* DGAssemble_HPP_*/
+#endif /* ASSEMBLE_DG_HPP_*/

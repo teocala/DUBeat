@@ -24,8 +24,8 @@
  * @author Matteo Calafà <matteo.calafa@mail.polimi.it>.
  */
 
-#ifndef ModelDG_HPP_
-#define ModelDG_HPP_
+#ifndef MODEL_DG_HPP_
+#define MODEL_DG_HPP_
 
 #include <deal.II/base/exceptions.h>
 #include <deal.II/base/parameter_handler.h>
@@ -38,11 +38,11 @@
 #include <string>
 #include <vector>
 
-#include "DG_Assemble.hpp"
-#include "DG_DoFHandler.hpp"
-#include "DG_Face_handler.hpp"
-#include "DG_Volume_handler.hpp"
-#include "DG_compute_errors.hpp"
+#include "assemble_DG.hpp"
+#include "dof_handler_DG.hpp"
+#include "face_handler_DG.hpp"
+#include "volume_handler_DG.hpp"
+#include "compute_errors_DG.hpp"
 #include "DUB_FEM_handler.hpp"
 #include "source/core_model.hpp"
 #include "source/geometry/mesh_handler.hpp"
@@ -108,7 +108,7 @@ protected:
   /// assembling. It has been readapted from the deal.II
   /// DoFTools::make_sparsity_pattern() method.
   void
-  make_sparsity_pattern(const DGDoFHandler<basis>               &dof,
+  make_sparsity_pattern(const DoFHandlerDG<basis>               &dof,
                         dealii::DynamicSparsityPattern          &sparsity,
                         const dealii::AffineConstraints<double> &constraints =
                           dealii::AffineConstraints<double>(),
@@ -191,12 +191,12 @@ protected:
   /// Number of degrees of freedom per cell.
   unsigned int dofs_per_cell;
   /// DoFHandler (internal use for useful already implemented methods).
-  DGDoFHandler<basis> dof_handler;
+  DoFHandlerDG<basis> dof_handler;
   /// Member used for conversions between analytical, nodal and modal
   /// representations of the solutions.
   std::shared_ptr<DUBFEMHandler<basis>> dub_fem_values;
   /// Matrix assembler.
-  std::unique_ptr<DGAssemble<basis>> assemble;
+  std::unique_ptr<AssembleDG<basis>> assemble;
   /// Linear solver handler.
   lifex::utils::LinearSolverHandler<lifex::LinAlg::MPI::Vector> linear_solver;
   /// Preconditioner handler.
@@ -331,7 +331,7 @@ ModelDG<basis>::setup_system()
 {
   std::unique_ptr<dealii::FE_SimplexDGP<lifex::dim>> fe =
     std::make_unique<dealii::FE_SimplexDGP<lifex::dim>>(prm_fe_degree);
-  assemble = std::make_unique<DGAssemble<basis>>(prm_fe_degree);
+  assemble = std::make_unique<AssembleDG<basis>>(prm_fe_degree);
 
   dof_handler.reinit(triangulation->get());
   dof_handler.distribute_dofs(prm_fe_degree);
@@ -388,7 +388,7 @@ ModelDG<basis>::setup_system()
 template <class basis>
 void
 ModelDG<basis>::make_sparsity_pattern(
-  const DGDoFHandler<basis>               &dof,
+  const DoFHandlerDG<basis>               &dof,
   dealii::DynamicSparsityPattern          &sparsity,
   const dealii::AffineConstraints<double> &constraints,
   const bool                               keep_constrained_dofs,
@@ -501,7 +501,7 @@ ModelDG<basis>::compute_errors(
   const std::shared_ptr<dealii::Function<lifex::dim>> &grad_u_ex,
   const char                                          *solution_name) const
 {
-  DGComputeErrors<basis> error_calculator(prm_fe_degree,
+  ComputeErrorsDG<basis> error_calculator(prm_fe_degree,
                                           prm_stability_coeff,
                                           dofs_per_cell,
                                           dof_handler,
@@ -654,4 +654,4 @@ ModelDG<DUBValues<lifex::dim>>::discretize_analytical_solution(
   sol_owned = dub_fem_values->analytical_to_dubiner(sol_owned, u_analytical);
 }
 
-#endif /* ModelDG_HPP_*/
+#endif /* MODEL_DG_HPP_*/

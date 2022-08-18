@@ -24,14 +24,14 @@
  * @author Matteo Calafà <matteo.calafa@mail.polimi.it>.
  */
 
-#ifndef LIFEX_PHYSICS_IONIC_DG_TTP06_HPP_
-#define LIFEX_PHYSICS_IONIC_DG_TTP06_HPP_
+#ifndef LIFEX_PHYSICS_IONIC_TTP06_DG_HPP_
+#define LIFEX_PHYSICS_IONIC_TTP06_DG_HPP_
 
 #include <string>
 #include <utility>
 #include <vector>
 
-#include "DG_ionic.hpp"
+#include "ionic_DG.hpp"
 
 namespace lifex
 {
@@ -47,7 +47,7 @@ namespace lifex
    */
 
   template <class basis>
-  class TTP06_DG : public Ionic_DG<basis>
+  class TTP06DG : public IonicDG<basis>
   {
   public:
     /// Ionic model label.
@@ -58,8 +58,8 @@ namespace lifex
     using CurrentType = std::array<NumberType, 12>;
 
     /// Constructor.
-    TTP06_DG(const std::string &subsection, const bool &standalone_)
-      : Ionic_DG<basis>(18, subsection + " / " + label, standalone_)
+    TTP06DG(const std::string &subsection, const bool &standalone_)
+      : IonicDG<basis>(18, subsection + " / " + label, standalone_)
     {
       this->compute_I_app = true;
     }
@@ -217,9 +217,9 @@ namespace lifex
 
   template <class basis>
   void
-  TTP06_DG<basis>::declare_parameters(ParamHandler &params) const
+  TTP06DG<basis>::declare_parameters(ParamHandler &params) const
   {
-    Ionic_DG<basis>::declare_parameters(params);
+    IonicDG<basis>::declare_parameters(params);
 
     // Declare parameters.
     params.set_verbosity(VerbosityParam::Full);
@@ -476,12 +476,12 @@ namespace lifex
 
   template <class basis>
   void
-  TTP06_DG<basis>::parse_parameters(ParamHandler &params)
+  TTP06DG<basis>::parse_parameters(ParamHandler &params)
   {
     // Parse input file.
     params.parse();
 
-    Ionic_DG<basis>::parse_parameters(params);
+    IonicDG<basis>::parse_parameters(params);
 
     // Read input parameters.
     params.enter_subsection_path(this->prm_subsection_path);
@@ -572,14 +572,14 @@ namespace lifex
 
   template <class basis>
   std::string
-  TTP06_DG<basis>::iterations_log_string(const unsigned int & /* n_iter */)
+  TTP06DG<basis>::iterations_log_string(const unsigned int & /* n_iter */)
   {
     return std::string(label) + ": direct solver";
   }
 
   template <class basis>
   std::vector<double>
-  TTP06_DG<basis>::setup_initial_conditions() const
+  TTP06DG<basis>::setup_initial_conditions() const
   {
     std::vector<double> w(this->n_variables);
     w[0]  = 0.0;     // M
@@ -606,21 +606,21 @@ namespace lifex
 
   template <class basis>
   double
-  TTP06_DG<basis>::setup_initial_transmembrane_potential() const
+  TTP06DG<basis>::setup_initial_transmembrane_potential() const
   {
     return -84e-3;
   }
 
   template <class basis>
   double
-  TTP06_DG<basis>::compute_calcium_raw(const std::vector<double> &w) const
+  TTP06DG<basis>::compute_calcium_raw(const std::vector<double> &w) const
   {
     return w[12];
   }
 
   template <class basis>
   std::pair<std::vector<double>, unsigned int>
-  TTP06_DG<basis>::solve_time_step_0d(const double              &u,
+  TTP06DG<basis>::solve_time_step_0d(const double              &u,
                                       const double              &alpha_bdf,
                                       const std::vector<double> &w_bdf,
                                       const std::vector<double> &w_ext,
@@ -694,7 +694,7 @@ namespace lifex
   template <class basis>
   template <class NumberType>
   void
-  TTP06_DG<basis>::compute_currents(const double            &ischemic_region,
+  TTP06DG<basis>::compute_currents(const double            &ischemic_region,
                                     const NumberType        &VV,
                                     CurrentType<NumberType> &currents)
   {
@@ -779,7 +779,7 @@ namespace lifex
 
   template <class basis>
   void
-  TTP06_DG<basis>::compute_concentration_derivatives(const double &Iapp)
+  TTP06DG<basis>::compute_concentration_derivatives(const double &Iapp)
   {
     auto &curr = std::get<CurrentType<double>>(currents);
 
@@ -838,7 +838,7 @@ namespace lifex
 
   template <class basis>
   void
-  TTP06_DG<basis>::compute_gating_constants(const double &CaSS)
+  TTP06DG<basis>::compute_gating_constants(const double &CaSS)
   {
     double V_mV = std::get<double>(VV) * 1e3; // from dimensionless to mV
 
@@ -968,7 +968,7 @@ namespace lifex
 
   template <class basis>
   std::pair<double, double>
-  TTP06_DG<basis>::Iion(const double              &u,
+  TTP06DG<basis>::Iion(const double              &u,
                         const double              &u_old,
                         const std::vector<double> &w,
                         const double              &ischemic_region,
@@ -1016,4 +1016,4 @@ namespace lifex
 
 } // namespace lifex
 
-#endif /*  LIFEX_PHYSICS_IONIC_DG_TTP06_HPP_ */
+#endif /*  LIFEX_PHYSICS_IONIC_TTP06_DG_HPP_ */

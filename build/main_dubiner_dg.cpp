@@ -26,7 +26,7 @@
 
 #include "../models/heat_dg.hpp"
 #include "../models/laplace_dg.hpp"
-#include "../models/monodomain_fitzhugh_dg.hpp"
+#include "../models/monodomain_fhn_dg.hpp"
 #include "../models/monodomain_ttp06_dg.hpp"
 #include "source/init.hpp"
 
@@ -43,7 +43,7 @@ main(int argc, char **argv)
       // Choose the model from the models folder and the basis from:
       // Dubiner basis:    DUBValues<lifex::dim>
       // FEM basis:        dealii::FE_SimplexDGP<lifex::dim>
-      DUBeat::models::Monodomain_ttp06_DG<dealii::FE_SimplexDGP<lifex::dim>>
+      DUBeat::models::MonodomainTTP06DG<dealii::FE_SimplexDGP<lifex::dim>>
         model;
 
       model.main_run_generate();

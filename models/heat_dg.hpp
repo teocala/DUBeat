@@ -32,9 +32,9 @@
 #include <memory>
 #include <vector>
 
-#include "../source/DG_Assemble.hpp"
-#include "../source/DG_Face_handler.hpp"
-#include "../source/DG_Volume_handler.hpp"
+#include "../source/assemble_DG.hpp"
+#include "../source/face_handler_DG.hpp"
+#include "../source/volume_handler_DG.hpp"
 #include "../source/DUBValues.hpp"
 #include "../source/DUB_FEM_handler.hpp"
 #include "../source/model_DG_t.hpp"
@@ -256,11 +256,11 @@ namespace DUBeat::models
    */
 
   template <class basis>
-  class Heat_DG : public ModelDG_t<basis>
+  class HeatDG : public ModelDG_t<basis>
   {
   public:
     /// Constructor.
-    Heat_DG<basis>()
+    HeatDG<basis>()
       : ModelDG_t<basis>("Heat")
     {
       this->u_ex      = std::make_shared<heat_DG::ExactSolution>();
@@ -277,7 +277,7 @@ namespace DUBeat::models
   /// Assembly of the linear system.
   template <class basis>
   void
-  Heat_DG<basis>::assemble_system()
+  HeatDG<basis>::assemble_system()
   {
     this->matrix = 0;
     this->rhs    = 0;

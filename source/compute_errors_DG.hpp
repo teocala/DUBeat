@@ -24,8 +24,8 @@
  * @author Matteo Calafà <matteo.calafa@mail.polimi.it>.
  */
 
-#ifndef DGComputeErrors_HPP_
-#define DGComputeErrors_HPP_
+#ifndef COMPUTE_ERRORS_DG_HPP_
+#define COMPUTE_ERRORS_DG_HPP_
 
 #include <deal.II/base/quadrature.h>
 
@@ -46,7 +46,7 @@
 #include <string>
 #include <vector>
 
-#include "DG_DoFHandler.hpp"
+#include "dof_handler_DG.hpp"
 #include "DUBValues.hpp"
 
 /**
@@ -65,14 +65,14 @@
  */
 
 template <class basis>
-class DGComputeErrors
+class ComputeErrorsDG
 {
 public:
   /// Constructor.
-  DGComputeErrors<basis>(const unsigned int         degree,
+  ComputeErrorsDG<basis>(const unsigned int         degree,
                          const double               stability_coeff,
                          const unsigned int         local_dofs,
-                         const DGDoFHandler<basis> &dof_hand,
+                         const DoFHandlerDG<basis> &dof_hand,
                          const unsigned int         nref_,
                          const std::string         &title)
     : dof_handler(dof_hand)
@@ -91,14 +91,14 @@ public:
   {}
 
   /// Default copy constructor.
-  DGComputeErrors<basis>(DGComputeErrors<basis> &ComputeErrorsDG) = default;
+  ComputeErrorsDG<basis>(ComputeErrorsDG<basis> &ComputeErrorsDG) = default;
 
   /// Default const copy constructor.
-  DGComputeErrors<basis>(const DGComputeErrors<basis> &ComputeErrorsDG) =
+  ComputeErrorsDG<basis>(const ComputeErrorsDG<basis> &ComputeErrorsDG) =
     default;
 
   /// Default move constructor.
-  DGComputeErrors<basis>(DGComputeErrors<basis> &&ComputeErrorsDG) = default;
+  ComputeErrorsDG<basis>(ComputeErrorsDG<basis> &&ComputeErrorsDG) = default;
 
   /// Reinitialization with new computed and exact solutions.
   void
@@ -151,7 +151,7 @@ private:
   get_date() const;
 
   /// Dof handler object of the problem.
-  const DGDoFHandler<basis> &dof_handler;
+  const DoFHandlerDG<basis> &dof_handler;
 
   /// Number of quadrature points in the volume element.
   /// By default: @f$(degree+2)^{dim}@f$.
@@ -205,7 +205,7 @@ private:
 
 template <class basis>
 void
-DGComputeErrors<basis>::reinit(
+ComputeErrorsDG<basis>::reinit(
   const lifex::LinAlg::MPI::Vector                    &sol_owned,
   const lifex::LinAlg::MPI::Vector                    &sol_ex_owned,
   const std::shared_ptr<dealii::Function<lifex::dim>> &u_ex_input,
@@ -221,7 +221,7 @@ DGComputeErrors<basis>::reinit(
 
 template <class basis>
 void
-DGComputeErrors<basis>::compute_errors(std::list<const char *> errors_defs)
+ComputeErrorsDG<basis>::compute_errors(std::list<const char *> errors_defs)
 {
   AssertThrow(u_ex != nullptr,
               dealii::StandardExceptions::ExcMessage(
@@ -266,7 +266,7 @@ DGComputeErrors<basis>::compute_errors(std::list<const char *> errors_defs)
 
 template <class basis>
 std::vector<double>
-DGComputeErrors<basis>::output_errors(std::list<const char *> errors_defs) const
+ComputeErrorsDG<basis>::output_errors(std::list<const char *> errors_defs) const
 {
   std::vector<double> output_errors = {};
 
@@ -292,7 +292,7 @@ DGComputeErrors<basis>::output_errors(std::list<const char *> errors_defs) const
 
 template <class basis>
 void
-DGComputeErrors<basis>::compute_error_inf()
+ComputeErrorsDG<basis>::compute_error_inf()
 {
   lifex::LinAlg::MPI::Vector difference = solution_owned;
   difference -= solution_ex_owned;
@@ -304,7 +304,7 @@ DGComputeErrors<basis>::compute_error_inf()
 /// error, the vector solutions are transformed in terms of FEM coefficients.
 template <>
 void
-DGComputeErrors<DUBValues<lifex::dim>>::compute_error_inf()
+ComputeErrorsDG<DUBValues<lifex::dim>>::compute_error_inf()
 {
   lifex::LinAlg::MPI::Vector solution_fem =
     dub_fem_values->dubiner_to_fem(solution_owned);
@@ -319,11 +319,11 @@ DGComputeErrors<DUBValues<lifex::dim>>::compute_error_inf()
 
 template <class basis>
 void
-DGComputeErrors<basis>::compute_error_L2()
+ComputeErrorsDG<basis>::compute_error_L2()
 {
   double error_L2 = 0;
 
-  DGVolumeHandler<lifex::dim>                 vol_handler(fe_degree);
+  VolumeHandlerDG<lifex::dim>                 vol_handler(fe_degree);
   std::vector<lifex::types::global_dof_index> dof_indices(dofs_per_cell);
 
   double local_approx;
@@ -369,14 +369,14 @@ DGComputeErrors<basis>::compute_error_L2()
 
 template <class basis>
 void
-DGComputeErrors<basis>::compute_error_H1()
+ComputeErrorsDG<basis>::compute_error_H1()
 {
   double                        error_semi_H1 = 0;
   dealii::Tensor<1, lifex::dim> local_approx_gradient;
   dealii::Tensor<1, lifex::dim> local_grad_exact;
   dealii::Tensor<1, lifex::dim> pointwise_diff;
 
-  DGVolumeHandler<lifex::dim>                 vol_handler(fe_degree);
+  VolumeHandlerDG<lifex::dim>                 vol_handler(fe_degree);
   std::vector<lifex::types::global_dof_index> dof_indices(dofs_per_cell);
 
   for (const auto &cell : dof_handler.active_cell_iterators())
@@ -435,14 +435,14 @@ DGComputeErrors<basis>::compute_error_H1()
 
 template <class basis>
 void
-DGComputeErrors<basis>::compute_error_DG()
+ComputeErrorsDG<basis>::compute_error_DG()
 {
   double error_DG = 0;
 
-  DGVolumeHandler<lifex::dim>                 vol_handler(fe_degree);
+  VolumeHandlerDG<lifex::dim>                 vol_handler(fe_degree);
   std::vector<lifex::types::global_dof_index> dof_indices(dofs_per_cell);
-  DGFaceHandler<lifex::dim>                   face_handler(fe_degree);
-  DGFaceHandler<lifex::dim>                   face_handler_neigh(fe_degree);
+  FaceHandlerDG<lifex::dim>                   face_handler(fe_degree);
+  FaceHandlerDG<lifex::dim>                   face_handler_neigh(fe_degree);
 
   for (const auto &cell : dof_handler.active_cell_iterators())
     {
@@ -525,7 +525,7 @@ DGComputeErrors<basis>::compute_error_DG()
 
 template <class basis>
 void
-DGComputeErrors<basis>::initialize_datafile() const
+ComputeErrorsDG<basis>::initialize_datafile() const
 {
   std::ofstream outdata;
   outdata.open("errors_" + model_name + "_" + std::to_string(lifex::dim) +
@@ -550,7 +550,7 @@ DGComputeErrors<basis>::initialize_datafile() const
 
 template <class basis>
 std::string
-DGComputeErrors<basis>::get_date() const
+ComputeErrorsDG<basis>::get_date() const
 {
   char   date[100];
   time_t curr_time;
@@ -563,7 +563,7 @@ DGComputeErrors<basis>::get_date() const
 
 template <class basis>
 void
-DGComputeErrors<basis>::update_datafile() const
+ComputeErrorsDG<basis>::update_datafile() const
 {
   const std::string filename = "errors_" + model_name + "_" +
                                std::to_string(lifex::dim) + "D_" +
@@ -620,4 +620,4 @@ DGComputeErrors<basis>::update_datafile() const
     }
 }
 
-#endif /* DGComputeErrors_HPP_*/
+#endif /* ComputeErrorsDG_HPP_*/

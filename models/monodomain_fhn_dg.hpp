@@ -24,17 +24,17 @@
  * @author Matteo Calafà <matteo.calafa@mail.polimi.it>.
  */
 
-#ifndef MONODOMAIN_FITZHUGH_DG_HPP_
-#define MONODOMAIN_FITZHUGH_DG_HPP_
+#ifndef MONODOMAIN_FHN_DG_HPP_
+#define MONODOMAIN_FHN_DG_HPP_
 
 #include <math.h>
 
 #include <memory>
 #include <vector>
 
-#include "../source/DG_Assemble.hpp"
-#include "../source/DG_Face_handler.hpp"
-#include "../source/DG_Volume_handler.hpp"
+#include "../source/assemble_DG.hpp"
+#include "../source/face_handler_DG.hpp"
+#include "../source/volume_handler_DG.hpp"
 #include "../source/DUBValues.hpp"
 #include "../source/DUB_FEM_handler.hpp"
 #include "../source/model_DG.hpp"
@@ -50,7 +50,7 @@
 
 namespace DUBeat::models
 {
-  namespace monodomain_fitzhugh_DG
+  namespace monodomain_fhn_DG
   {
     /**
      * @brief Exact solution of the trans-membrane potential.
@@ -371,7 +371,7 @@ namespace DUBeat::models
           }
       }
     };
-  } // namespace monodomain_fitzhugh_DG
+  } // namespace monodomain_fhn_DG
 
   /**
    * @brief  Class to solve the monodomain equation with Fitzhugh-Nagumo ionic model for the cardiac electrophysiology
@@ -443,12 +443,12 @@ namespace DUBeat::models
    */
 
   template <class basis>
-  class Monodomain_fitzhugh_DG : public ModelDG_t<basis>
+  class MonodomainFHNDG : public ModelDG_t<basis>
   {
   public:
     /// Constructor.
-    Monodomain_fitzhugh_DG<basis>()
-      : ModelDG_t<basis>("Monodomain Fitzhugh")
+    MonodomainFHNDG<basis>()
+      : ModelDG_t<basis>("Monodomain Fitzhugh-Nagumo")
       , ChiM(1e5)
       , Sigma(0.12)
       , Cm(1e-2)
@@ -457,16 +457,16 @@ namespace DUBeat::models
       , gamma(0.1)
       , a(13e-3)
     {
-      this->u_ex = std::make_shared<monodomain_fitzhugh_DG::ExactSolution>();
+      this->u_ex = std::make_shared<monodomain_fhn_DG::ExactSolution>();
       this->grad_u_ex =
-        std::make_shared<monodomain_fitzhugh_DG::GradExactSolution>();
-      this->f_ex = std::make_shared<monodomain_fitzhugh_DG::RightHandSide>(
+        std::make_shared<monodomain_fhn_DG::GradExactSolution>();
+      this->f_ex = std::make_shared<monodomain_fhn_DG::RightHandSide>(
         ChiM, Sigma, Cm, kappa, epsilon, gamma, a);
-      this->g_n = std::make_shared<monodomain_fitzhugh_DG::BCNeumann>(Sigma);
-      w_ex = std::make_shared<monodomain_fitzhugh_DG::ExactSolution_w>(epsilon,
+      this->g_n = std::make_shared<monodomain_fhn_DG::BCNeumann>(Sigma);
+      w_ex = std::make_shared<monodomain_fhn_DG::ExactSolution_w>(epsilon,
                                                                        gamma);
       grad_w_ex =
-        std::make_shared<monodomain_fitzhugh_DG::GradExactSolution_w>(epsilon,
+        std::make_shared<monodomain_fhn_DG::GradExactSolution_w>(epsilon,
                                                                       gamma);
     }
 
@@ -523,7 +523,7 @@ namespace DUBeat::models
 
   template <class basis>
   void
-  Monodomain_fitzhugh_DG<basis>::run()
+  MonodomainFHNDG<basis>::run()
   {
     this->create_mesh();
     this->setup_system();
@@ -589,7 +589,7 @@ namespace DUBeat::models
 
   template <class basis>
   void
-  Monodomain_fitzhugh_DG<basis>::update_time()
+  MonodomainFHNDG<basis>::update_time()
   {
     this->u_ex->set_time(this->time);
     this->f_ex->set_time(this->time);
@@ -611,7 +611,7 @@ namespace DUBeat::models
 
   template <class basis>
   void
-  Monodomain_fitzhugh_DG<basis>::time_initialization()
+  MonodomainFHNDG<basis>::time_initialization()
   {
     this->u_ex->set_time(this->prm_time_init);
     this->discretize_analytical_solution(this->u_ex, this->solution_ex_owned);
@@ -636,7 +636,7 @@ namespace DUBeat::models
 
   template <class basis>
   void
-  Monodomain_fitzhugh_DG<basis>::assemble_system()
+  MonodomainFHNDG<basis>::assemble_system()
   {
     const double &alpha_bdf = this->bdf_handler.get_alpha();
 
@@ -774,4 +774,4 @@ namespace DUBeat::models
   }
 } // namespace DUBeat::models
 
-#endif /* MONODOMAIN_FITZHUGH_DG_HPP_*/
+#endif /* MONODOMAIN_FHN_DG_HPP_*/

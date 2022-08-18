@@ -39,7 +39,7 @@
 #include <cmath>
 #include <vector>
 
-#include "DG_DoFHandler.hpp"
+#include "dof_handler_DG.hpp"
 #include "DUBValues.hpp"
 #include "source/init.hpp"
 
@@ -57,7 +57,7 @@ class DUBFEMHandler : public DUBValues<lifex::dim>
 {
 private:
   /// Dof handler object of the problem.
-  const DGDoFHandler<basis> &dof_handler;
+  const DoFHandlerDG<basis> &dof_handler;
 
   /// Number of quadrature points in the volume element.
   /// By default: @f$(degree+2)^{dim}@f$.
@@ -66,7 +66,7 @@ private:
 public:
   /// Constructor.
   DUBFEMHandler<basis>(const unsigned int         degree,
-                       const DGDoFHandler<basis> &dof_hand)
+                       const DoFHandlerDG<basis> &dof_hand)
     : DUBValues<lifex::dim>(degree)
     , dof_handler(dof_hand)
     , n_quad_points(static_cast<int>(std::pow(degree + 2, lifex::dim)))
@@ -138,7 +138,7 @@ DUBFEMHandler<basis>::fem_to_dubiner(
   const lifex::LinAlg::MPI::Vector &fem_solution) const
 {
   const dealii::FE_SimplexDGP<lifex::dim> fe_dg(this->poly_degree);
-  DGVolumeHandler<lifex::dim>             vol_handler(this->poly_degree);
+  VolumeHandlerDG<lifex::dim>             vol_handler(this->poly_degree);
 
   lifex::LinAlg::MPI::Vector dub_solution;
   dub_solution.reinit(fem_solution);
@@ -187,7 +187,7 @@ DUBFEMHandler<basis>::analytical_to_dubiner(
   lifex::LinAlg::MPI::Vector                           dub_solution,
   const std::shared_ptr<dealii::Function<lifex::dim>> &u_analytical) const
 {
-  DGVolumeHandler<lifex::dim> vol_handler(this->poly_degree);
+  VolumeHandlerDG<lifex::dim> vol_handler(this->poly_degree);
 
   dealii::IndexSet owned_dofs = dof_handler.locally_owned_dofs();
 

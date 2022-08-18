@@ -24,8 +24,8 @@
  * @author Matteo Calafà <matteo.calafa@mail.polimi.it>.
  */
 
-#ifndef DGVolumeHandler_HPP_
-#define DGVolumeHandler_HPP_
+#ifndef VOLUME_HANDLER_DG_HPP_
+#define VOLUME_HANDLER_DG_HPP_
 
 #include <deal.II/base/quadrature_lib.h>
 #include <deal.II/base/tensor.h>
@@ -47,7 +47,7 @@
  * @brief Class for the main operations on a discontinuous Galerkin volume element.
  */
 template <unsigned int dim>
-class DGVolumeHandler
+class VolumeHandlerDG
 {
 protected:
   /// Number of quadrature points in one dimensional elements.
@@ -81,7 +81,7 @@ protected:
 
 public:
   /// Constructor.
-  DGVolumeHandler<dim>(const unsigned int degree)
+  VolumeHandlerDG<dim>(const unsigned int degree)
     : n_quad_points_1D(degree + 2)
     , fe_dg(std::make_unique<dealii::FE_SimplexDGP<dim>>(1))
     , mapping(std::make_unique<dealii::MappingFE<dim>>(*fe_dg))
@@ -95,13 +95,13 @@ public:
   {}
 
   /// Default copy constructor.
-  DGVolumeHandler<dim>(DGVolumeHandler<dim> &DGVolumeHandler) = default;
+  VolumeHandlerDG<dim>(VolumeHandlerDG<dim> &VolumeHandlerDG) = default;
 
   /// Default const copy constructor.
-  DGVolumeHandler<dim>(const DGVolumeHandler<dim> &DGVolumeHandler) = default;
+  VolumeHandlerDG<dim>(const VolumeHandlerDG<dim> &VolumeHandlerDG) = default;
 
   /// Default move constructor.
-  DGVolumeHandler<dim>(DGVolumeHandler<dim> &&DGVolumeHandler) = default;
+  VolumeHandlerDG<dim>(VolumeHandlerDG<dim> &&VolumeHandlerDG) = default;
 
   /// Reinit objects on the current new_cell.
   void
@@ -129,12 +129,12 @@ public:
   get_n_quad_points() const;
 
   /// Destructor.
-  virtual ~DGVolumeHandler() = default;
+  virtual ~VolumeHandlerDG() = default;
 };
 
 template <unsigned int dim>
 void
-DGVolumeHandler<dim>::reinit(
+VolumeHandlerDG<dim>::reinit(
   const typename dealii::DoFHandler<dim>::active_cell_iterator &new_cell)
 {
   cell = new_cell;
@@ -144,7 +144,7 @@ DGVolumeHandler<dim>::reinit(
 
 template <unsigned int dim>
 dealii::Point<dim>
-DGVolumeHandler<dim>::quadrature_real(const unsigned int q) const
+VolumeHandlerDG<dim>::quadrature_real(const unsigned int q) const
 {
   AssertThrow(initialized, dealii::StandardExceptions::ExcNotInitialized());
 
@@ -157,7 +157,7 @@ DGVolumeHandler<dim>::quadrature_real(const unsigned int q) const
 
 template <unsigned int dim>
 dealii::Point<dim>
-DGVolumeHandler<dim>::quadrature_ref(const unsigned int q) const
+VolumeHandlerDG<dim>::quadrature_ref(const unsigned int q) const
 {
   AssertThrow(initialized, dealii::StandardExceptions::ExcNotInitialized());
 
@@ -170,7 +170,7 @@ DGVolumeHandler<dim>::quadrature_ref(const unsigned int q) const
 
 template <unsigned int dim>
 double
-DGVolumeHandler<dim>::quadrature_weight(
+VolumeHandlerDG<dim>::quadrature_weight(
   const unsigned int quadrature_point_no) const
 {
   AssertThrow(initialized, dealii::StandardExceptions::ExcNotInitialized());
@@ -184,7 +184,7 @@ DGVolumeHandler<dim>::quadrature_weight(
 
 template <unsigned int dim>
 dealii::Tensor<2, dim>
-DGVolumeHandler<dim>::get_jacobian_inverse() const
+VolumeHandlerDG<dim>::get_jacobian_inverse() const
 {
   AssertThrow(initialized, dealii::StandardExceptions::ExcNotInitialized());
 
@@ -207,11 +207,11 @@ DGVolumeHandler<dim>::get_jacobian_inverse() const
 
 template <unsigned int dim>
 unsigned int
-DGVolumeHandler<dim>::get_n_quad_points() const
+VolumeHandlerDG<dim>::get_n_quad_points() const
 {
   AssertThrow(initialized, dealii::StandardExceptions::ExcNotInitialized());
 
   return fe_values.get_n_quad_points.size();
 }
 
-#endif /* DGVolumeHandler_HPP_*/
+#endif /* VOLUME_HANDLER_DG_HPP_*/

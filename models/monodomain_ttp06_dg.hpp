@@ -32,10 +32,10 @@
 #include <memory>
 #include <vector>
 
-#include "../source/DG_Assemble.hpp"
-#include "../source/DG_Face_handler.hpp"
-#include "../source/DG_Volume_handler.hpp"
-#include "../source/DG_ttp06.hpp"
+#include "../source/assemble_DG.hpp"
+#include "../source/face_handler_DG.hpp"
+#include "../source/volume_handler_DG.hpp"
+#include "../source/ttp06_DG.hpp"
 #include "../source/DUBValues.hpp"
 #include "../source/DUB_FEM_handler.hpp"
 #include "../source/QGaussLegendreSimplex.hpp"
@@ -209,16 +209,16 @@ namespace DUBeat::models
    */
 
   template <class basis>
-  class Monodomain_ttp06_DG : public ModelDG_t<basis>
+  class MonodomainTTP06DG : public ModelDG_t<basis>
   {
   public:
     /// Constructor.
-    Monodomain_ttp06_DG<basis>()
+    MonodomainTTP06DG<basis>()
       : ModelDG_t<basis>("Monodomain TTP06")
       , ChiM(14000)
       , Sigma(0.1334) // 0.1334 longitudinal, 0.0176 transversal
       , Cm(1e-2)
-      , ionic_model(std::make_shared<lifex::TTP06_DG<basis>>(
+      , ionic_model(std::make_shared<lifex::TTP06DG<basis>>(
           "Monodomain TTP06 / Ionic model",
           false))
       , fiber_generation("Fiber generation", false)
@@ -240,7 +240,7 @@ namespace DUBeat::models
     /// Membrane capacity.
     double Cm;
     /// Ionic model
-    std::shared_ptr<lifex::TTP06_DG<basis>> ionic_model;
+    std::shared_ptr<lifex::TTP06DG<basis>> ionic_model;
     /// FIber generation
     lifex::FiberGeneration fiber_generation;
     /// Transmural vector (0 in the endocardium, 1 in the epicardium).
@@ -283,7 +283,7 @@ namespace DUBeat::models
 
   template <class basis>
   void
-  Monodomain_ttp06_DG<basis>::update_time()
+  MonodomainTTP06DG<basis>::update_time()
   {
     // Update time for all the known analytical functions.
     this->u_ex->set_time(this->time);
@@ -300,7 +300,7 @@ namespace DUBeat::models
 
   template <class basis>
   void
-  Monodomain_ttp06_DG<basis>::declare_parameters(
+  MonodomainTTP06DG<basis>::declare_parameters(
     lifex::ParamHandler &params) const
   {
     // Default parameters.
@@ -365,7 +365,7 @@ namespace DUBeat::models
 
   template <class basis>
   void
-  Monodomain_ttp06_DG<basis>::parse_parameters(lifex::ParamHandler &params)
+  MonodomainTTP06DG<basis>::parse_parameters(lifex::ParamHandler &params)
   {
     // Parse input file.
     params.parse();
@@ -410,7 +410,7 @@ namespace DUBeat::models
 
   template <class basis>
   void
-  Monodomain_ttp06_DG<basis>::time_initialization()
+  MonodomainTTP06DG<basis>::time_initialization()
   {
     // Set initial time to the exact analytical solution.
     this->u_ex->set_time(this->prm_time_init);
@@ -432,7 +432,7 @@ namespace DUBeat::models
 
   template <class basis>
   void
-  Monodomain_ttp06_DG<basis>::setup_ionic_model()
+  MonodomainTTP06DG<basis>::setup_ionic_model()
   {
     std::shared_ptr<QGaussLegendreSimplex<lifex::dim>> quadrature_formula(
       std::make_shared<QGaussLegendreSimplex<lifex::dim>>(this->prm_fe_degree +
@@ -478,7 +478,7 @@ namespace DUBeat::models
 
   template <class basis>
   void
-  Monodomain_ttp06_DG<basis>::run()
+  MonodomainTTP06DG<basis>::run()
   {
     this->create_mesh();
     this->setup_system();
@@ -535,7 +535,7 @@ namespace DUBeat::models
 
   template <class basis>
   void
-  Monodomain_ttp06_DG<basis>::assemble_system()
+  MonodomainTTP06DG<basis>::assemble_system()
   {
     ionic_model->solve_time_step(this->solution,
                                  this->prm_time_step,
