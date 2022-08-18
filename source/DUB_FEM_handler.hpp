@@ -39,8 +39,8 @@
 #include <cmath>
 #include <vector>
 
+#include "DG_DoFHandler.hpp"
 #include "DUBValues.hpp"
-#include "DoFHandler_DG.hpp"
 #include "source/init.hpp"
 
 /**
@@ -57,7 +57,7 @@ class DUBFEMHandler : public DUBValues<lifex::dim>
 {
 private:
   /// Dof handler object of the problem.
-  const DoFHandler_DG<basis> &dof_handler;
+  const DGDoFHandler<basis> &dof_handler;
 
   /// Number of quadrature points in the volume element.
   /// By default: @f$(degree+2)^{dim}@f$.
@@ -65,8 +65,8 @@ private:
 
 public:
   /// Constructor.
-  DUBFEMHandler<basis>(const unsigned int          degree,
-                       const DoFHandler_DG<basis> &dof_hand)
+  DUBFEMHandler<basis>(const unsigned int         degree,
+                       const DGDoFHandler<basis> &dof_hand)
     : DUBValues<lifex::dim>(degree)
     , dof_handler(dof_hand)
     , n_quad_points(static_cast<int>(std::pow(degree + 2, lifex::dim)))

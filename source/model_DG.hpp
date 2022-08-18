@@ -39,12 +39,11 @@
 #include <vector>
 
 #include "DG_Assemble.hpp"
+#include "DG_DoFHandler.hpp"
 #include "DG_Face_handler.hpp"
 #include "DG_Volume_handler.hpp"
-#include "DG_error_parser.hpp"
+#include "DG_compute_errors.hpp"
 #include "DUB_FEM_handler.hpp"
-#include "DoFHandler_DG.hpp"
-#include "compute_errors_DG.hpp"
 #include "source/core_model.hpp"
 #include "source/geometry/mesh_handler.hpp"
 #include "source/init.hpp"
@@ -93,10 +92,6 @@ public:
   virtual void
   parse_parameters(lifex::ParamHandler &params) override;
 
-  /// Return the number of degrees of freedom per element.
-  unsigned int
-  get_dofs_per_cell() const;
-
   /// Run the simulation.
   virtual void
   run() override;
@@ -113,8 +108,8 @@ protected:
   /// assembling. It has been readapted from the deal.II
   /// DoFTools::make_sparsity_pattern() method.
   void
-  make_sparsity_pattern(const DoFHandler_DG<basis> &             dof,
-                        dealii::DynamicSparsityPattern &         sparsity,
+  make_sparsity_pattern(const DGDoFHandler<basis>               &dof,
+                        dealii::DynamicSparsityPattern          &sparsity,
                         const dealii::AffineConstraints<double> &constraints =
                           dealii::AffineConstraints<double>(),
                         const bool keep_constrained_dofs = true,
@@ -143,7 +138,7 @@ protected:
   solve_system();
 
   /// To compute errors at the end of system solving, it exploits the
-  /// Compute_Errors_DG class.
+  /// DGComputeErrors class.
   void
   compute_errors(const lifex::LinAlg::MPI::Vector &solution_owned,
                  const lifex::LinAlg::MPI::Vector &solution_ex_owned,
@@ -179,7 +174,7 @@ protected:
   void
   discretize_analytical_solution(
     const std::shared_ptr<dealii::Function<lifex::dim>> &u_analytical,
-    lifex::LinAlg::MPI::Vector &                         sol_owned);
+    lifex::LinAlg::MPI::Vector                          &sol_owned);
 
   /// Name of the class/problem.
   const std::string model_name;
@@ -196,7 +191,7 @@ protected:
   /// Number of degrees of freedom per cell.
   unsigned int dofs_per_cell;
   /// DoFHandler (internal use for useful already implemented methods).
-  DoFHandler_DG<basis> dof_handler;
+  DGDoFHandler<basis> dof_handler;
   /// Member used for conversions between analytical, nodal and modal
   /// representations of the solutions.
   std::shared_ptr<DUBFEMHandler<basis>> dub_fem_values;
@@ -297,26 +292,6 @@ ModelDG<basis>::parse_parameters(lifex::ParamHandler &params)
 }
 
 template <class basis>
-unsigned int
-ModelDG<basis>::get_dofs_per_cell() const
-{
-  // The analytical formula is:
-  // n_dof_per_cell = (p+1)*(p+2)*...(p+d) / d!,
-  // where p is the space order and d the space dimension..
-
-  unsigned int denominator = 1;
-  unsigned int nominator   = 1;
-
-  for (unsigned int i = 1; i <= lifex::dim; i++)
-    {
-      denominator *= i;
-      nominator *= prm_fe_degree + i;
-    }
-
-  return (int)(nominator / denominator);
-}
-
-template <class basis>
 void
 ModelDG<basis>::run()
 {
@@ -373,7 +348,7 @@ ModelDG<basis>::setup_system()
 
 
   // Add (dof, dof_neigh) to dsp, so to the matrix
-  dofs_per_cell = get_dofs_per_cell();
+  dofs_per_cell = fe->dofs_per_cell;
   std::vector<lifex::types::global_dof_index> dof_indices(dofs_per_cell);
   std::vector<lifex::types::global_dof_index> dof_indices_neigh(dofs_per_cell);
 
@@ -413,8 +388,8 @@ ModelDG<basis>::setup_system()
 template <class basis>
 void
 ModelDG<basis>::make_sparsity_pattern(
-  const DoFHandler_DG<basis> &             dof,
-  dealii::DynamicSparsityPattern &         sparsity,
+  const DGDoFHandler<basis>               &dof,
+  dealii::DynamicSparsityPattern          &sparsity,
   const dealii::AffineConstraints<double> &constraints,
   const bool                               keep_constrained_dofs,
   const dealii::types::subdomain_id        subdomain_id)
@@ -520,16 +495,18 @@ ModelDG<basis>::solve_system()
 template <class basis>
 void
 ModelDG<basis>::compute_errors(
-  const lifex::LinAlg::MPI::Vector &                   solution_owned,
-  const lifex::LinAlg::MPI::Vector &                   solution_ex_owned,
+  const lifex::LinAlg::MPI::Vector                    &solution_owned,
+  const lifex::LinAlg::MPI::Vector                    &solution_ex_owned,
   const std::shared_ptr<dealii::Function<lifex::dim>> &u_ex,
   const std::shared_ptr<dealii::Function<lifex::dim>> &grad_u_ex,
-  const char *                                         solution_name) const
+  const char                                          *solution_name) const
 {
-  Compute_Errors_DG<basis> error_calculator(prm_fe_degree,
-                                            prm_stability_coeff,
-                                            dofs_per_cell,
-                                            dof_handler);
+  DGComputeErrors<basis> error_calculator(prm_fe_degree,
+                                          prm_stability_coeff,
+                                          dofs_per_cell,
+                                          dof_handler,
+                                          prm_n_refinements,
+                                          model_name);
   error_calculator.reinit(
     solution_owned, solution_ex_owned, u_ex, grad_u_ex, solution_name);
   error_calculator.compute_errors();
@@ -546,8 +523,7 @@ ModelDG<basis>::compute_errors(
         << "Error DG:    " << std::setw(6) << std::fixed << std::setprecision(6)
         << errors[3] << std::endl;
 
-  error_parser::update_datafile(
-    lifex::dim, prm_n_refinements, model_name, errors, solution_name);
+  error_calculator.update_datafile();
 }
 
 template <class basis>
@@ -557,7 +533,7 @@ ModelDG<basis>::output_results() const
   lifex::DataOut<lifex::dim> data_out;
 
   // To output results, we need the deal.II DoFHandler instead of the DUBeat
-  // DoFHandler_DG since we are required here to use deal.II functions. On the
+  // DGDoFHandler since we are required here to use deal.II functions. On the
   // other hand, the deal.II DofHandler is limited to the 2nd order polynomials.
   AssertThrow(prm_fe_degree < 3,
               dealii::StandardExceptions::ExcMessage(
@@ -662,7 +638,7 @@ template <>
 void
 ModelDG<dealii::FE_SimplexDGP<lifex::dim>>::discretize_analytical_solution(
   const std::shared_ptr<dealii::Function<lifex::dim>> &u_analytical,
-  lifex::LinAlg::MPI::Vector &                         sol_owned)
+  lifex::LinAlg::MPI::Vector                          &sol_owned)
 {
   dealii::VectorTools::interpolate(dof_handler, *u_analytical, sol_owned);
 }
@@ -673,7 +649,7 @@ template <>
 void
 ModelDG<DUBValues<lifex::dim>>::discretize_analytical_solution(
   const std::shared_ptr<dealii::Function<lifex::dim>> &u_analytical,
-  lifex::LinAlg::MPI::Vector &                         sol_owned)
+  lifex::LinAlg::MPI::Vector                          &sol_owned)
 {
   sol_owned = dub_fem_values->analytical_to_dubiner(sol_owned, u_analytical);
 }

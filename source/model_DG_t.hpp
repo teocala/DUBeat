@@ -40,7 +40,6 @@
 #include "DG_Assemble.hpp"
 #include "DG_Face_handler.hpp"
 #include "DG_Volume_handler.hpp"
-#include "DG_error_parser.hpp"
 #include "DUBValues.hpp"
 #include "DUB_FEM_handler.hpp"
 #include "model_DG.hpp"
@@ -101,8 +100,8 @@ protected:
   /// Computation of the errors at an intermediate time-step.
   virtual void
   intermediate_error_print(
-    const lifex::LinAlg::MPI::Vector &                   solution_owned,
-    const lifex::LinAlg::MPI::Vector &                   solution_ex_owned,
+    const lifex::LinAlg::MPI::Vector                    &solution_owned,
+    const lifex::LinAlg::MPI::Vector                    &solution_ex_owned,
     const std::shared_ptr<dealii::Function<lifex::dim>> &u_ex,
     const char *solution_name = (char *)"u");
 
@@ -252,10 +251,10 @@ ModelDG_t<basis>::time_initialization()
 template <class basis>
 void
 ModelDG_t<basis>::intermediate_error_print(
-  const lifex::LinAlg::MPI::Vector &                   solution_owned,
-  const lifex::LinAlg::MPI::Vector &                   solution_ex_owned,
+  const lifex::LinAlg::MPI::Vector                    &solution_owned,
+  const lifex::LinAlg::MPI::Vector                    &solution_ex_owned,
   const std::shared_ptr<dealii::Function<lifex::dim>> &u_ex,
-  const char *                                         solution_name)
+  const char                                          *solution_name)
 {
   AssertThrow(u_ex != nullptr,
               dealii::StandardExceptions::ExcMessage(

@@ -24,14 +24,14 @@
  * @author Matteo Calafà <matteo.calafa@mail.polimi.it>.
  */
 
-#ifndef LIFEX_IONIC_TTP06_DG_HPP_
-#define LIFEX_IONIC_TTP06_DG_HPP_
+#ifndef LIFEX_PHYSICS_IONIC_DG_TTP06_HPP_
+#define LIFEX_PHYSICS_IONIC_DG_TTP06_HPP_
 
 #include <string>
 #include <utility>
 #include <vector>
 
-#include "ionic_dg.hpp"
+#include "DG_ionic.hpp"
 
 namespace lifex
 {
@@ -83,22 +83,22 @@ namespace lifex
 
     /// Solve 0D time step, given the transmembrane potential.
     virtual std::pair<std::vector<double>, unsigned int>
-    solve_time_step_0d(const double &             u,
-                       const double &             alpha_bdf,
+    solve_time_step_0d(const double              &u,
+                       const double              &alpha_bdf,
                        const std::vector<double> &w_bdf,
                        const std::vector<double> &w_ext,
-                       const double &             cell_type,
-                       const double &             ischemic_region,
-                       const double &             Iapp) override;
+                       const double              &cell_type,
+                       const double              &ischemic_region,
+                       const double              &Iapp) override;
 
     /// Evaluate the ionic current given the transmembrane potential and the
     /// ionic model variables.
     virtual std::pair<double, double>
-    Iion(const double &             u,
-         const double &             u_old,
+    Iion(const double              &u,
+         const double              &u_old,
          const std::vector<double> &w,
-         const double &             ischemic_region,
-         const double &             cell_type) override;
+         const double              &ischemic_region,
+         const double              &cell_type) override;
 
     /// @copydoc Ionic::get_repolarization_upper_threshold
     virtual double
@@ -127,8 +127,8 @@ namespace lifex
     /// Compute all the currents of the model.
     template <class NumberType>
     void
-    compute_currents(const double &           ischemic_region,
-                     const NumberType &       VV,
+    compute_currents(const double            &ischemic_region,
+                     const NumberType        &VV,
                      CurrentType<NumberType> &currents);
 
     /// Compute the derivatives of the concentration variables of the model.
@@ -620,11 +620,11 @@ namespace lifex
 
   template <class basis>
   std::pair<std::vector<double>, unsigned int>
-  TTP06_DG<basis>::solve_time_step_0d(const double &             u,
-                                      const double &             alpha_bdf,
+  TTP06_DG<basis>::solve_time_step_0d(const double              &u,
+                                      const double              &alpha_bdf,
                                       const std::vector<double> &w_bdf,
                                       const std::vector<double> &w_ext,
-                                      const double &             cell_type,
+                                      const double              &cell_type,
                                       const double &ischemic_region,
                                       const double &Iapp)
   {
@@ -694,8 +694,8 @@ namespace lifex
   template <class basis>
   template <class NumberType>
   void
-  TTP06_DG<basis>::compute_currents(const double &           ischemic_region,
-                                    const NumberType &       VV,
+  TTP06_DG<basis>::compute_currents(const double            &ischemic_region,
+                                    const NumberType        &VV,
                                     CurrentType<NumberType> &currents)
   {
     // NB: the output is in mV/ms !
@@ -968,10 +968,10 @@ namespace lifex
 
   template <class basis>
   std::pair<double, double>
-  TTP06_DG<basis>::Iion(const double &             u,
-                        const double &             u_old,
+  TTP06_DG<basis>::Iion(const double              &u,
+                        const double              &u_old,
                         const std::vector<double> &w,
-                        const double &             ischemic_region,
+                        const double              &ischemic_region,
                         const double & /*cell_type*/)
   {
     for (unsigned int j = 0; j < this->n_variables; ++j)
@@ -1016,4 +1016,4 @@ namespace lifex
 
 } // namespace lifex
 
-#endif /* LIFEX_IONIC_TTP06_DG_HPP_ */
+#endif /*  LIFEX_PHYSICS_IONIC_DG_TTP06_HPP_ */

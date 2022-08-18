@@ -315,7 +315,7 @@ namespace DUBeat::models
     std::vector<lifex::types::global_dof_index> dof_indices(
       this->dofs_per_cell);
     dealii::IndexSet owned_dofs = this->dof_handler.locally_owned_dofs();
-    const double &   alpha_bdf  = this->bdf_handler.get_alpha();
+    const double    &alpha_bdf  = this->bdf_handler.get_alpha();
 
     for (const auto &cell : this->dof_handler.active_cell_iterators())
       {

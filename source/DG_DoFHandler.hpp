@@ -62,7 +62,7 @@ using active_cell_iterator = typename ActiveSelector::active_cell_iterator;
  * every order while DGFEM with order at most 2.
  */
 template <class basis>
-class DoFHandler_DG : public dealii::DoFHandler<lifex::dim>
+class DGDoFHandler : public dealii::DoFHandler<lifex::dim>
 {
 private:
   /// Polynomial space degree.
@@ -73,19 +73,19 @@ private:
 
 public:
   /// Constructor.
-  DoFHandler_DG<basis>()
+  DGDoFHandler<basis>()
     : dealii::DoFHandler<lifex::dim>()
     , degree(0)
   {}
 
   /// Default copy constructor.
-  DoFHandler_DG<basis>(DoFHandler_DG<basis> &DoFHandlerDG) = default;
+  DGDoFHandler<basis>(DGDoFHandler<basis> &DoFHandlerDG) = default;
 
   /// Default const copy constructor.
-  DoFHandler_DG<basis>(const DoFHandler_DG<basis> &DOFHandlerDG) = default;
+  DGDoFHandler<basis>(const DGDoFHandler<basis> &DOFHandlerDG) = default;
 
   /// Default move constructor.
-  DoFHandler_DG<basis>(DoFHandler_DG<basis> &&DoFHandlerDG) = default;
+  DGDoFHandler<basis>(DGDoFHandler<basis> &&DoFHandlerDG) = default;
 
   /// Return copy of n_dofs_per_cell.
   unsigned int
@@ -118,7 +118,7 @@ public:
 
 template <class basis>
 unsigned int
-DoFHandler_DG<basis>::n_dofs_per_cell() const
+DGDoFHandler<basis>::n_dofs_per_cell() const
 {
   AssertThrow(degree > 0,
               dealii::StandardExceptions::ExcMessage(
@@ -143,7 +143,7 @@ DoFHandler_DG<basis>::n_dofs_per_cell() const
 
 template <class basis>
 unsigned int
-DoFHandler_DG<basis>::n_dofs() const
+DGDoFHandler<basis>::n_dofs() const
 {
   AssertThrow(degree > 0,
               dealii::StandardExceptions::ExcMessage(
@@ -165,7 +165,7 @@ DoFHandler_DG<basis>::n_dofs() const
 /// the deal.II original distribute_dofs. Limited to order 2.
 template <>
 void
-DoFHandler_DG<dealii::FE_SimplexDGP<lifex::dim>>::distribute_dofs(
+DGDoFHandler<dealii::FE_SimplexDGP<lifex::dim>>::distribute_dofs(
   const dealii::FE_SimplexDGP<lifex::dim> &fe)
 {
   AssertThrow(fe.degree < 3,
@@ -181,7 +181,7 @@ DoFHandler_DG<dealii::FE_SimplexDGP<lifex::dim>>::distribute_dofs(
 /// limited to 2.
 template <>
 void
-DoFHandler_DG<DUBValues<lifex::dim>>::distribute_dofs(
+DGDoFHandler<DUBValues<lifex::dim>>::distribute_dofs(
   const dealii::FE_SimplexDGP<lifex::dim> &fe)
 {
   AssertThrow(fe.degree < 3,
@@ -207,7 +207,7 @@ DoFHandler_DG<DUBValues<lifex::dim>>::distribute_dofs(
 /// so it is limited to space order at most 2.
 template <>
 void
-DoFHandler_DG<dealii::FE_SimplexDGP<lifex::dim>>::distribute_dofs(
+DGDoFHandler<dealii::FE_SimplexDGP<lifex::dim>>::distribute_dofs(
   const unsigned int degree)
 {
   AssertThrow(degree,
@@ -225,7 +225,7 @@ DoFHandler_DG<dealii::FE_SimplexDGP<lifex::dim>>::distribute_dofs(
 /// polynomial order.
 template <>
 void
-DoFHandler_DG<DUBValues<lifex::dim>>::distribute_dofs(const unsigned int degree)
+DGDoFHandler<DUBValues<lifex::dim>>::distribute_dofs(const unsigned int degree)
 {
   this->degree                 = degree;
   unsigned int n_dofs_per_cell = this->n_dofs_per_cell();
@@ -248,7 +248,7 @@ DoFHandler_DG<DUBValues<lifex::dim>>::distribute_dofs(const unsigned int degree)
 /// methods.
 template <>
 std::vector<lifex::types::global_dof_index>
-DoFHandler_DG<dealii::FE_SimplexDGP<lifex::dim>>::get_dof_indices(
+DGDoFHandler<dealii::FE_SimplexDGP<lifex::dim>>::get_dof_indices(
   active_cell_iterator cell) const
 {
   std::vector<lifex::types::global_dof_index> dof_indices(
@@ -262,7 +262,7 @@ DoFHandler_DG<dealii::FE_SimplexDGP<lifex::dim>>::get_dof_indices(
 /// directly from the internal dof_map.
 template <>
 std::vector<lifex::types::global_dof_index>
-DoFHandler_DG<DUBValues<lifex::dim>>::get_dof_indices(
+DGDoFHandler<DUBValues<lifex::dim>>::get_dof_indices(
   active_cell_iterator cell) const
 {
   std::vector<lifex::types::global_dof_index> dof_indices(
@@ -273,7 +273,7 @@ DoFHandler_DG<DUBValues<lifex::dim>>::get_dof_indices(
 
 template <class basis>
 dealii::IndexSet
-DoFHandler_DG<basis>::locally_owned_dofs() const
+DGDoFHandler<basis>::locally_owned_dofs() const
 {
   dealii::IndexSet owned_dofs(this->n_dofs());
   // For the time being, this function returns all the dofs.

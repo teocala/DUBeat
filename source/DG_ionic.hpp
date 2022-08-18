@@ -24,8 +24,8 @@
  * @author Matteo Calafà <matteo.calafa@mail.polimi.it>.
  */
 
-#ifndef LIFEX_PHYSICS_IONIC_DG_HPP_
-#define LIFEX_PHYSICS_IONIC_DG_HPP_
+#ifndef LIFEX_PHYSICS_DG_IONIC_HPP_
+#define LIFEX_PHYSICS_DG_IONIC_HPP_
 
 #include <map>
 #include <memory>
@@ -33,8 +33,8 @@
 #include <utility>
 #include <vector>
 
+#include "../../DUBeat/source/DG_DoFHandler.hpp"
 #include "../../DUBeat/source/DG_Volume_handler.hpp"
-#include "../../DUBeat/source/DoFHandler_DG.hpp"
 #include "core/source/core_model.hpp"
 #include "core/source/generic_factory.hpp"
 #include "core/source/geometry/mesh_handler.hpp"
@@ -128,16 +128,16 @@ namespace lifex
      *                         coupled to a 3D electrophysiology model and
      *                         initialized through @ref initialize_3d.
      */
-    Ionic_DG(const size_t &     n_variables_,
+    Ionic_DG(const size_t      &n_variables_,
              const std::string &subsection,
-             const bool &       standalone_)
+             const bool        &standalone_)
       : CoreModel(subsection)
       , QuadratureEvaluationFEMScalar()
       , standalone(standalone_)
       , n_variables(n_variables_)
       , prm_bdf_order(1)
       , csv_writer(mpi_rank == 0)
-      , dof_handler(std::make_unique<DoFHandler_DG<basis>>())
+      , dof_handler(std::make_unique<DGDoFHandler<basis>>())
       , I_app_function(nullptr)
       , do_0d_simulation_before_initialization(false)
     {
@@ -167,12 +167,12 @@ namespace lifex
     virtual void
     initialize_3d(
       const std::shared_ptr<const utils::MeshHandler> &triangulation_,
-      const unsigned int &                             fe_degree_,
-      const std::shared_ptr<const Quadrature<dim>> &   quadrature_formula_,
-      const std::shared_ptr<const AppliedCurrent> &    I_app_function_,
-      const unsigned int &                             bdf_order_,
+      const unsigned int                              &fe_degree_,
+      const std::shared_ptr<const Quadrature<dim>>    &quadrature_formula_,
+      const std::shared_ptr<const AppliedCurrent>     &I_app_function_,
+      const unsigned int                              &bdf_order_,
       const std::map<types::material_id, std::string> &map_id_volume_,
-      const std::string &                              volume_label_) final;
+      const std::string                               &volume_label_) final;
 
     /// Override of @ref CoreModel::declare_parameters.
     virtual void
@@ -231,13 +231,13 @@ namespace lifex
      * @return The pair [state variables at current time step, number of iterations needed to solve].
      */
     virtual std::pair<std::vector<double>, unsigned int>
-    solve_time_step_0d(const double &             u,
-                       const double &             alpha_bdf,
+    solve_time_step_0d(const double              &u,
+                       const double              &alpha_bdf,
                        const std::vector<double> &w_bdf,
                        const std::vector<double> &w_ext,
-                       const double &             cell_type,
-                       const double &             ischemic_region,
-                       const double &             Iapp) = 0;
+                       const double              &cell_type,
+                       const double              &ischemic_region,
+                       const double              &Iapp) = 0;
 
     /**
      * Compute the evolution of ionic variables at all degrees of freedom, given
@@ -250,8 +250,8 @@ namespace lifex
     template <class VectorType>
     void
     solve_time_step(const VectorType &u,
-                    const double &    time_step_,
-                    const double &    time_);
+                    const double     &time_step_,
+                    const double     &time_);
 
     /**
      * Solves a time step of the ionic model and of the electrophysiology model
@@ -274,11 +274,11 @@ namespace lifex
      * @f$\frac{\partial I_\mathrm{ion}}{\partial u}(u, \mathbf{w})@f$.
      */
     virtual std::pair<double, double>
-    Iion(const double &             u,
-         const double &             u_ext,
+    Iion(const double              &u,
+         const double              &u_ext,
          const std::vector<double> &w,
-         const double &             ischemic_region,
-         const double &             cell_type) = 0;
+         const double              &ischemic_region,
+         const double              &cell_type) = 0;
 
     /**
      * @brief Assemble the ionic current @f$I_\mathrm{ion}(u, \mathbf{w})@f$
@@ -303,8 +303,8 @@ namespace lifex
     void
     assemble_Iion_ICI_tpl(const VectorType &u,
                           const VectorType &u_ext,
-                          VectorType &      Iion_ICI_vec_owned,
-                          VectorType &      dIion_du_ICI_vec_owned);
+                          VectorType       &Iion_ICI_vec_owned,
+                          VectorType       &dIion_du_ICI_vec_owned);
 
     /**
      * @brief Evaluates the ionic current @f$I_\mathrm{ion}(u, \mathbf{w})@f$
@@ -389,7 +389,7 @@ namespace lifex
     /// Set ischemic region.
     void
     set_ischemic_region(const LinAlg::MPI::Vector *ischemic_region_,
-                        const double &             prm_scar_tolerance_)
+                        const double              &prm_scar_tolerance_)
     {
       ischemic_region    = ischemic_region_;
       prm_scar_tolerance = prm_scar_tolerance_;
@@ -464,7 +464,7 @@ namespace lifex
 
     /// Declare entries for the CSV log.
     void
-    declare_entries_csv(utils::CSVWriter & csv_writer,
+    declare_entries_csv(utils::CSVWriter  &csv_writer,
                         const std::string &output_mode) const;
 
     // /// Set entries for the CSV log.
@@ -569,7 +569,7 @@ namespace lifex
     std::unique_ptr<DGVolumeHandler<dim>> vol_handler;
 
     /// DoF handler.
-    std::unique_ptr<DoFHandler_DG<basis>> dof_handler;
+    std::unique_ptr<DGDoFHandler<basis>> dof_handler;
 
     /// Vector of BDF solutions, for each ionic variable.
     std::vector<LinAlg::MPI::Vector> w_bdf;
@@ -642,7 +642,7 @@ namespace lifex
       w_bdf_0d; ///< BDF combination of state variables at
                 ///< previous timesteps, for 0D simulations
     std::vector<std::shared_ptr<const double>>
-           w_ext_0d; ///< BDF extrapolation of state variables, for 0D simulations
+      w_ext_0d; ///< BDF extrapolation of state variables, for 0D simulations
     double calcium_0d; ///< Calcium concentration for 0D simulations
 
 
@@ -687,8 +687,7 @@ namespace lifex
           {
             break;
           }
-      }
-    while (!(this->cell_next)->is_locally_owned());
+    } while (!(this->cell_next)->is_locally_owned());
 
     AssertThrow(this->cell->center() == cell_other->center(),
                 ExcLifexInternalError());
@@ -700,12 +699,12 @@ namespace lifex
   void
   Ionic_DG<basis>::initialize_3d(
     const std::shared_ptr<const utils::MeshHandler> &triangulation_,
-    const unsigned int &                             fe_degree_,
-    const std::shared_ptr<const Quadrature<dim>> &   quadrature_formula_,
-    const std::shared_ptr<const AppliedCurrent> &    I_app_function_,
-    const unsigned int &                             bdf_order_,
+    const unsigned int                              &fe_degree_,
+    const std::shared_ptr<const Quadrature<dim>>    &quadrature_formula_,
+    const std::shared_ptr<const AppliedCurrent>     &I_app_function_,
+    const unsigned int                              &bdf_order_,
     const std::map<types::material_id, std::string> &map_id_volume_,
-    const std::string &                              volume_label_)
+    const std::string                               &volume_label_)
   {
     AssertThrow(!standalone, ExcNotStandalone());
 
@@ -971,8 +970,8 @@ namespace lifex
   template <class VectorType>
   void
   Ionic_DG<basis>::solve_time_step(const VectorType &u,
-                                   const double &    time_step_,
-                                   const double &    time_)
+                                   const double     &time_step_,
+                                   const double     &time_)
   {
     TimerOutput::Scope timer_section(timer_output,
                                      subsection_label + " / Solve");
@@ -1070,7 +1069,7 @@ namespace lifex
   {
     double              dIion_du_val;
     double              Iion_val;
-    const double &      alpha_bdf = bdf_handler_0d[0].get_alpha();
+    const double       &alpha_bdf = bdf_handler_0d[0].get_alpha();
     std::vector<double> ww_bdf(n_variables);
     std::vector<double> ww_ext(n_variables);
 
@@ -1335,7 +1334,7 @@ namespace lifex
   void
   Ionic_DG<basis>::assemble_Iion_ICI_tpl(const VectorType &u,
                                          const VectorType &u_ext,
-                                         VectorType &      Iion_ICI_vec_owned,
+                                         VectorType       &Iion_ICI_vec_owned,
                                          VectorType &dIion_du_ICI_vec_owned)
   {
     std::vector<double> w_loc(n_variables);
@@ -1702,27 +1701,6 @@ namespace lifex
   {
     return prm_calcium_rescale * compute_calcium_raw(w);
   }
-  //
-  // template <class basis>
-  // void
-  // Ionic_DG<basis>::attach_output(DataOut<dim> &     data_out,
-  //                      const std::string &output_mode) const
-  // {
-  //   data_out.add_data_vector(*dof_handler,
-  //                            calcium,
-  //                            "calcium" + volume_label_output);
-  //
-  //   if (output_mode == "All")
-  //     {
-  //       for (size_t n = 0; n < n_variables; ++n)
-  //         {
-  //           data_out.add_data_vector(*dof_handler,
-  //                                    w[n],
-  //                                    "w" + std::to_string(n) +
-  //                                      volume_label_output);
-  //         }
-  //     }
-  // }
 
   template <class basis>
   void
@@ -1760,7 +1738,7 @@ namespace lifex
 
   template <class basis>
   void
-  Ionic_DG<basis>::declare_entries_csv(utils::CSVWriter & csv_writer,
+  Ionic_DG<basis>::declare_entries_csv(utils::CSVWriter  &csv_writer,
                                        const std::string &output_mode) const
   {
     csv_writer.declare_entries({"calcium_min" + volume_label_output,
@@ -1780,99 +1758,6 @@ namespace lifex
           }
       }
   }
-
-  // template <class basis>
-  // void
-  // Ionic_DG<basis>::set_entries_csv(utils::CSVWriter & csv_writer,
-  //                        const std::string &output_mode) const
-  // {
-  //   csv_writer.set_entries(
-  //     {{"calcium_min" + volume_label_output,
-  //       utils::vec_min(calcium_owned, volume_dof_indices)},
-  //      {"calcium_avg" + volume_label_output,
-  //       utils::vec_avg(calcium_owned, volume_dof_indices)},
-  //      {"calcium_max" + volume_label_output,
-  //       utils::vec_max(calcium_owned, volume_dof_indices)}});
-  //
-  //   if (output_mode == "All")
-  //     {
-  //       for (size_t n = 0; n < n_variables; ++n)
-  //         {
-  //           csv_writer.set_entries(
-  //             {{"w" + std::to_string(n) + "_min" + volume_label_output,
-  //               utils::vec_min(w_owned[n], volume_dof_indices)},
-  //              {"w" + std::to_string(n) + "_avg" + volume_label_output,
-  //               utils::vec_avg(w_owned[n], volume_dof_indices)},
-  //              {"w" + std::to_string(n) + "_max" + volume_label_output,
-  //               utils::vec_max(w_owned[n], volume_dof_indices)}});
-  //         }
-  //     }
-  //
-  //   // The purpose here is to visualize the time transient of some variables
-  //   of
-  //   // interest at a specific dof: sometimes global information such as
-  //   // min, max and mean do not provide enough insight, thus it is useful to
-  //   // plot the time transient at a specific dof. The rationale is simply to
-  //   // take an arbitrary dof (but always the same dof across different
-  //   // timesteps).
-  //   //
-  //   // Here, since the aim is to store a random point per volume (and every
-  //   // volume may be shared among multiple processes), the value retrieved
-  //   // is simply the first owned dof in the current volume belonging to the
-  //   // process with the lowest rank, which is then communicated for writing.
-  //
-  //   // Determine the lowest rank process owning a dof in the current volume.
-  //   const bool is_volume_owned = !volume_dof_indices.is_empty();
-  //
-  //   const std::vector<bool> is_volume_owned_by_rank =
-  //     Utilities::MPI::all_gather(mpi_comm, is_volume_owned);
-  //
-  //   const size_t mpi_lowest_rank_owning =
-  //     std::distance(is_volume_owned_by_rank.begin(),
-  //                   std::find_if(is_volume_owned_by_rank.begin(),
-  //                                is_volume_owned_by_rank.end(),
-  //                                [](const bool owned) {
-  //                                  return owned == true;
-  //                                }));
-  //
-  //   // Set variables to lowest double value on all processes.
-  //   double              calcium_volume =
-  //   std::numeric_limits<double>::lowest(); std::vector<double>
-  //   w_volume(n_variables, calcium_volume);
-  //
-  //   // Set actual values on lowest rank owning process.
-  //   if (mpi_rank == mpi_lowest_rank_owning)
-  //     {
-  //       const types::global_dof_index idx_first_owned_dof =
-  //         *(volume_dof_indices.begin());
-  //
-  //       calcium_volume = calcium_owned[idx_first_owned_dof];
-  //
-  //       for (size_t n = 0; n < n_variables; ++n)
-  //         w_volume[n] = w_owned[n][idx_first_owned_dof];
-  //     }
-  //
-  //   // Reduce values among processes.
-  //   calcium_volume = Utilities::MPI::max(calcium_volume, mpi_comm);
-  //   for (size_t n = 0; n < n_variables; ++n)
-  //     w_volume[n] = Utilities::MPI::max(w_volume[n], mpi_comm);
-  //
-  //   if (csv_writer.is_active())
-  //     {
-  //       csv_writer.set_entries(
-  //         {{"calcium_point" + volume_label_output, calcium_volume}});
-  //
-  //       if (output_mode == "All")
-  //         {
-  //           for (size_t n = 0; n < n_variables; ++n)
-  //             {
-  //               csv_writer.set_entries(
-  //                 {{"w" + std::to_string(n) + "_point" + volume_label_output,
-  //                   w_volume[n]}});
-  //             }
-  //         }
-  //     }
-  // }
 } // namespace lifex
 
-#endif /* LIFEX_PHYSICS_IONIC__DG_HPP_ */
+#endif /* LIFEX_PHYSICS_DG_IONIC_HPP_ */

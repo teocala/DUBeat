@@ -35,12 +35,12 @@
 #include "../source/DG_Assemble.hpp"
 #include "../source/DG_Face_handler.hpp"
 #include "../source/DG_Volume_handler.hpp"
+#include "../source/DG_ttp06.hpp"
 #include "../source/DUBValues.hpp"
 #include "../source/DUB_FEM_handler.hpp"
 #include "../source/QGaussLegendreSimplex.hpp"
 #include "../source/model_DG.hpp"
 #include "../source/model_DG_t.hpp"
-#include "../source/ttp06_dg.hpp"
 #include "source/core_model.hpp"
 #include "source/fiber_generation.hpp"
 #include "source/geometry/mesh_handler.hpp"
@@ -459,7 +459,7 @@ namespace DUBeat::models
       ischemic_region_generation.get_ischemic_region();
 
     std::map<dealii::types::material_id, std::string> map_id_volume;
-    map_id_volume[0] = "Epicardium";
+    map_id_volume[0] = "Myocardium";
 
     ionic_model->initialize_3d(this->triangulation,
                                this->prm_fe_degree,
@@ -467,7 +467,7 @@ namespace DUBeat::models
                                I_app,
                                this->prm_bdf_order,
                                map_id_volume,
-                               "Epicardium");
+                               "Myocardium");
     ionic_model->setup_system(true);
 
     ionic_model->set_ischemic_region(

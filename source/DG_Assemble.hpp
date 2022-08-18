@@ -39,6 +39,7 @@
 
 #include "DG_Face_handler.hpp"
 #include "DG_Volume_handler.hpp"
+#include "DG_ttp06.hpp"
 #include "DUB_FEM_handler.hpp"
 #include "source/core_model.hpp"
 #include "source/geometry/mesh_handler.hpp"
@@ -48,7 +49,6 @@
 #include "source/numerics/linear_solver_handler.hpp"
 #include "source/numerics/preconditioner_handler.hpp"
 #include "source/numerics/tools.hpp"
-#include "ttp06_dg.hpp"
 
 /**
  * @brief Class for the assembly of the main local matrices for discontinuous
@@ -112,7 +112,7 @@ public:
         static_cast<int>(std::pow(n_quad_points_1D, lifex::dim - 1)))
     , poly_degree(degree)
   {
-    dofs_per_cell = this->get_dofs_per_cell();
+    dofs_per_cell = basis_ptr->dofs_per_cell;
   }
 
   /// Default copy constructor.
@@ -127,17 +127,13 @@ public:
   /// Reinitialize object on the current new_edge of the new_cell.
   void
   reinit(const typename dealii::DoFHandler<lifex::dim>::active_cell_iterator
-           &                new_cell,
+                           &new_cell,
          const unsigned int new_edge);
 
   /// Reinitialize object on the current new_cell.
   void
   reinit(const typename dealii::DoFHandler<lifex::dim>::active_cell_iterator
            &new_cell);
-
-  /// Return the number of degrees of freedom per element.
-  unsigned int
-  get_dofs_per_cell() const;
 
   /// Assembly of stiffness matrix: @f[V(i,j)=\int_{\mathcal{K}} \nabla
   /// \varphi_j \cdot \nabla \varphi_i \,dx @f]
@@ -222,7 +218,7 @@ public:
   /// where @f$u^n@f$ is the solution at a generic previous step @f$ n@f$.
   dealii::Vector<double>
   local_u0_M_rhs(
-    const lifex::LinAlg::MPI::Vector &                  u0,
+    const lifex::LinAlg::MPI::Vector                   &u0,
     const std::vector<dealii::types::global_dof_index> &dof_indices) const;
 
   /// Assembly of the right hand side term associated to the previous time-step
@@ -233,7 +229,7 @@ public:
   /// @f$ n@f$.
   dealii::Vector<double>
   local_w0_M_rhs(
-    const lifex::LinAlg::MPI::Vector &                  u0,
+    const lifex::LinAlg::MPI::Vector                   &u0,
     const std::vector<dealii::types::global_dof_index> &dof_indices) const;
 
   /// Assembly of the non-linear local matrix of the Fitzhugh-Nagumo model:
@@ -243,7 +239,7 @@ public:
   /// and @f$u^n@f$ is the solution at a generic previous step @f$ n@f$.
   dealii::FullMatrix<double>
   local_non_linear_fitzhugh(
-    const lifex::LinAlg::MPI::Vector &                  u0,
+    const lifex::LinAlg::MPI::Vector                   &u0,
     const double                                        a,
     const std::vector<dealii::types::global_dof_index> &dof_indices) const;
 
@@ -284,26 +280,6 @@ DGAssemble<basis>::reinit(
 {
   cell = new_cell;
   vol_handler.reinit(new_cell);
-}
-
-template <class basis>
-unsigned int
-DGAssemble<basis>::get_dofs_per_cell() const
-{
-  // The analytical formula is:
-  // n_dof_per_cell = (p+1)*(p+2)*...(p+d) / d!,
-  // where p is the space order and d the space dimension..
-
-  unsigned int denominator = 1;
-  unsigned int nominator   = 1;
-
-  for (unsigned int i = 1; i <= lifex::dim; i++)
-    {
-      denominator *= i;
-      nominator *= poly_degree + i;
-    }
-
-  return (int)(nominator / denominator);
 }
 
 template <class basis>
@@ -664,7 +640,7 @@ DGAssemble<basis>::local_IN(const double theta) const
 template <class basis>
 dealii::Vector<double>
 DGAssemble<basis>::local_u0_M_rhs(
-  const lifex::LinAlg::MPI::Vector &                  u0,
+  const lifex::LinAlg::MPI::Vector                   &u0,
   const std::vector<dealii::types::global_dof_index> &dof_indices) const
 {
   std::vector<double> u_bdf_loc(n_quad_points);
@@ -702,7 +678,7 @@ DGAssemble<basis>::local_u0_M_rhs(
 template <class basis>
 dealii::Vector<double>
 DGAssemble<basis>::local_w0_M_rhs(
-  const lifex::LinAlg::MPI::Vector &                  u0,
+  const lifex::LinAlg::MPI::Vector                   &u0,
   const std::vector<dealii::types::global_dof_index> &dof_indices) const
 {
   dealii::Vector<double>              cell_rhs(dofs_per_cell);
@@ -730,7 +706,7 @@ DGAssemble<basis>::local_w0_M_rhs(
 template <class basis>
 dealii::FullMatrix<double>
 DGAssemble<basis>::local_non_linear_fitzhugh(
-  const lifex::LinAlg::MPI::Vector &                  u0,
+  const lifex::LinAlg::MPI::Vector                   &u0,
   const double                                        a,
   const std::vector<dealii::types::global_dof_index> &dof_indices) const
 {

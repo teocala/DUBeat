@@ -24,8 +24,8 @@
  * @author Matteo Calafà <matteo.calafa@mail.polimi.it>.
  */
 
-#ifndef ComputeErrorsDG_HPP_
-#define ComputeErrorsDG_HPP_
+#ifndef DGComputeErrors_HPP_
+#define DGComputeErrors_HPP_
 
 #include <deal.II/base/quadrature.h>
 
@@ -36,11 +36,18 @@
 
 #include <deal.II/lac/trilinos_vector.h>
 
+#include <time.h>
+
 #include <cmath>
+#include <cstdlib>
+#include <filesystem>
+#include <fstream>
+#include <iostream>
+#include <string>
 #include <vector>
 
+#include "DG_DoFHandler.hpp"
 #include "DUBValues.hpp"
-#include "DoFHandler_DG.hpp"
 
 /**
  * @brief Class to compute the errors between the numerical solution
@@ -58,19 +65,23 @@
  */
 
 template <class basis>
-class Compute_Errors_DG
+class DGComputeErrors
 {
 public:
   /// Constructor.
-  Compute_Errors_DG<basis>(const unsigned int          degree,
-                           const double                stability_coeff,
-                           const unsigned int          local_dofs,
-                           const DoFHandler_DG<basis> &dof_hand)
+  DGComputeErrors<basis>(const unsigned int         degree,
+                         const double               stability_coeff,
+                         const unsigned int         local_dofs,
+                         const DGDoFHandler<basis> &dof_hand,
+                         const unsigned int         nref_,
+                         const std::string         &title)
     : dof_handler(dof_hand)
     , n_quad_points(static_cast<int>(std::pow(degree + 2, lifex::dim)))
     , n_quad_points_face(static_cast<int>(std::pow(degree + 2, lifex::dim - 1)))
     , dofs_per_cell(local_dofs)
     , fe_degree(degree)
+    , nref(nref_)
+    , model_name(title)
     , stability_coefficient(stability_coeff)
     , basis_ptr(std::make_unique<basis>(degree))
     , solution_name((char *)"u")
@@ -80,20 +91,19 @@ public:
   {}
 
   /// Default copy constructor.
-  Compute_Errors_DG<basis>(Compute_Errors_DG<basis> &ComputeErrorsDG) = default;
+  DGComputeErrors<basis>(DGComputeErrors<basis> &ComputeErrorsDG) = default;
 
   /// Default const copy constructor.
-  Compute_Errors_DG<basis>(const Compute_Errors_DG<basis> &ComputeErrorsDG) =
+  DGComputeErrors<basis>(const DGComputeErrors<basis> &ComputeErrorsDG) =
     default;
 
   /// Default move constructor.
-  Compute_Errors_DG<basis>(Compute_Errors_DG<basis> &&ComputeErrorsDG) =
-    default;
+  DGComputeErrors<basis>(DGComputeErrors<basis> &&ComputeErrorsDG) = default;
 
   /// Reinitialization with new computed and exact solutions.
   void
-  reinit(const lifex::LinAlg::MPI::Vector &                   sol_owned,
-         const lifex::LinAlg::MPI::Vector &                   sol_ex_owned,
+  reinit(const lifex::LinAlg::MPI::Vector                    &sol_owned,
+         const lifex::LinAlg::MPI::Vector                    &sol_ex_owned,
          const std::shared_ptr<dealii::Function<lifex::dim>> &u_ex_input,
          const std::shared_ptr<dealii::Function<lifex::dim>> &grad_u_ex_input,
          const char *solution_name_input);
@@ -110,6 +120,14 @@ public:
   std::vector<double>
   output_errors(
     std::list<const char *> errors_defs = {"inf", "L2", "H1", "DG"}) const;
+
+  /// Update the datafile with the new errors.
+  void
+  update_datafile() const;
+
+  /// Create the datafile for the errors.
+  void
+  initialize_datafile() const;
 
 private:
   /// Compute the @f$L^\infty@f$ error.
@@ -128,8 +146,12 @@ private:
   void
   compute_error_DG();
 
+  /// Return the current date and time.
+  std::string
+  get_date() const;
+
   /// Dof handler object of the problem.
-  const DoFHandler_DG<basis> &dof_handler;
+  const DGDoFHandler<basis> &dof_handler;
 
   /// Number of quadrature points in the volume element.
   /// By default: @f$(degree+2)^{dim}@f$.
@@ -147,6 +169,12 @@ private:
 
   /// Polynomial degree.
   const unsigned int fe_degree;
+
+  /// Number of refinements
+  const unsigned int nref;
+
+  /// Name of the model
+  const std::string model_name;
 
   /// Pointer to the basis handler.
   const std::unique_ptr<basis> basis_ptr;
@@ -177,12 +205,12 @@ private:
 
 template <class basis>
 void
-Compute_Errors_DG<basis>::reinit(
-  const lifex::LinAlg::MPI::Vector &                   sol_owned,
-  const lifex::LinAlg::MPI::Vector &                   sol_ex_owned,
+DGComputeErrors<basis>::reinit(
+  const lifex::LinAlg::MPI::Vector                    &sol_owned,
+  const lifex::LinAlg::MPI::Vector                    &sol_ex_owned,
   const std::shared_ptr<dealii::Function<lifex::dim>> &u_ex_input,
   const std::shared_ptr<dealii::Function<lifex::dim>> &grad_u_ex_input,
-  const char *                                         solution_name_input)
+  const char                                          *solution_name_input)
 {
   solution_owned    = sol_owned;
   solution_ex_owned = sol_ex_owned;
@@ -193,7 +221,7 @@ Compute_Errors_DG<basis>::reinit(
 
 template <class basis>
 void
-Compute_Errors_DG<basis>::compute_errors(std::list<const char *> errors_defs)
+DGComputeErrors<basis>::compute_errors(std::list<const char *> errors_defs)
 {
   AssertThrow(u_ex != nullptr,
               dealii::StandardExceptions::ExcMessage(
@@ -238,8 +266,7 @@ Compute_Errors_DG<basis>::compute_errors(std::list<const char *> errors_defs)
 
 template <class basis>
 std::vector<double>
-Compute_Errors_DG<basis>::output_errors(
-  std::list<const char *> errors_defs) const
+DGComputeErrors<basis>::output_errors(std::list<const char *> errors_defs) const
 {
   std::vector<double> output_errors = {};
 
@@ -265,7 +292,7 @@ Compute_Errors_DG<basis>::output_errors(
 
 template <class basis>
 void
-Compute_Errors_DG<basis>::compute_error_inf()
+DGComputeErrors<basis>::compute_error_inf()
 {
   lifex::LinAlg::MPI::Vector difference = solution_owned;
   difference -= solution_ex_owned;
@@ -277,7 +304,7 @@ Compute_Errors_DG<basis>::compute_error_inf()
 /// error, the vector solutions are transformed in terms of FEM coefficients.
 template <>
 void
-Compute_Errors_DG<DUBValues<lifex::dim>>::compute_error_inf()
+DGComputeErrors<DUBValues<lifex::dim>>::compute_error_inf()
 {
   lifex::LinAlg::MPI::Vector solution_fem =
     dub_fem_values->dubiner_to_fem(solution_owned);
@@ -292,7 +319,7 @@ Compute_Errors_DG<DUBValues<lifex::dim>>::compute_error_inf()
 
 template <class basis>
 void
-Compute_Errors_DG<basis>::compute_error_L2()
+DGComputeErrors<basis>::compute_error_L2()
 {
   double error_L2 = 0;
 
@@ -342,7 +369,7 @@ Compute_Errors_DG<basis>::compute_error_L2()
 
 template <class basis>
 void
-Compute_Errors_DG<basis>::compute_error_H1()
+DGComputeErrors<basis>::compute_error_H1()
 {
   double                        error_semi_H1 = 0;
   dealii::Tensor<1, lifex::dim> local_approx_gradient;
@@ -408,7 +435,7 @@ Compute_Errors_DG<basis>::compute_error_H1()
 
 template <class basis>
 void
-Compute_Errors_DG<basis>::compute_error_DG()
+DGComputeErrors<basis>::compute_error_DG()
 {
   double error_DG = 0;
 
@@ -496,4 +523,101 @@ Compute_Errors_DG<basis>::compute_error_DG()
   errors[3] = sqrt(error_semi_H1 + error_DG);
 }
 
-#endif /* ComputeErrorsDG_HPP_*/
+template <class basis>
+void
+DGComputeErrors<basis>::initialize_datafile() const
+{
+  std::ofstream outdata;
+  outdata.open("errors_" + model_name + "_" + std::to_string(lifex::dim) +
+               "D_" + solution_name + ".data");
+  if (!outdata)
+    {
+      std::cerr << "Error: file could not be opened" << std::endl;
+      exit(1);
+    }
+
+  const std::string date = get_date();
+
+  outdata << "nref" << '\t' << "l_inf" << '\t' << "l_2" << '\t' << "h_1" << '\t'
+          << "DG" << '\t' << "date" << std::endl;
+
+  for (unsigned int i = 1; i <= 5; ++i)
+    outdata << i << '\t' << "x" << '\t' << "x" << '\t' << "x" << '\t' << "x"
+            << '\t' << date << std::endl;
+
+  outdata.close();
+}
+
+template <class basis>
+std::string
+DGComputeErrors<basis>::get_date() const
+{
+  char   date[100];
+  time_t curr_time;
+  time(&curr_time);
+  tm curr_tm;
+  localtime_r(&curr_time, &curr_tm);
+  strftime(date, 100, "%D %T", &curr_tm);
+  return date;
+}
+
+template <class basis>
+void
+DGComputeErrors<basis>::update_datafile() const
+{
+  const std::string filename = "errors_" + model_name + "_" +
+                               std::to_string(lifex::dim) + "D_" +
+                               solution_name + ".data";
+
+  // If datafile does not exist, initialize it before.
+  if (!std::filesystem::exists(filename))
+    initialize_datafile();
+
+  std::ifstream indata;
+  std::ofstream outdata;
+  indata.open(filename);
+  outdata.open("errors_tmp.data");
+
+  if (!outdata || !indata)
+    {
+      std::cerr << "Error: file could not be opened" << std::endl;
+      exit(1);
+    }
+
+  std::string line;
+  std::getline(indata, line);
+
+  const char n_ref_c = '0' + nref;
+
+  outdata << line << std::endl;
+
+  const std::string date = get_date();
+
+  for (unsigned int i = 0; i < 10; ++i)
+    {
+      std::getline(indata, line);
+
+      if (line[0] == n_ref_c)
+        outdata << nref << '\t' << errors[0] << '\t' << errors[1] << '\t'
+                << errors[2] << '\t' << errors[3] << '\t' << date << std::endl;
+      else
+        outdata << line << std::endl;
+    }
+
+  outdata.close();
+  indata.close();
+
+  std::ifstream indata2("errors_tmp.data");
+  std::ofstream outdata2(filename);
+  outdata2 << indata2.rdbuf();
+  outdata2.close();
+  indata2.close();
+
+  if (remove("errors_tmp.data") != 0)
+    {
+      std::cerr << "Error in deleting file" << std::endl;
+      exit(1);
+    }
+}
+
+#endif /* DGComputeErrors_HPP_*/
