@@ -113,8 +113,8 @@ protected:
   /// assembling. It has been readapted from the deal.II
   /// DoFTools::make_sparsity_pattern() method.
   void
-  make_sparsity_pattern(const DoFHandler_DG<basis>              &dof,
-                        dealii::DynamicSparsityPattern          &sparsity,
+  make_sparsity_pattern(const DoFHandler_DG<basis> &             dof,
+                        dealii::DynamicSparsityPattern &         sparsity,
                         const dealii::AffineConstraints<double> &constraints =
                           dealii::AffineConstraints<double>(),
                         const bool keep_constrained_dofs = true,
@@ -179,7 +179,7 @@ protected:
   void
   discretize_analytical_solution(
     const std::shared_ptr<dealii::Function<lifex::dim>> &u_analytical,
-    lifex::LinAlg::MPI::Vector                          &sol_owned);
+    lifex::LinAlg::MPI::Vector &                         sol_owned);
 
   /// Name of the class/problem.
   const std::string model_name;
@@ -241,7 +241,7 @@ ModelDG<basis>::declare_parameters(lifex::ParamHandler &params) const
   {
     params.declare_entry(
       "Number of refinements",
-      "3",
+      "2",
       dealii::Patterns::Integer(0),
       "Number of global mesh refinement steps applied to initial grid.");
     params.declare_entry("FE space degree",
@@ -413,8 +413,8 @@ ModelDG<basis>::setup_system()
 template <class basis>
 void
 ModelDG<basis>::make_sparsity_pattern(
-  const DoFHandler_DG<basis>              &dof,
-  dealii::DynamicSparsityPattern          &sparsity,
+  const DoFHandler_DG<basis> &             dof,
+  dealii::DynamicSparsityPattern &         sparsity,
   const dealii::AffineConstraints<double> &constraints,
   const bool                               keep_constrained_dofs,
   const dealii::types::subdomain_id        subdomain_id)
@@ -520,11 +520,11 @@ ModelDG<basis>::solve_system()
 template <class basis>
 void
 ModelDG<basis>::compute_errors(
-  const lifex::LinAlg::MPI::Vector                    &solution_owned,
-  const lifex::LinAlg::MPI::Vector                    &solution_ex_owned,
+  const lifex::LinAlg::MPI::Vector &                   solution_owned,
+  const lifex::LinAlg::MPI::Vector &                   solution_ex_owned,
   const std::shared_ptr<dealii::Function<lifex::dim>> &u_ex,
   const std::shared_ptr<dealii::Function<lifex::dim>> &grad_u_ex,
-  const char                                          *solution_name) const
+  const char *                                         solution_name) const
 {
   Compute_Errors_DG<basis> error_calculator(prm_fe_degree,
                                             prm_stability_coeff,
@@ -662,7 +662,7 @@ template <>
 void
 ModelDG<dealii::FE_SimplexDGP<lifex::dim>>::discretize_analytical_solution(
   const std::shared_ptr<dealii::Function<lifex::dim>> &u_analytical,
-  lifex::LinAlg::MPI::Vector                          &sol_owned)
+  lifex::LinAlg::MPI::Vector &                         sol_owned)
 {
   dealii::VectorTools::interpolate(dof_handler, *u_analytical, sol_owned);
 }
@@ -673,7 +673,7 @@ template <>
 void
 ModelDG<DUBValues<lifex::dim>>::discretize_analytical_solution(
   const std::shared_ptr<dealii::Function<lifex::dim>> &u_analytical,
-  lifex::LinAlg::MPI::Vector                          &sol_owned)
+  lifex::LinAlg::MPI::Vector &                         sol_owned)
 {
   sol_owned = dub_fem_values->analytical_to_dubiner(sol_owned, u_analytical);
 }

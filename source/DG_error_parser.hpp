@@ -54,7 +54,7 @@ namespace error_parser
   void
   initialize_datafile(const unsigned int dim,
                       const std::string &filename,
-                      const char        *solution_name)
+                      const char *       solution_name)
   {
     std::ofstream outdata;
     outdata.open("errors_" + filename + "_" + std::to_string(dim) + "D_" +
@@ -81,9 +81,9 @@ namespace error_parser
   void
   update_datafile(const unsigned int         dim,
                   const unsigned int         nref,
-                  const std::string         &title,
+                  const std::string &        title,
                   const std::vector<double> &errors,
-                  const char                *solution_name)
+                  const char *               solution_name)
   {
     const std::string filename = "errors_" + title + "_" + std::to_string(dim) +
                                  "D_" + solution_name + ".data";

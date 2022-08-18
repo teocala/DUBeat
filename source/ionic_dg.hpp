@@ -39,9 +39,9 @@
 #include "core/source/generic_factory.hpp"
 #include "core/source/geometry/mesh_handler.hpp"
 #include "core/source/io/csv_writer.hpp"
+#include "core/source/numerics/numbers.hpp"
 #include "core/source/numerics/time_handler.hpp"
 #include "source/helpers/applied_current.hpp"
-#include "source/numerics/numbers.hpp"
 
 namespace lifex
 {
@@ -128,9 +128,9 @@ namespace lifex
      *                         coupled to a 3D electrophysiology model and
      *                         initialized through @ref initialize_3d.
      */
-    Ionic_DG(const size_t      &n_variables_,
+    Ionic_DG(const size_t &     n_variables_,
              const std::string &subsection,
-             const bool        &standalone_)
+             const bool &       standalone_)
       : CoreModel(subsection)
       , QuadratureEvaluationFEMScalar()
       , standalone(standalone_)
@@ -167,12 +167,12 @@ namespace lifex
     virtual void
     initialize_3d(
       const std::shared_ptr<const utils::MeshHandler> &triangulation_,
-      const unsigned int                              &fe_degree_,
-      const std::shared_ptr<const Quadrature<dim>>    &quadrature_formula_,
-      const std::shared_ptr<const AppliedCurrent>     &I_app_function_,
-      const unsigned int                              &bdf_order_,
+      const unsigned int &                             fe_degree_,
+      const std::shared_ptr<const Quadrature<dim>> &   quadrature_formula_,
+      const std::shared_ptr<const AppliedCurrent> &    I_app_function_,
+      const unsigned int &                             bdf_order_,
       const std::map<types::material_id, std::string> &map_id_volume_,
-      const std::string                               &volume_label_) final;
+      const std::string &                              volume_label_) final;
 
     /// Override of @ref CoreModel::declare_parameters.
     virtual void
@@ -231,13 +231,13 @@ namespace lifex
      * @return The pair [state variables at current time step, number of iterations needed to solve].
      */
     virtual std::pair<std::vector<double>, unsigned int>
-    solve_time_step_0d(const double              &u,
-                       const double              &alpha_bdf,
+    solve_time_step_0d(const double &             u,
+                       const double &             alpha_bdf,
                        const std::vector<double> &w_bdf,
                        const std::vector<double> &w_ext,
-                       const double              &cell_type,
-                       const double              &ischemic_region,
-                       const double              &Iapp) = 0;
+                       const double &             cell_type,
+                       const double &             ischemic_region,
+                       const double &             Iapp) = 0;
 
     /**
      * Compute the evolution of ionic variables at all degrees of freedom, given
@@ -250,8 +250,8 @@ namespace lifex
     template <class VectorType>
     void
     solve_time_step(const VectorType &u,
-                    const double     &time_step_,
-                    const double     &time_);
+                    const double &    time_step_,
+                    const double &    time_);
 
     /**
      * Solves a time step of the ionic model and of the electrophysiology model
@@ -274,11 +274,11 @@ namespace lifex
      * @f$\frac{\partial I_\mathrm{ion}}{\partial u}(u, \mathbf{w})@f$.
      */
     virtual std::pair<double, double>
-    Iion(const double              &u,
-         const double              &u_ext,
+    Iion(const double &             u,
+         const double &             u_ext,
          const std::vector<double> &w,
-         const double              &ischemic_region,
-         const double              &cell_type) = 0;
+         const double &             ischemic_region,
+         const double &             cell_type) = 0;
 
     /**
      * @brief Assemble the ionic current @f$I_\mathrm{ion}(u, \mathbf{w})@f$
@@ -303,8 +303,8 @@ namespace lifex
     void
     assemble_Iion_ICI_tpl(const VectorType &u,
                           const VectorType &u_ext,
-                          VectorType       &Iion_ICI_vec_owned,
-                          VectorType       &dIion_du_ICI_vec_owned);
+                          VectorType &      Iion_ICI_vec_owned,
+                          VectorType &      dIion_du_ICI_vec_owned);
 
     /**
      * @brief Evaluates the ionic current @f$I_\mathrm{ion}(u, \mathbf{w})@f$
@@ -389,7 +389,7 @@ namespace lifex
     /// Set ischemic region.
     void
     set_ischemic_region(const LinAlg::MPI::Vector *ischemic_region_,
-                        const double              &prm_scar_tolerance_)
+                        const double &             prm_scar_tolerance_)
     {
       ischemic_region    = ischemic_region_;
       prm_scar_tolerance = prm_scar_tolerance_;
@@ -464,7 +464,7 @@ namespace lifex
 
     /// Declare entries for the CSV log.
     void
-    declare_entries_csv(utils::CSVWriter  &csv_writer,
+    declare_entries_csv(utils::CSVWriter & csv_writer,
                         const std::string &output_mode) const;
 
     // /// Set entries for the CSV log.
@@ -642,7 +642,7 @@ namespace lifex
       w_bdf_0d; ///< BDF combination of state variables at
                 ///< previous timesteps, for 0D simulations
     std::vector<std::shared_ptr<const double>>
-      w_ext_0d; ///< BDF extrapolation of state variables, for 0D simulations
+           w_ext_0d; ///< BDF extrapolation of state variables, for 0D simulations
     double calcium_0d; ///< Calcium concentration for 0D simulations
 
 
@@ -687,7 +687,8 @@ namespace lifex
           {
             break;
           }
-    } while (!(this->cell_next)->is_locally_owned());
+      }
+    while (!(this->cell_next)->is_locally_owned());
 
     AssertThrow(this->cell->center() == cell_other->center(),
                 ExcLifexInternalError());
@@ -699,12 +700,12 @@ namespace lifex
   void
   Ionic_DG<basis>::initialize_3d(
     const std::shared_ptr<const utils::MeshHandler> &triangulation_,
-    const unsigned int                              &fe_degree_,
-    const std::shared_ptr<const Quadrature<dim>>    &quadrature_formula_,
-    const std::shared_ptr<const AppliedCurrent>     &I_app_function_,
-    const unsigned int                              &bdf_order_,
+    const unsigned int &                             fe_degree_,
+    const std::shared_ptr<const Quadrature<dim>> &   quadrature_formula_,
+    const std::shared_ptr<const AppliedCurrent> &    I_app_function_,
+    const unsigned int &                             bdf_order_,
     const std::map<types::material_id, std::string> &map_id_volume_,
-    const std::string                               &volume_label_)
+    const std::string &                              volume_label_)
   {
     AssertThrow(!standalone, ExcNotStandalone());
 
@@ -970,8 +971,8 @@ namespace lifex
   template <class VectorType>
   void
   Ionic_DG<basis>::solve_time_step(const VectorType &u,
-                                   const double     &time_step_,
-                                   const double     &time_)
+                                   const double &    time_step_,
+                                   const double &    time_)
   {
     TimerOutput::Scope timer_section(timer_output,
                                      subsection_label + " / Solve");
@@ -1069,7 +1070,7 @@ namespace lifex
   {
     double              dIion_du_val;
     double              Iion_val;
-    const double       &alpha_bdf = bdf_handler_0d[0].get_alpha();
+    const double &      alpha_bdf = bdf_handler_0d[0].get_alpha();
     std::vector<double> ww_bdf(n_variables);
     std::vector<double> ww_ext(n_variables);
 
@@ -1334,7 +1335,7 @@ namespace lifex
   void
   Ionic_DG<basis>::assemble_Iion_ICI_tpl(const VectorType &u,
                                          const VectorType &u_ext,
-                                         VectorType       &Iion_ICI_vec_owned,
+                                         VectorType &      Iion_ICI_vec_owned,
                                          VectorType &dIion_du_ICI_vec_owned)
   {
     std::vector<double> w_loc(n_variables);
@@ -1759,7 +1760,7 @@ namespace lifex
 
   template <class basis>
   void
-  Ionic_DG<basis>::declare_entries_csv(utils::CSVWriter  &csv_writer,
+  Ionic_DG<basis>::declare_entries_csv(utils::CSVWriter & csv_writer,
                                        const std::string &output_mode) const
   {
     csv_writer.declare_entries({"calcium_min" + volume_label_output,

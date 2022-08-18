@@ -47,27 +47,27 @@
 #include "source/numerics/preconditioner_handler.hpp"
 #include "source/numerics/tools.hpp"
 
-namespace lifex::examples
+namespace DUBeat::models
 {
   namespace heat_DG
   {
     /**
      * @brief Exact solution of the problem.
      */
-    class ExactSolution : public utils::FunctionDirichlet
+    class ExactSolution : public lifex::utils::FunctionDirichlet
     {
     public:
       /// Constructor.
       ExactSolution()
-        : utils::FunctionDirichlet()
+        : lifex::utils::FunctionDirichlet()
       {}
 
       /// Evaluate the exact solution in a point.
       virtual double
-      value(const Point<dim> &p,
+      value(const dealii::Point<lifex::dim> &p,
             const unsigned int /*component*/ = 0) const override
       {
-        if (dim == 2)
+        if (lifex::dim == 2)
           return std::sin(2 * M_PI * p[0]) * std::sin(2 * M_PI * p[1]) *
                  std::exp(-5 * this->get_time());
         else
@@ -81,20 +81,20 @@ namespace lifex::examples
     /**
      * @brief Source term.
      */
-    class RightHandSide : public Function<dim>
+    class RightHandSide : public lifex::Function<lifex::dim>
     {
     public:
       /// Constructor.
       RightHandSide()
-        : Function<dim>()
+        : lifex::Function<lifex::dim>()
       {}
 
       /// Evaluate the source term in a point.
       virtual double
-      value(const Point<dim> &p,
+      value(const dealii::Point<lifex::dim> &p,
             const unsigned int /*component*/ = 0) const override
       {
-        if (dim == 2)
+        if (lifex::dim == 2)
           return std::sin(2 * M_PI * p[0]) * std::sin(2 * M_PI * p[1]) *
                  std::exp(-5 * this->get_time()) * (8 * M_PI * M_PI - 5);
         else
@@ -108,20 +108,20 @@ namespace lifex::examples
     /**
      * @brief Neumann boundary condition.
      */
-    class BCNeumann : public Function<dim>
+    class BCNeumann : public lifex::Function<lifex::dim>
     {
     public:
       /// Constructor.
       BCNeumann()
-        : Function<dim>()
+        : lifex::Function<lifex::dim>()
       {}
 
       /// Evaluate the Neumann boundary condition function in a point.
       virtual double
-      value(const Point<dim> &p,
+      value(const dealii::Point<lifex::dim> &p,
             const unsigned int /*component*/ = 0) const override
       {
-        if (dim == 2)
+        if (lifex::dim == 2)
           return -2 * M_PI * std::sin(2 * M_PI * p[0]) *
                    std::cos(2 * M_PI * p[1]) * std::exp(-5 * this->get_time()) *
                    (std::abs(p[1]) < 1e-10) +
@@ -168,20 +168,20 @@ namespace lifex::examples
     /**
      * @brief Gradient of the exact solution.
      */
-    class GradExactSolution : public Function<dim>
+    class GradExactSolution : public lifex::Function<lifex::dim>
     {
     public:
       /// Constructor.
       GradExactSolution()
-        : Function<dim>()
+        : lifex::Function<lifex::dim>()
       {}
 
       /// Evaluate the gradient of the exact solution in a point.
       virtual double
-      value(const Point<dim>  &p,
-            const unsigned int component = 0) const override
+      value(const dealii::Point<lifex::dim> &p,
+            const unsigned int               component = 0) const override
       {
-        if (dim == 2)
+        if (lifex::dim == 2)
           {
             if (component == 0) // x
               return 2 * M_PI * std::cos(2 * M_PI * p[0]) *
@@ -289,32 +289,33 @@ namespace lifex::examples
     // definition.
 
     // See DG_Assemble::local_V().
-    FullMatrix<double> V(this->dofs_per_cell, this->dofs_per_cell);
+    dealii::FullMatrix<double> V(this->dofs_per_cell, this->dofs_per_cell);
     // See DG_Assemble::local_M().
-    FullMatrix<double> M(this->dofs_per_cell, this->dofs_per_cell);
+    dealii::FullMatrix<double> M(this->dofs_per_cell, this->dofs_per_cell);
     // See DG_Assemble::local_S().
-    FullMatrix<double> S(this->dofs_per_cell, this->dofs_per_cell);
+    dealii::FullMatrix<double> S(this->dofs_per_cell, this->dofs_per_cell);
     // See DG_Assemble::local_I().
-    FullMatrix<double> I(this->dofs_per_cell, this->dofs_per_cell);
+    dealii::FullMatrix<double> I(this->dofs_per_cell, this->dofs_per_cell);
     // Transpose of I.
-    FullMatrix<double> I_t(this->dofs_per_cell, this->dofs_per_cell);
+    dealii::FullMatrix<double> I_t(this->dofs_per_cell, this->dofs_per_cell);
     // See DG_Assemble::local_IN().
-    FullMatrix<double> IN(this->dofs_per_cell, this->dofs_per_cell);
+    dealii::FullMatrix<double> IN(this->dofs_per_cell, this->dofs_per_cell);
     // Transpose of IN.
-    FullMatrix<double> IN_t(this->dofs_per_cell, this->dofs_per_cell);
+    dealii::FullMatrix<double> IN_t(this->dofs_per_cell, this->dofs_per_cell);
     // See DG_Assemble::local_SN().
-    FullMatrix<double> SN(this->dofs_per_cell, this->dofs_per_cell);
+    dealii::FullMatrix<double> SN(this->dofs_per_cell, this->dofs_per_cell);
 
     // See DG_Assemble::local_rhs().
-    Vector<double> cell_rhs(this->dofs_per_cell);
+    dealii::Vector<double> cell_rhs(this->dofs_per_cell);
     // See DG_Assemble::local_rhs_edge_neumann().
-    Vector<double> cell_rhs_edge(this->dofs_per_cell);
+    dealii::Vector<double> cell_rhs_edge(this->dofs_per_cell);
     // See DG_Assemble::local_u0_M_rhs().
-    Vector<double> u0_rhs(this->dofs_per_cell);
+    dealii::Vector<double> u0_rhs(this->dofs_per_cell);
 
-    std::vector<types::global_dof_index> dof_indices(this->dofs_per_cell);
+    std::vector<lifex::types::global_dof_index> dof_indices(
+      this->dofs_per_cell);
     dealii::IndexSet owned_dofs = this->dof_handler.locally_owned_dofs();
-    const double    &alpha_bdf  = this->bdf_handler.get_alpha();
+    const double &   alpha_bdf  = this->bdf_handler.get_alpha();
 
     for (const auto &cell : this->dof_handler.active_cell_iterators())
       {
@@ -341,7 +342,7 @@ namespace lifex::examples
             for (const auto &edge : cell->face_indices())
               {
                 this->assemble->reinit(cell, edge);
-                std::vector<types::global_dof_index> dof_indices_neigh(
+                std::vector<lifex::types::global_dof_index> dof_indices_neigh(
                   this->dofs_per_cell);
 
                 if (!cell->at_boundary(edge))
@@ -375,9 +376,9 @@ namespace lifex::examples
           }
       }
 
-    this->matrix.compress(VectorOperation::add);
-    this->rhs.compress(VectorOperation::add);
+    this->matrix.compress(dealii::VectorOperation::add);
+    this->rhs.compress(dealii::VectorOperation::add);
   }
-} // namespace lifex::examples
+} // namespace DUBeat::models
 
 #endif /* HEAT_DG_HPP_*/

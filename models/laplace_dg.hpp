@@ -45,27 +45,27 @@
 #include "source/numerics/preconditioner_handler.hpp"
 #include "source/numerics/tools.hpp"
 
-namespace lifex::examples
+namespace DUBeat::models
 {
   namespace laplace_DG
   {
     /**
      * @brief Exact solution.
      */
-    class ExactSolution : public utils::FunctionDirichlet
+    class ExactSolution : public lifex::utils::FunctionDirichlet
     {
     public:
       /// Constructor.
       ExactSolution()
-        : utils::FunctionDirichlet()
+        : lifex::utils::FunctionDirichlet()
       {}
 
       /// Evaluate the exact solution in a point.
       virtual double
-      value(const Point<dim> &p,
+      value(const dealii::Point<lifex::dim> &p,
             const unsigned int /*component*/ = 0) const override
       {
-        if (dim == 2)
+        if (lifex::dim == 2)
           return std::exp(p[0] + p[1]);
         else
           return std::exp(p[0] + p[1] + p[2]);
@@ -75,20 +75,20 @@ namespace lifex::examples
     /**
      * @brief Source term.
      */
-    class RightHandSide : public Function<dim>
+    class RightHandSide : public lifex::Function<lifex::dim>
     {
     public:
       /// Constructor.
       RightHandSide()
-        : Function<dim>()
+        : Function<lifex::dim>()
       {}
 
       /// Evaluate the source term in a point.
       virtual double
-      value(const Point<dim> &p,
+      value(const dealii::Point<lifex::dim> &p,
             const unsigned int /*component*/ = 0) const override
       {
-        if (dim == 2)
+        if (lifex::dim == 2)
           return -2 * std::exp(p[0] + p[1]);
         else
           return -3 * std::exp(p[0] + p[1] + p[2]);
@@ -98,20 +98,20 @@ namespace lifex::examples
     /**
      * @brief Gradient of the exact solution.
      */
-    class GradExactSolution : public Function<dim>
+    class GradExactSolution : public lifex::Function<lifex::dim>
     {
     public:
       /// Constructor.
       GradExactSolution()
-        : Function<dim>()
+        : Function<lifex::dim>()
       {}
 
       /// Evaluate the gradient of the exact solution in a point.
       virtual double
-      value(const Point<dim>  &p,
-            const unsigned int component = 0) const override
+      value(const dealii::Point<lifex::dim> &p,
+            const unsigned int               component = 0) const override
       {
-        if (dim == 2)
+        if (lifex::dim == 2)
           {
             if (component == 0) // x
               return std::exp(p[0] + p[1]);
@@ -190,30 +190,31 @@ namespace lifex::examples
     // their definition.
 
     // See DG_Assemble::local_V().
-    FullMatrix<double> V(this->dofs_per_cell, this->dofs_per_cell);
+    dealii::FullMatrix<double> V(this->dofs_per_cell, this->dofs_per_cell);
     // See DG_Assemble::local_S().
-    FullMatrix<double> S(this->dofs_per_cell, this->dofs_per_cell);
+    dealii::FullMatrix<double> S(this->dofs_per_cell, this->dofs_per_cell);
     // See DG_Assemble::local_I().
-    FullMatrix<double> I(this->dofs_per_cell, this->dofs_per_cell);
+    dealii::FullMatrix<double> I(this->dofs_per_cell, this->dofs_per_cell);
     // Transpose of I.
-    FullMatrix<double> I_t(this->dofs_per_cell, this->dofs_per_cell);
+    dealii::FullMatrix<double> I_t(this->dofs_per_cell, this->dofs_per_cell);
     // See DG_Assemble::local_IB().
-    FullMatrix<double> IB(this->dofs_per_cell, this->dofs_per_cell);
+    dealii::FullMatrix<double> IB(this->dofs_per_cell, this->dofs_per_cell);
     // Transpose of IB.
-    FullMatrix<double> IB_t(this->dofs_per_cell, this->dofs_per_cell);
+    dealii::FullMatrix<double> IB_t(this->dofs_per_cell, this->dofs_per_cell);
     // See DG_Assemble::local_IN().
-    FullMatrix<double> IN(this->dofs_per_cell, this->dofs_per_cell);
+    dealii::FullMatrix<double> IN(this->dofs_per_cell, this->dofs_per_cell);
     // Transpose of IN.
-    FullMatrix<double> IN_t(this->dofs_per_cell, this->dofs_per_cell);
+    dealii::FullMatrix<double> IN_t(this->dofs_per_cell, this->dofs_per_cell);
     // See DG_Assemble::local_SN().
-    FullMatrix<double> SN(this->dofs_per_cell, this->dofs_per_cell);
+    dealii::FullMatrix<double> SN(this->dofs_per_cell, this->dofs_per_cell);
 
     // See DG_Assemble::local_rhs().
-    Vector<double> cell_rhs(this->dofs_per_cell);
+    dealii::Vector<double> cell_rhs(this->dofs_per_cell);
     // See DG_Assemble::local_rhs_edge_dirichlet().
-    Vector<double> cell_rhs_edge(this->dofs_per_cell);
+    dealii::Vector<double> cell_rhs_edge(this->dofs_per_cell);
 
-    std::vector<types::global_dof_index> dof_indices(this->dofs_per_cell);
+    std::vector<lifex::types::global_dof_index> dof_indices(
+      this->dofs_per_cell);
 
     for (const auto &cell : this->dof_handler.active_cell_iterators())
       {
@@ -231,7 +232,7 @@ namespace lifex::examples
             for (const auto &edge : cell->face_indices())
               {
                 this->assemble->reinit(cell, edge);
-                std::vector<types::global_dof_index> dof_indices_neigh(
+                std::vector<lifex::types::global_dof_index> dof_indices_neigh(
                   this->dofs_per_cell);
 
                 S = this->assemble->local_S(this->prm_stability_coeff);
@@ -270,9 +271,9 @@ namespace lifex::examples
           }
       }
 
-    this->matrix.compress(VectorOperation::add);
-    this->rhs.compress(VectorOperation::add);
+    this->matrix.compress(dealii::VectorOperation::add);
+    this->rhs.compress(dealii::VectorOperation::add);
   }
-} // namespace lifex::examples
+} // namespace DUBeat::models
 
 #endif /* LAPLACE_DG_HPP_*/

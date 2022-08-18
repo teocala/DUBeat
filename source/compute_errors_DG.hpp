@@ -92,8 +92,8 @@ public:
 
   /// Reinitialization with new computed and exact solutions.
   void
-  reinit(const lifex::LinAlg::MPI::Vector                    &sol_owned,
-         const lifex::LinAlg::MPI::Vector                    &sol_ex_owned,
+  reinit(const lifex::LinAlg::MPI::Vector &                   sol_owned,
+         const lifex::LinAlg::MPI::Vector &                   sol_ex_owned,
          const std::shared_ptr<dealii::Function<lifex::dim>> &u_ex_input,
          const std::shared_ptr<dealii::Function<lifex::dim>> &grad_u_ex_input,
          const char *solution_name_input);
@@ -178,11 +178,11 @@ private:
 template <class basis>
 void
 Compute_Errors_DG<basis>::reinit(
-  const lifex::LinAlg::MPI::Vector                    &sol_owned,
-  const lifex::LinAlg::MPI::Vector                    &sol_ex_owned,
+  const lifex::LinAlg::MPI::Vector &                   sol_owned,
+  const lifex::LinAlg::MPI::Vector &                   sol_ex_owned,
   const std::shared_ptr<dealii::Function<lifex::dim>> &u_ex_input,
   const std::shared_ptr<dealii::Function<lifex::dim>> &grad_u_ex_input,
-  const char                                          *solution_name_input)
+  const char *                                         solution_name_input)
 {
   solution_owned    = sol_owned;
   solution_ex_owned = sol_ex_owned;
