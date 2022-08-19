@@ -14,8 +14,9 @@ They both work in either 2 or 3 dimensions depending on the lifex configuration 
 
 
 ### Dependencies
-`DUBeat 1.0.0` relies almost exclusively on the [lifex][] `1.5.0` installation and its dependencies. Check its [download and install][] page to verify you satisfy all the requirements and install it.  
-More precisely, the library has been implemented using [CMake][] `3.16.3` and the libraries included in the lifex `mk` module, `2022.0` version. This module can be downloaded from [here][] and we refer again to the lifex [download and install][] page for more information about its installation. In particular, this package contains:
+The library can be used only on a `linux` machine with [CMake][] ≥ `3.22.1` and [GNU bash][] ≥ `5.1.16`.  
+Then, `DUBeat 1.0.0` relies almost exclusively on the [lifex][] `1.5.0` installation and its dependencies. Check its [download and install][] page to verify you satisfy all the requirements and install it.  
+More precisely, the library has been implemented using the libraries included in the lifex `mk` module, `2022.0` version. This module can be downloaded from [here][] and we refer again to the lifex [download and install][] page for more information. In particular, `DUBeat` uses from this package:
 - [ADOL-C][] = `2.7.2`
 - [Boost][] = `1.76.0`
 - [deal.II][] = `9.3.1`
@@ -26,9 +27,9 @@ More precisely, the library has been implemented using [CMake][] `3.16.3` and th
 
 In addition to the core libraries, other packages need to be installed for supplementary reasons:
 - [Python][] ≥ `3.9.6` for the creation of convergence plot figures (see generate_convergence_plots.py).
-- [Doxygen][] ≥ `1.8.17` for the generation of the library documentation.
-- [Graphviz][] ≥ `2.42.2` for the automatic creation of figures included in the documentation.
-- [Clang-Format][] ≥ `10.0.0` for the automatic indentation of the library codes
+- [Doxygen][] ≥ `1.9.1` for the generation of the library documentation.
+- [Graphviz][] ≥ `2.43.0` for the automatic creation of figures included in the documentation.
+- [Clang-Format][] ≥ `14.0.0` for the automatic indentation of the library codes
 - [gmsh][] ≥ `4.0.4` for the generation of mesh files.
 - [ParaView][] ≥ `5.9.1` for the analysis and view of numerical solutions.
 
@@ -71,12 +72,16 @@ To run from this template, you have to follow the five next steps:
   to run your simulation.
 
 ### See your results
-Results can be viewed in two ways:
-- By default, you should see on the screen the numerical errors with the exact solution. In addition, the DG_error_parser.hpp script will write the errors on a `.data` file. Finally, you can use the generate_convergence_plots.py script to create plots of the errors for different mesh refinements starting from a `.data` file.
+Results can be viewed and analysed in two ways:
+- By default, you should see on the screen the numerical errors with the exact solution. In addition, the `ComputeErrorsDG` class will write the errors on a `.data` file. Finally, you can use the `extra/generate_convergence_plots.py` script to create plots of the errors for different mesh refinements starting from a `.data` file.
 - The code generates two solution files, open `solution.xdmf` with [ParaView][] to see the contour plots of the numerical and exact solutions.
 
 ### Documentation, indentation and cleaning
-- In the main folder, run
+The `Make` configuration permits to easily perform some operations that are suggested to keep
+a neat and working environment in `DUBeat`, especially for users that want to contribute to
+the library or personalize their problems. The following operations are to be
+executed on the linux command line from the library main folder:
+- Run
   ```bash
   make doc
   ```
@@ -86,7 +91,7 @@ Results can be viewed in two ways:
   make indent
   ```
   to automatically indent all the files using our customized [Clang-Format][] setup.
-- Still in the main folder, run
+- To conclude, you can run
   ```bash
   make clean
   ```
@@ -98,10 +103,16 @@ Results can be viewed in two ways:
 
 
 ### Personalize your problem
-- Other applications/problems can be easily implemented. Just implement your own model header as in the `models` folder!
-  Notice that the addition of a new type of DG matrix needs to be supplemented in the DG_Assemble.hpp methods.
+It is very simple to add a new model/problem in `DUBeat`, just follow the next tips!   
+- A new model should follow the same structure as the ones in the models folder. This
+  implies that the class should derive from `ModelDG` if it is a stationary problem, while it
+  should derive from `ModelDG_t` if it is a time-dependent problem.
+- The only method that must necessarily be implemented is `assemble_system` that specifies
+  how the linear system of the problem is defined. However, also all the other methods can
+  be overridden based on the problem choices.
+- The addition of a new type of discontinuous Galerkin local matrix needs to be supplemented in the `assemble_DG.hpp` methods.
 - As for now, simplices meshes can not be built runtime in [deal.II][]. Therefore, some example meshes are provided in the folder `meshes` and used in the default version.
-  In case you need to use your own `.msh` files, you need to use the version of the `create_mesh` method in ModelDG that accepts a user-defined mesh path.
+  In case you need to use your own `.msh` files, you need to use the version of the `create_mesh` method in `ModelDG` that accepts a user-defined mesh path.
 - If you need to add new scripts or folders, remember to add them to the `make` and `indent` configurations.
 
 
@@ -115,6 +126,7 @@ Results can be viewed in two ways:
 [Graphviz]: https://graphviz.org/
 [gmsh]: https://gmsh.info/
 [CMake]: https://cmake.org/
+[GNU bash]: https://www.gnu.org/software/bash/
 [here]: https://github.com/elauksap/mk/releases/download/v2022.0/mk-2022.0-lifex.tar.gz
 [Clang-Format]: https://clang.llvm.org/docs/ClangFormat.html
 [deal.II]: https://www.dealii.org/

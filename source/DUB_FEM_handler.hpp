@@ -41,8 +41,8 @@
 
 #include "DUBValues.hpp"
 #include "dof_handler_DG.hpp"
-#include "volume_handler_DG.hpp"
 #include "source/init.hpp"
+#include "volume_handler_DG.hpp"
 
 /**
  * @brief
