@@ -30,12 +30,12 @@
 #include <memory>
 #include <vector>
 
-#include "../source/assemble_DG.hpp"
-#include "../source/face_handler_DG.hpp"
-#include "../source/volume_handler_DG.hpp"
 #include "../source/DUBValues.hpp"
 #include "../source/DUB_FEM_handler.hpp"
+#include "../source/assemble_DG.hpp"
+#include "../source/face_handler_DG.hpp"
 #include "../source/model_DG.hpp"
+#include "../source/volume_handler_DG.hpp"
 #include "source/core_model.hpp"
 #include "source/geometry/mesh_handler.hpp"
 #include "source/init.hpp"
@@ -262,7 +262,9 @@ namespace DUBeat::models
                     std::tie(IB, IB_t) =
                       this->assemble->local_IB(this->prm_penalty_coeff);
                     cell_rhs_edge = this->assemble->local_rhs_edge_dirichlet(
-                      this->prm_stability_coeff, this->u_ex);
+                      this->prm_stability_coeff,
+                      this->prm_penalty_coeff,
+                      this->u_ex);
                     this->matrix.add(dof_indices, IB);
                     this->matrix.add(dof_indices, IB_t);
                     this->rhs.add(dof_indices, cell_rhs_edge);

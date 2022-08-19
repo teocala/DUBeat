@@ -129,8 +129,8 @@ namespace lifex
      *                         initialized through @ref initialize_3d.
      */
     IonicDG(const size_t      &n_variables_,
-             const std::string &subsection,
-             const bool        &standalone_)
+            const std::string &subsection,
+            const bool        &standalone_)
       : CoreModel(subsection)
       , QuadratureEvaluationFEMScalar()
       , standalone(standalone_)
@@ -970,8 +970,8 @@ namespace lifex
   template <class VectorType>
   void
   IonicDG<basis>::solve_time_step(const VectorType &u,
-                                   const double     &time_step_,
-                                   const double     &time_)
+                                  const double     &time_step_,
+                                  const double     &time_)
   {
     TimerOutput::Scope timer_section(timer_output,
                                      subsection_label + " / Solve");
@@ -1314,7 +1314,7 @@ namespace lifex
   template <class basis>
   void
   IonicDG<basis>::assemble_Iion_ICI(const LinAlg::MPI::Vector &u,
-                                     const LinAlg::MPI::Vector &u_ext)
+                                    const LinAlg::MPI::Vector &u_ext)
 
   {
     assemble_Iion_ICI_tpl<LinAlg::MPI::Vector>(u,
@@ -1333,9 +1333,9 @@ namespace lifex
   template <class VectorType>
   void
   IonicDG<basis>::assemble_Iion_ICI_tpl(const VectorType &u,
-                                         const VectorType &u_ext,
-                                         VectorType       &Iion_ICI_vec_owned,
-                                         VectorType &dIion_du_ICI_vec_owned)
+                                        const VectorType &u_ext,
+                                        VectorType       &Iion_ICI_vec_owned,
+                                        VectorType &dIion_du_ICI_vec_owned)
   {
     std::vector<double> w_loc(n_variables);
 
@@ -1432,7 +1432,7 @@ namespace lifex
   template <class basis>
   std::pair<std::vector<double>, std::vector<double>>
   IonicDG<basis>::Iion_ICI_hybrid(const LinAlg::MPI::Vector &u,
-                                   const LinAlg::MPI::Vector &u_ext)
+                                  const LinAlg::MPI::Vector &u_ext)
   {
     AssertThrow(dof_handler != nullptr, ExcNotInitialized());
 
@@ -1523,7 +1523,7 @@ namespace lifex
   template <class basis>
   std::pair<std::vector<double>, std::vector<double>>
   IonicDG<basis>::Iion_SVI(const std::vector<double> &u_loc,
-                            const std::vector<double> &u_ext_loc)
+                           const std::vector<double> &u_ext_loc)
   {
     AssertThrow(dof_handler != nullptr, ExcNotInitialized());
 
@@ -1597,7 +1597,7 @@ namespace lifex
   template <class basis>
   std::pair<std::vector<double>, std::vector<double>>
   IonicDG<basis>::Iion_quadrature(const std::vector<double> &u_loc,
-                                   const std::vector<double> &u_ext_loc)
+                                  const std::vector<double> &u_ext_loc)
   {
     AssertThrow(dof_handler != nullptr, ExcNotInitialized());
 
@@ -1739,7 +1739,7 @@ namespace lifex
   template <class basis>
   void
   IonicDG<basis>::declare_entries_csv(utils::CSVWriter  &csv_writer,
-                                       const std::string &output_mode) const
+                                      const std::string &output_mode) const
   {
     csv_writer.declare_entries({"calcium_min" + volume_label_output,
                                 "calcium_avg" + volume_label_output,

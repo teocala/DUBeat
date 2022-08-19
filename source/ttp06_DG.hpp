@@ -621,12 +621,12 @@ namespace lifex
   template <class basis>
   std::pair<std::vector<double>, unsigned int>
   TTP06DG<basis>::solve_time_step_0d(const double              &u,
-                                      const double              &alpha_bdf,
-                                      const std::vector<double> &w_bdf,
-                                      const std::vector<double> &w_ext,
-                                      const double              &cell_type,
-                                      const double &ischemic_region,
-                                      const double &Iapp)
+                                     const double              &alpha_bdf,
+                                     const std::vector<double> &w_bdf,
+                                     const std::vector<double> &w_ext,
+                                     const double              &cell_type,
+                                     const double              &ischemic_region,
+                                     const double              &Iapp)
   {
     for (unsigned int j = 0; j < this->n_variables; ++j)
       {
@@ -695,8 +695,8 @@ namespace lifex
   template <class NumberType>
   void
   TTP06DG<basis>::compute_currents(const double            &ischemic_region,
-                                    const NumberType        &VV,
-                                    CurrentType<NumberType> &currents)
+                                   const NumberType        &VV,
+                                   CurrentType<NumberType> &currents)
   {
     // NB: the output is in mV/ms !
 
@@ -969,10 +969,10 @@ namespace lifex
   template <class basis>
   std::pair<double, double>
   TTP06DG<basis>::Iion(const double              &u,
-                        const double              &u_old,
-                        const std::vector<double> &w,
-                        const double              &ischemic_region,
-                        const double & /*cell_type*/)
+                       const double              &u_old,
+                       const std::vector<double> &w,
+                       const double              &ischemic_region,
+                       const double & /*cell_type*/)
   {
     for (unsigned int j = 0; j < this->n_variables; ++j)
       {

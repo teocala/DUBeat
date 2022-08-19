@@ -38,12 +38,11 @@
 #include <string>
 #include <vector>
 
+#include "DUB_FEM_handler.hpp"
 #include "assemble_DG.hpp"
+#include "compute_errors_DG.hpp"
 #include "dof_handler_DG.hpp"
 #include "face_handler_DG.hpp"
-#include "volume_handler_DG.hpp"
-#include "compute_errors_DG.hpp"
-#include "DUB_FEM_handler.hpp"
 #include "source/core_model.hpp"
 #include "source/geometry/mesh_handler.hpp"
 #include "source/init.hpp"
@@ -52,6 +51,7 @@
 #include "source/numerics/linear_solver_handler.hpp"
 #include "source/numerics/preconditioner_handler.hpp"
 #include "source/numerics/tools.hpp"
+#include "volume_handler_DG.hpp"
 
 /**
  * @brief

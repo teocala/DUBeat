@@ -37,8 +37,8 @@
 #include <memory>
 #include <utility>
 
-#include "volume_handler_DG.hpp"
 #include "QGaussLegendreSimplex.hpp"
+#include "volume_handler_DG.hpp"
 
 /**
  * @brief Class for the main operations on the faces of a discontinuous

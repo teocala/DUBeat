@@ -46,8 +46,8 @@
 #include <string>
 #include <vector>
 
-#include "dof_handler_DG.hpp"
 #include "DUBValues.hpp"
+#include "dof_handler_DG.hpp"
 
 /**
  * @brief Class to compute the errors between the numerical solution

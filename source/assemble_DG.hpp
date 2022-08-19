@@ -37,10 +37,8 @@
 #include <utility>
 #include <vector>
 
-#include "face_handler_DG.hpp"
-#include "volume_handler_DG.hpp"
-#include "ttp06_DG.hpp"
 #include "DUB_FEM_handler.hpp"
+#include "face_handler_DG.hpp"
 #include "source/core_model.hpp"
 #include "source/geometry/mesh_handler.hpp"
 #include "source/init.hpp"
@@ -49,6 +47,8 @@
 #include "source/numerics/linear_solver_handler.hpp"
 #include "source/numerics/preconditioner_handler.hpp"
 #include "source/numerics/tools.hpp"
+#include "ttp06_DG.hpp"
+#include "volume_handler_DG.hpp"
 
 /**
  * @brief Class for the assembly of the main local matrices for discontinuous
@@ -156,11 +156,13 @@ public:
 
   /// Assembly of the local matrix associated to non-homogeneous Dirichlet
   /// boundary conditions: @f[F(i)=\int_{\mathcal{F}} \gamma u \varphi_i^{+} -
-  /// u \nabla \varphi_i^{+}  \cdot n \,ds @f] where @f$\gamma@f$ is the
-  /// regularity coeficient and @f$u@f$ the known solution of the problem.
+  /// \theta u \nabla \varphi_i^{+}  \cdot n \,ds @f] where @f$\gamma@f$ is the
+  /// regularity coeficient, @f$\theta@f$ is the penalty coefficient and @f$u@f$
+  /// the known solution of the problem.
   dealii::Vector<double>
   local_rhs_edge_dirichlet(
     const double stability_coefficient,
+    const double theta,
     const std::shared_ptr<lifex::utils::FunctionDirichlet> &u_ex) const;
 
   /// Assembly of the right hand side term associated to non-homogeneous
@@ -368,8 +370,14 @@ template <class basis>
 dealii::Vector<double>
 AssembleDG<basis>::local_rhs_edge_dirichlet(
   const double                                            stability_coefficient,
+  const double                                            theta,
   const std::shared_ptr<lifex::utils::FunctionDirichlet> &u_ex) const
 {
+  AssertThrow(theta == 1. || theta == 0. || theta == -1.,
+              dealii::StandardExceptions::ExcMessage(
+                "Penalty coefficient must be 1 (SIP method) or 0 (IIP method) "
+                "or -1 (NIP method)."));
+
   AssertThrow(u_ex != nullptr,
               dealii::StandardExceptions::ExcMessage(
                 "Not valid pointer to the exact solution."));
@@ -397,6 +405,7 @@ AssembleDG<basis>::local_rhs_edge_dirichlet(
             face_handler.quadrature_weight(q) * measure_ratio;
 
           cell_rhs(i) -=
+            theta *
             ((basis_ptr->shape_grad(i, face_handler.quadrature_ref(q)) *
               BJinv) *
              face_handler.get_normal()) *
@@ -543,6 +552,7 @@ AssembleDG<basis>::local_I(const double theta) const
 
   I_t.copy_transposed(I);
   I_t *= (-1);
+  I *= (-1);
   I *= theta;
 
   return {I, I_t};
@@ -585,6 +595,7 @@ AssembleDG<basis>::local_IB(const double theta) const
 
   IB_t.copy_transposed(IB);
   IB_t *= (-1);
+  IB *= (-1);
   IB *= theta;
 
   return {IB, IB_t};
@@ -632,6 +643,7 @@ AssembleDG<basis>::local_IN(const double theta) const
 
   IN_t.copy_transposed(IN);
   IN_t *= (-1);
+  IN *= (-1);
   IN *= theta;
 
   return {IN, IN_t};

@@ -37,11 +37,10 @@
 #include <string>
 #include <vector>
 
-#include "assemble_DG.hpp"
-#include "face_handler_DG.hpp"
-#include "volume_handler_DG.hpp"
 #include "DUBValues.hpp"
 #include "DUB_FEM_handler.hpp"
+#include "assemble_DG.hpp"
+#include "face_handler_DG.hpp"
 #include "model_DG.hpp"
 #include "source/core_model.hpp"
 #include "source/geometry/mesh_handler.hpp"
@@ -52,6 +51,7 @@
 #include "source/numerics/preconditioner_handler.hpp"
 #include "source/numerics/time_handler.hpp"
 #include "source/numerics/tools.hpp"
+#include "volume_handler_DG.hpp"
 
 /**
  * @brief Class representing the resolution of time-dependent problems using

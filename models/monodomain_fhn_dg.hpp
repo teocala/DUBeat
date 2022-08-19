@@ -32,13 +32,13 @@
 #include <memory>
 #include <vector>
 
-#include "../source/assemble_DG.hpp"
-#include "../source/face_handler_DG.hpp"
-#include "../source/volume_handler_DG.hpp"
 #include "../source/DUBValues.hpp"
 #include "../source/DUB_FEM_handler.hpp"
+#include "../source/assemble_DG.hpp"
+#include "../source/face_handler_DG.hpp"
 #include "../source/model_DG.hpp"
 #include "../source/model_DG_t.hpp"
+#include "../source/volume_handler_DG.hpp"
 #include "source/core_model.hpp"
 #include "source/geometry/mesh_handler.hpp"
 #include "source/init.hpp"
@@ -463,11 +463,11 @@ namespace DUBeat::models
       this->f_ex = std::make_shared<monodomain_fhn_DG::RightHandSide>(
         ChiM, Sigma, Cm, kappa, epsilon, gamma, a);
       this->g_n = std::make_shared<monodomain_fhn_DG::BCNeumann>(Sigma);
-      w_ex = std::make_shared<monodomain_fhn_DG::ExactSolution_w>(epsilon,
-                                                                       gamma);
+      w_ex =
+        std::make_shared<monodomain_fhn_DG::ExactSolution_w>(epsilon, gamma);
       grad_w_ex =
         std::make_shared<monodomain_fhn_DG::GradExactSolution_w>(epsilon,
-                                                                      gamma);
+                                                                 gamma);
     }
 
   private:
