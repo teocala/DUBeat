@@ -188,7 +188,7 @@ public:
   /// Assembly of the local matrix I and its transpose:
   ///@f[
   /// \begin{aligned}
-  /// I(i,j)= & \frac{1}{2}
+  /// I(i,j)= & - \frac{1}{2}
   /// \int_{\mathcal{F}} \nabla \varphi_i^{+} \cdot  n^{+} \varphi_j^{+}  \, ds
   /// \\ I_T(i,j)= & - \frac{\theta}{2} \int_{\mathcal{F}} \nabla \varphi_j^{+}
   /// \cdot  n^{+} \varphi_i^{+}  \, ds \end{aligned} @f] where @f$\theta@f$ is
@@ -198,7 +198,7 @@ public:
 
   /// Assembly of the local matrix I and its transpose on the boundary edges:
   /// @f[\begin{aligned}
-  /// IB(i,j)=& \: \theta \int_{\mathcal{F}} \nabla \varphi_i^{+} \cdot n^{+}
+  /// IB(i,j)=& \: - \theta \int_{\mathcal{F}} \nabla \varphi_i^{+} \cdot n^{+}
   /// \varphi_j^{+} \, ds \\ IB_T(i,j)=& - \int_{\mathcal{F}} \nabla
   /// \varphi_j^{+} \cdot n^{+} \varphi_i^{+} \, ds \end{aligned} @f] where
   /// @f$\theta@f$ is the penalty coefficient.
@@ -206,7 +206,7 @@ public:
   local_IB(const double theta) const;
 
   /// Assembly of the local matrix I and its transpose at the interface with
-  /// the adjacent element: @f[\begin{aligned} IN(i,j)=& \frac{\theta}{2}
+  /// the adjacent element: @f[\begin{aligned} IN(i,j)=& - \frac{\theta}{2}
   /// \int_{\mathcal{F}} \nabla \varphi_i^{+} \cdot n^{+} \varphi_j^{-}  \, ds
   /// \\ IN_T(i,j)=& -\frac{1}{2} \int_{\mathcal{F}} \nabla \varphi_j^{+} \cdot
   /// n^{+} \varphi_i^{-}  \, ds \end{aligned} @f] where @f$\theta@f$ is the

@@ -156,7 +156,7 @@ ModelDG_t<basis>::declare_parameters(lifex::ParamHandler &params) const
   {
     params.declare_entry(
       "Penalty coefficient",
-      "-1",
+      "1",
       dealii::Patterns::Double(-1, 1),
       "Penalty coefficient in the Discontinuous Galerkin formulation.");
     params.declare_entry(
