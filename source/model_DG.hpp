@@ -125,7 +125,8 @@ protected:
   initialize_solution(lifex::LinAlg::MPI::Vector &solution_owned,
                       lifex::LinAlg::MPI::Vector &solution);
 
-  /// Assembly of the linear system, pure virtual.
+  /// Assembly of the linear system, pure virtual. To specialize in relation to
+  /// the model to solve.
   virtual void
   assemble_system() = 0;
 
@@ -141,8 +142,9 @@ protected:
   void
   solve_system();
 
-  /// To compute errors at the end of system solving, it exploits the
-  /// DGComputeErrors class.
+  /// To compute the @f$L^\infty@f$ error, the @f$L^2@f$ error, the @f$H^1@f$
+  /// error and the @f$DG@f$ error at the end of system solving, it exploits the
+  /// DGComputeErrors<basis> class.
   void
   compute_errors(const lifex::LinAlg::MPI::Vector &solution_owned,
                  const lifex::LinAlg::MPI::Vector &solution_ex_owned,

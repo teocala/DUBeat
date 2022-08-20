@@ -89,7 +89,7 @@ protected:
   virtual void
   parse_parameters(lifex::ParamHandler &params) override;
 
-  /// Setup for the time-dependent problems at time-step 0.
+  /// Setup for the time-dependent problems at the initial time-step.
   virtual void
   time_initialization();
 
@@ -97,7 +97,7 @@ protected:
   virtual void
   update_time();
 
-  /// Computation of the errors at an intermediate time-step.
+  /// Computation of the @f$L^\infty@f$ error at an intermediate time-step.
   virtual void
   intermediate_error_print(
     const lifex::LinAlg::MPI::Vector                    &solution_owned,

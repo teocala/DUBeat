@@ -39,7 +39,6 @@
 
 #include "DUB_FEM_handler.hpp"
 #include "face_handler_DG.hpp"
-#include "volume_handler_DG.hpp"
 #include "source/core_model.hpp"
 #include "source/geometry/mesh_handler.hpp"
 #include "source/init.hpp"
@@ -48,6 +47,7 @@
 #include "source/numerics/linear_solver_handler.hpp"
 #include "source/numerics/preconditioner_handler.hpp"
 #include "source/numerics/tools.hpp"
+#include "volume_handler_DG.hpp"
 
 /**
  * @brief Class for the assembly of the main local matrices for discontinuous
@@ -191,9 +191,9 @@ public:
   /// Assembly of the local matrix I and its transpose:
   ///@f[
   /// \begin{aligned}
-  /// I(i,j)= & - \frac{1}{2}
+  /// I(i,j)= & - \frac{\theta}{2}
   /// \int_{\mathcal{F}} \nabla \varphi_i^{+} \cdot  n^{+} \varphi_j^{+}  \, ds
-  /// \\ I_T(i,j)= & - \frac{\theta}{2} \int_{\mathcal{F}} \nabla \varphi_j^{+}
+  /// \\ I_T(i,j)= & - \frac{1}{2} \int_{\mathcal{F}} \nabla \varphi_j^{+}
   /// \cdot  n^{+} \varphi_i^{+}  \, ds \end{aligned} @f] where @f$\theta@f$ is
   /// the penalty coefficient.
   std::pair<dealii::FullMatrix<double>, dealii::FullMatrix<double>>
@@ -238,9 +238,9 @@ public:
     const std::vector<dealii::types::global_dof_index> &dof_indices) const;
 
   /// Assembly of the non-linear local matrix of the Fitzhugh-Nagumo model:
-  /// @f[C(i,j)=\int_{\mathcal{K}} \chi_m k
+  /// @f[C(i,j)=\int_{\mathcal{K}}
   /// (u^n-1)(u^n-a) \varphi_j \varphi_i \, dx @f]
-  /// where @f$\chi_m@f$ and @f$k@f$ are parameters of the monodomain equation
+  /// where @f$a@f$ is parameter of the monodomain equation
   /// and @f$u^n@f$ is the solution at a generic previous step @f$ n@f$.
   dealii::FullMatrix<double>
   local_non_linear_fitzhugh(

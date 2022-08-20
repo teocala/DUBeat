@@ -52,10 +52,10 @@ protected:
   /// Polynomial degree used.
   const unsigned int poly_degree;
 
-  /// Tolerance used for some operations, default value is @f$10^{-10}@f$.
+  /// Default tolerance.
   const double tol = 1e-10;
 
-  /// Evaluation of the (n,alpha,beta)-Jacobi polynomial (only internal use to
+  /// Evaluation of the @f$(n,\alpha,\beta)@f$-Jacobi polynomial (used to
   /// evaluate Dubiner basis).
   double
   eval_jacobi_polynomial(const unsigned int n,
@@ -64,9 +64,9 @@ protected:
                          const double       eval_point) const;
 
   /// Conversion from the FEM basis taxonomy (@f$1^{st}@f$ basis function,
-  /// @f$2^{nd}@f$ basis function ... ) to the Dubiner basis taxonomy (where
-  /// every basis function is indexed by a tuple of indexes @f$(i,j)@f$ in 2D
-  /// and three indexes @f$(i,j,k)@f$ in 3D). It is needed to order
+  /// @f$2^{nd}@f$ basis function@f$\ldots@f$) to the Dubiner basis taxonomy
+  /// (where every basis function is indexed by a tuple of indexes @f$(i,j)@f$
+  /// in 2D and three indexes @f$(i,j,k)@f$ in 3D). It is needed to order
   /// sequentially all the Dubiner basis functions of a certain element.
   std::array<unsigned int, dim>
   fun_coeff_conversion(const unsigned int n) const;

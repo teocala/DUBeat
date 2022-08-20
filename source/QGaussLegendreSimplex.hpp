@@ -39,7 +39,7 @@
 extern std::pair<std::vector<dealii::Point<1>>, std::vector<double>>
 gauleg(const double       left_position,
        const double       right_position,
-       const unsigned int n_quadrature_points)
+       const unsigned int n)
 {
   AssertThrow(left_position < right_position,
               dealii::StandardExceptions::ExcMessage(
@@ -51,14 +51,14 @@ gauleg(const double       left_position,
   const double middle_point = 0.5 * (right_position + left_position);
   const double half_length  = 0.5 * (right_position - left_position);
 
-  std::vector<dealii::Point<1>> coords(n_quadrature_points);
-  std::vector<double>           weights(n_quadrature_points);
+  std::vector<dealii::Point<1>> coords(n);
+  std::vector<double>           weights(n);
 
   double z, z1, p1, p2, p3, pp = 0.0;
 
-  for (unsigned int i = 1; i <= (n_quadrature_points + 1) / 2.; ++i)
+  for (unsigned int i = 1; i <= (n + 1) / 2.; ++i)
     {
-      z  = std::cos(M_PI * (i - 0.25) / (n_quadrature_points + 0.5));
+      z  = std::cos(M_PI * (i - 0.25) / (n + 0.5));
       z1 = z + 1.;
 
       while (!(std::abs(z - z1) < 1e-10))
@@ -66,24 +66,24 @@ gauleg(const double       left_position,
           p1 = 1.0;
           p2 = 0.0;
 
-          for (unsigned int j = 1; j <= n_quadrature_points; ++j)
+          for (unsigned int j = 1; j <= n; ++j)
             {
               p3 = p2;
               p2 = p1;
               p1 = ((2 * j - 1) * z * p2 - (j - 1) * p3) / j;
             }
 
-          pp = n_quadrature_points * (z * p1 - p2) / (pow(z, 2) - 1);
+          pp = n * (z * p1 - p2) / (pow(z, 2) - 1);
           z1 = z;
           z  = z1 - p1 / pp;
         }
 
       const dealii::Point<1> P1(middle_point - half_length * z);
       const dealii::Point<1> P2(middle_point + half_length * z);
-      coords[i - 1]                   = P1;
-      coords[n_quadrature_points - i] = P2;
+      coords[i - 1]  = P1;
+      coords[n - i]  = P2;
       weights[i - 1] = 2.0 * half_length / ((1.0 - z * z) * pp * pp);
-      weights[n_quadrature_points - i] = weights[i - 1];
+      weights[n - i] = weights[i - 1];
     }
 
   return {coords, weights};
@@ -100,40 +100,38 @@ class QGaussLegendreSimplex : public dealii::Quadrature<dim>
 {
 public:
   /// Constructor.
-  QGaussLegendreSimplex<dim>(const unsigned int n_quadrature_points);
+  QGaussLegendreSimplex<dim>(const unsigned int n);
 };
 
-/// To create @f$n@f$ quadrature points and weights in the segment @f$(0,1)@f$.
+/// To create @f$n@f$ quadrature points and weights in the interval @f$(0,1)@f$.
 template <>
-QGaussLegendreSimplex<1>::QGaussLegendreSimplex(
-  const unsigned int n_quadrature_points)
-  : dealii::Quadrature<1>(n_quadrature_points)
+QGaussLegendreSimplex<1>::QGaussLegendreSimplex(const unsigned int n)
+  : dealii::Quadrature<1>(n)
 {
-  std::vector<dealii::Point<1>> coords_1D(n_quadrature_points);
-  std::vector<double>           weights_1D(n_quadrature_points);
-  std::tie(coords_1D, weights_1D) = gauleg(0, 1, n_quadrature_points);
+  std::vector<dealii::Point<1>> coords_1D(n);
+  std::vector<double>           weights_1D(n);
+  std::tie(coords_1D, weights_1D) = gauleg(0, 1, n);
 
   this->quadrature_points = coords_1D;
   this->weights           = weights_1D;
 }
 
-/// To create @f$n^2@f$ quadrature points and weights on the triangle @f$(0,0)
-/// , (0.1) , (1,0)@f$.
+/// To create @f$n^2@f$ quadrature points and weights on the triangle of
+/// vertices @f$(0,0) , (0.1) , (1,0)@f$.
 template <>
-QGaussLegendreSimplex<2>::QGaussLegendreSimplex(
-  const unsigned int n_quadrature_points)
-  : dealii::Quadrature<2>(n_quadrature_points)
+QGaussLegendreSimplex<2>::QGaussLegendreSimplex(const unsigned int n)
+  : dealii::Quadrature<2>(n)
 {
-  std::vector<dealii::Point<1>> coords_1D(n_quadrature_points);
-  std::vector<double>           weights_1D(n_quadrature_points);
-  std::tie(coords_1D, weights_1D) = gauleg(-1, 1, n_quadrature_points);
+  std::vector<dealii::Point<1>> coords_1D(n);
+  std::vector<double>           weights_1D(n);
+  std::tie(coords_1D, weights_1D) = gauleg(-1, 1, n);
 
   std::vector<dealii::Point<2>> coords_2D;
   std::vector<double>           weights_2D;
 
-  for (unsigned int i = 0; i < n_quadrature_points; ++i)
+  for (unsigned int i = 0; i < n; ++i)
     {
-      for (unsigned int j = 0; j < n_quadrature_points; ++j)
+      for (unsigned int j = 0; j < n; ++j)
         {
           const dealii::Point<2> P((1 + coords_1D[i][0]) / 2,
                                    (1 - coords_1D[i][0]) *
@@ -149,25 +147,25 @@ QGaussLegendreSimplex<2>::QGaussLegendreSimplex(
   this->weights           = weights_2D;
 }
 
-/// To create @f$n^3@f$ quadrature points and weights on the tetrahedron
+/// To create @f$n^3@f$ quadrature points and weights on the tetrahedron of
+/// vertices
 /// @f$(0,0,0) , (1,0,0) , (0,1,0) , (0,0,1)@f$.
 template <>
-QGaussLegendreSimplex<3>::QGaussLegendreSimplex(
-  const unsigned int n_quadrature_points)
-  : dealii::Quadrature<3>(n_quadrature_points)
+QGaussLegendreSimplex<3>::QGaussLegendreSimplex(const unsigned int n)
+  : dealii::Quadrature<3>(n)
 {
-  std::vector<dealii::Point<1>> coords_1D(n_quadrature_points);
-  std::vector<double>           weights_1D(n_quadrature_points);
-  std::tie(coords_1D, weights_1D) = gauleg(-1, 1, n_quadrature_points);
+  std::vector<dealii::Point<1>> coords_1D(n);
+  std::vector<double>           weights_1D(n);
+  std::tie(coords_1D, weights_1D) = gauleg(-1, 1, n);
 
   std::vector<dealii::Point<3>> coords_3D;
   std::vector<double>           weights_3D;
 
-  for (unsigned int i = 0; i < n_quadrature_points; ++i)
+  for (unsigned int i = 0; i < n; ++i)
     {
-      for (unsigned int j = 0; j < n_quadrature_points; ++j)
+      for (unsigned int j = 0; j < n; ++j)
         {
-          for (unsigned int k = 0; k < n_quadrature_points; ++k)
+          for (unsigned int k = 0; k < n; ++k)
             {
               const dealii::Point<3> new_coords((coords_1D[i][0] + 1) *
                                                   (coords_1D[j][0] - 1) *

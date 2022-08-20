@@ -62,6 +62,9 @@
  * +\gamma \|[[ u-\nabla u_h]]\|_{L^2(\mathcal{F})}^2  @f] where @f$\gamma @f$
  * is the stability coefficient and the @f$L^2(\mathcal{F}) @f$ norm is computed
  * on the faces instead of the volume.
+ * Furthermore, the class can create and update a datafile containing the errors
+ * from different simulations that has been previously run with different
+ * polynomial orders and grid refinements.
  */
 
 template <class basis>

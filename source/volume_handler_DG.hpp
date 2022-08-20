@@ -108,17 +108,20 @@ public:
   reinit(
     const typename dealii::DoFHandler<dim>::active_cell_iterator &new_cell);
 
-  /// Spatial quadrature point position (actual element).
+  /// Return the @f$q@f$-th spatial quadrature point position on the actual
+  /// element.
   virtual dealii::Point<dim>
   quadrature_real(const unsigned int q) const;
 
-  /// Spatial quadrature point position (reference element).
+  /// Return the @f$q@f$-th spatial quadrature point position on the reference
+  /// element.
   virtual dealii::Point<dim>
   quadrature_ref(const unsigned int q) const;
 
-  /// Quadrature_weight associated to quadrature node.
+  /// Return the quadrature weight associated to the @f$q@f$-th quadrature
+  /// point.
   virtual double
-  quadrature_weight(const unsigned int quadrature_point_no) const;
+  quadrature_weight(const unsigned int q) const;
 
   /// Inverse of the Jacobian of the reference-to-actual transformation.
   dealii::Tensor<2, dim>
@@ -170,16 +173,15 @@ VolumeHandlerDG<dim>::quadrature_ref(const unsigned int q) const
 
 template <unsigned int dim>
 double
-VolumeHandlerDG<dim>::quadrature_weight(
-  const unsigned int quadrature_point_no) const
+VolumeHandlerDG<dim>::quadrature_weight(const unsigned int q) const
 {
   AssertThrow(initialized, dealii::StandardExceptions::ExcNotInitialized());
 
-  AssertThrow(quadrature_point_no < pow(n_quad_points_1D, dim),
+  AssertThrow(q < pow(n_quad_points_1D, dim),
               dealii::StandardExceptions::ExcMessage(
                 "Index of quadrature point outside the limit."));
 
-  return QGLpoints.weight(quadrature_point_no);
+  return QGLpoints.weight(q);
 }
 
 template <unsigned int dim>

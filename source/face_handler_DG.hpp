@@ -57,7 +57,10 @@ private:
   /// Quadrature formula for face elements.
   const QGaussLegendreSimplex<dim - 1> QGLpoints_face;
 
-  /// Object for FEM basis for face elements.
+  /// Internal FEM basis class for face elements. This internal member permits
+  /// to exploit useful already implemented operations. The polynomial order is
+  /// always 1 because it is only needed for geometric operations not related to
+  /// the degrees of freedom.
   std::unique_ptr<dealii::FEFaceValues<dim>> fe_face_values;
 
 public:
@@ -87,18 +90,20 @@ public:
   reinit(const typename dealii::DoFHandler<dim>::active_cell_iterator &new_cell,
          const unsigned int new_edge);
 
-  /// Spatial quadrature point position (actual element).
+  /// Return the @f$q@f$-th spatial quadrature point position on the actual
+  /// element.
   dealii::Point<dim>
   quadrature_real(const unsigned int q) const override;
 
-  /// Spatial quadrature point position (reference element).
+  /// Return the @f$q@f$-th spatial quadrature point position on the reference
+  /// element.
   dealii::Point<dim>
   quadrature_ref(const unsigned int q) const override;
 
-  /// Quadrature weight associated to a quadrature node, needed for numerical
-  /// integration.
+  /// Return the quadrature weight associated to the @f$q@f$-th quadrature
+  /// point.
   double
-  quadrature_weight(const unsigned int quadrature_point_no) const override;
+  quadrature_weight(const unsigned int q) const override;
 
   /// To manually obtain the associated quadrature point index in the
   /// neighbor element on the shared face.
@@ -163,17 +168,16 @@ FaceHandlerDG<dim>::quadrature_ref(const unsigned int q) const
 
 template <unsigned int dim>
 double
-FaceHandlerDG<dim>::quadrature_weight(
-  const unsigned int quadrature_point_no) const
+FaceHandlerDG<dim>::quadrature_weight(const unsigned int q) const
 {
   AssertThrow(this->initialized,
               dealii::StandardExceptions::ExcNotInitialized());
 
-  AssertThrow(quadrature_point_no < pow(this->n_quad_points_1D, dim - 1),
+  AssertThrow(q < pow(this->n_quad_points_1D, dim - 1),
               dealii::StandardExceptions::ExcMessage(
                 "Index of quadrature point outside the limit."));
 
-  return QGLpoints_face.weight(quadrature_point_no);
+  return QGLpoints_face.weight(q);
 }
 
 template <unsigned int dim>
