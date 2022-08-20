@@ -39,6 +39,7 @@
 
 #include "DUB_FEM_handler.hpp"
 #include "face_handler_DG.hpp"
+#include "volume_handler_DG.hpp"
 #include "source/core_model.hpp"
 #include "source/geometry/mesh_handler.hpp"
 #include "source/init.hpp"
@@ -47,8 +48,6 @@
 #include "source/numerics/linear_solver_handler.hpp"
 #include "source/numerics/preconditioner_handler.hpp"
 #include "source/numerics/tools.hpp"
-#include "ttp06_DG.hpp"
-#include "volume_handler_DG.hpp"
 
 /**
  * @brief Class for the assembly of the main local matrices for discontinuous
@@ -68,7 +67,7 @@
 template <class basis>
 class AssembleDG
 {
-private:
+protected:
   /// Basis function class.
   const std::unique_ptr<basis> basis_ptr;
 
@@ -248,14 +247,6 @@ public:
     const lifex::LinAlg::MPI::Vector                   &u0,
     const double                                        a,
     const std::vector<dealii::types::global_dof_index> &dof_indices) const;
-
-  /// Assembly of the local vector of the TTP06 ionic model:
-  /// @f[ION(i)=\int_{\mathcal{K}} I_{ion} \varphi_i \, dx @f]
-  /// where @f$I_{ion}()@f$ is the ionic current computed following the
-  /// <a href="https://doi.org/10.1152/ajpheart.00109.2006.">Ten-Tusscher
-  /// Panvilov ionic model</a>.
-  dealii::Vector<double>
-  local_ttp06(const std::shared_ptr<lifex::TTP06DG<basis>> ionic_model) const;
 
   /// Destructor.
   virtual ~AssembleDG() = default;
@@ -783,36 +774,5 @@ AssembleDG<basis>::local_non_linear_fitzhugh(
 
   return C;
 }
-
-template <class basis>
-dealii::Vector<double>
-AssembleDG<basis>::local_ttp06(
-  const std::shared_ptr<lifex::TTP06DG<basis>> ionic_model) const
-{
-  dealii::Vector<double> cell_rhs(dofs_per_cell);
-
-  const dealii::Tensor<2, lifex::dim> BJinv =
-    vol_handler.get_jacobian_inverse();
-  const double det = 1 / determinant(BJinv);
-
-  std::vector<double> Iion_loc(n_quad_points);
-  std::vector<double> dIion_du_loc(n_quad_points);
-
-  std::tie(Iion_loc, dIion_du_loc) = ionic_model->Iion_ICI();
-
-  for (unsigned int q = 0; q < n_quad_points; ++q)
-    {
-      for (unsigned int i = 0; i < dofs_per_cell; ++i)
-        {
-          cell_rhs(i) +=
-            Iion_loc[q] *
-            basis_ptr->shape_value(i, vol_handler.quadrature_ref(q)) *
-            vol_handler.quadrature_weight(q) * det;
-        }
-    }
-
-  return cell_rhs;
-}
-
 
 #endif /* ASSEMBLE_DG_HPP_*/
