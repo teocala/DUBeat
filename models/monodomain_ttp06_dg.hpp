@@ -330,7 +330,7 @@ namespace DUBeat::models
     {
       params.declare_entry(
         "Penalty coefficient",
-        "-1",
+        "1",
         dealii::Patterns::Double(-1, 1),
         "Penalty coefficient in the Discontinuous Galerkin formulation.");
       params.declare_entry(
@@ -419,8 +419,9 @@ namespace DUBeat::models
     // discretization of the analytical u_ex.
     this->discretize_analytical_solution(this->u_ex, this->solution_ex_owned);
 
-    this->solution_owned = this->solution =
-      ionic_model->setup_initial_transmembrane_potential();
+    this->solution = ionic_model->setup_initial_transmembrane_potential();
+    this->conversion_to_dub(this->solution);
+    this->solution_owned = this->solution;
 
     // Initialization of the initial solution.
     const std::vector<lifex::LinAlg::MPI::Vector> sol_init(
@@ -459,7 +460,7 @@ namespace DUBeat::models
       ischemic_region_generation.get_ischemic_region();
 
     std::map<dealii::types::material_id, std::string> map_id_volume;
-    map_id_volume[0] = "Myocardium";
+    map_id_volume[0] = "Epicardium";
 
     ionic_model->initialize_3d(this->triangulation,
                                this->prm_fe_degree,
@@ -467,7 +468,7 @@ namespace DUBeat::models
                                I_app,
                                this->prm_bdf_order,
                                map_id_volume,
-                               "Myocardium");
+                               "Epicardium");
     ionic_model->setup_system(true);
 
     ionic_model->set_ischemic_region(

@@ -112,7 +112,7 @@ public:
         static_cast<int>(std::pow(n_quad_points_1D, lifex::dim - 1)))
     , poly_degree(degree)
   {
-    dofs_per_cell = basis_ptr->dofs_per_cell;
+    dofs_per_cell = this->get_dofs_per_cell();
   }
 
   /// Default copy constructor.
@@ -134,6 +134,10 @@ public:
   void
   reinit(const typename dealii::DoFHandler<lifex::dim>::active_cell_iterator
            &new_cell);
+
+  /// Return the number of degrees of freedom per element.
+  unsigned int
+  get_dofs_per_cell() const;
 
   /// Assembly of stiffness matrix: @f[V(i,j)=\int_{\mathcal{K}} \nabla
   /// \varphi_j \cdot \nabla \varphi_i \,dx @f]
@@ -283,6 +287,27 @@ AssembleDG<basis>::reinit(
   cell = new_cell;
   vol_handler.reinit(new_cell);
 }
+
+template <class basis>
+unsigned int
+AssembleDG<basis>::get_dofs_per_cell() const
+{
+  // The analytical formula is:
+  // n_dof_per_cell = (p+1)*(p+2)*...(p+d) / d!,
+  // where p is the space order and d the space dimension..
+
+  unsigned int denominator = 1;
+  unsigned int nominator   = 1;
+
+  for (unsigned int i = 1; i <= lifex::dim; i++)
+    {
+      denominator *= i;
+      nominator *= poly_degree + i;
+    }
+
+  return (int)(nominator / denominator);
+}
+
 
 template <class basis>
 dealii::FullMatrix<double>

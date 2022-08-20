@@ -448,6 +448,10 @@ namespace lifex
       return prm_output_basename;
     }
 
+    /// Return the number of degrees of freedom per element.
+    unsigned int
+    get_dofs_per_cell() const;
+
     /// Getter for the upper threshold to compute repolarization maps
     /// (see @ref Electrophysiology::compute_repolarization_time).
     /// @note The returned value must be provided in dimensionless form
@@ -708,15 +712,15 @@ namespace lifex
   {
     AssertThrow(!standalone, ExcNotStandalone());
 
-    triangulation = triangulation_;
-
-    fe          = std::make_unique<basis>(fe_degree_);
-    vol_handler = std::make_unique<VolumeHandlerDG<dim>>(fe_degree_);
-
     fe_degree = fe_degree_;
 
+    triangulation = triangulation_;
+
+    fe          = std::make_unique<basis>(fe_degree);
+    vol_handler = std::make_unique<VolumeHandlerDG<dim>>(fe_degree);
+
     dof_handler->reinit(triangulation->get());
-    dof_handler->distribute_dofs(*fe);
+    dof_handler->distribute_dofs(fe_degree);
     this->QuadratureEvaluationFEMScalar::setup(*dof_handler,
                                                *quadrature_formula_,
                                                update_values);
@@ -1064,6 +1068,27 @@ namespace lifex
   }
 
   template <class basis>
+  unsigned int
+  IonicDG<basis>::get_dofs_per_cell() const
+  {
+    // The analytical formula is:
+    // n_dof_per_cell = (p+1)*(p+2)*...(p+d) / d!,
+    // where p is the space order and d the space dimension..
+
+    unsigned int denominator = 1;
+    unsigned int nominator   = 1;
+
+    for (unsigned int i = 1; i <= lifex::dim; i++)
+      {
+        denominator *= i;
+        nominator *= fe_degree + i;
+      }
+
+    return (int)(nominator / denominator);
+  }
+
+
+  template <class basis>
   void
   IonicDG<basis>::solve_electrophysiology_time_step_0d(const bool &verbose)
   {
@@ -1206,7 +1231,7 @@ namespace lifex
       }
 
     // Determine global dof indices of current volume.
-    const unsigned int                   dofs_per_cell = fe->dofs_per_cell;
+    const unsigned int                   dofs_per_cell = get_dofs_per_cell();
     std::vector<types::global_dof_index> dof_indices(dofs_per_cell);
     for (const auto &cell : dof_handler->active_cell_iterators())
       {
