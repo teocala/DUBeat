@@ -23,7 +23,10 @@
 # The make file used in the DUBeat library.
 #
 
-LIFEX_PATH?=/home/matteo/lifex
+
+# Modify the LIFEX_PATH variable and assign the path to your local lifex installation.
+LIFEX_PATH?=/home/path_to_lifex/lifex
+
 
 lifexInc=$(LIFEX_PATH)
 lifexLib=$(LIFEX_PATH)/build/lib
@@ -39,10 +42,8 @@ mkTbbInc?=/u/sw/toolchains/gcc-glibc/11.2.0/pkgs/tbb/2021.3.0/include
 mkTbbLib?=/u/sw/toolchains/gcc-glibc/11.2.0/pkgs/tbb/2021.3.0/lib
 mkP4estInc?=/u/sw/toolchains/gcc-glibc/11.2.0/pkgs/p4est/2.3.2/include
 mkP4estLib?=/u/sw/toolchains/gcc-glibc/11.2.0/pkgs/p4est/2.3.2/lib
-mkPetscInc?=/u/sw/toolchains/gcc-glibc/11.2.0/pkgs/petsc/3.15.1/include
-mkPetscLib?=/u/sw/toolchains/gcc-glibc/11.2.0/pkgs/petsc/3.15.1/lib
+mkPetscPrefix?=/u/sw/toolchains/gcc-glibc/11.2.0/pkgs/petsc/3.15.1
 
 
-
-CPPFLAGS+= -DLIN_ALG_TRILINOS -I$(mkDealiiInc) -I$(lifexInc) -I$(mkAdolcInc) -I$(mkTrilinosInc) -I$(mkBoostInc) -I$(mkTbbInc) -I$(mkP4estInc) -I$(mkPetscInc)
-LDLIBS+=-L$(mkDealiiLib) -ldeal_II -L$(lifexLib) -Wl,-rpath=$(lifexLib) -llifex_core -L$(mkAdolcLib) -L$(mkTrilinosLib) -lepetra -lteuchoscore -lteuchoscomm -L$(mkBoostLib) -L$(mkTbbLib) -ltbb -L$(mkP4estLib) -L$(mkPetscLib) -lstdc++ -ldl -lm
+CPPFLAGS+= -DLIN_ALG_TRILINOS -I$(mkDealiiInc) -I$(lifexInc) -I$(mkAdolcInc) -I$(mkTrilinosInc) -I$(mkBoostInc) -I$(mkTbbInc) -I$(mkP4estInc) -I$(mkPetscPrefix)/include
+LDLIBS+=-L$(mkDealiiLib) -ldeal_II -L$(lifexLib) -Wl,-rpath=$(lifexLib) -llifex_core -L$(mkAdolcLib) -L$(mkTrilinosLib) -lepetra -lteuchoscore -lteuchoscomm -L$(mkBoostLib) -L$(mkTbbLib) -ltbb -L$(mkP4estLib) -L$(mkPetsc)/lib -lstdc++ -ldl -lm
