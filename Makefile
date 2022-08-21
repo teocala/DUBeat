@@ -55,6 +55,10 @@ INDENT = ./extra/indent
 
 all: $(DEPEND) $(EXEC)
 
+ifeq ("$(wildcard $(LIFEX_PATH))", "")
+	@echo "LIFEX_PATH is not correct, set your local lifex installation path in Makefile.inc"
+endif
+
 clean:
 	$(RM) -f $(EXEC) $(OBJS)
 	cd $(DIR); $(RM) *.out *.bak *~ *.aux *.log
