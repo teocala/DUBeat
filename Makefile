@@ -54,11 +54,10 @@ INDENT = ./extra/indent
 .DEFAULT_GOAL = all
 
 
-
 all: check_lifex $(DEPEND) $(EXEC)	
 
 check_lifex:
-	@if [ ! -d $(LIFEX_PATH) ]; then echo "LIFEX_PATH is not correct, set your local lifex installation path in Makefile.inc"; fi
+	@if [ ! -d $(LIFEX_PATH) ]; then echo "\033[91mLIFEX_PATH is not correct, set your local lifex installation path in Makefile.inc\033[0m"; fi
 
 clean:
 	@$(RM) -f $(EXEC) $(OBJS)
