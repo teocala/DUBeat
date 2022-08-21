@@ -343,7 +343,7 @@ ModelDG<basis>::run()
   compute_errors(solution_owned, solution_ex_owned, u_ex, grad_u_ex, "u");
 
   // Generation of the graphical output.
-  if (prm_fe_degree < 3) // due to the current deal.II availabilities.
+  if (prm_fe_degree < 10) // due to the current deal.II availabilities.
     {
       conversion_to_fem(solution_ex);
       solution = solution_owned;
@@ -562,12 +562,13 @@ ModelDG<basis>::output_results() const
   // To output results, we need the deal.II DoFHandler instead of the DUBeat
   // DGDoFHandler since we are required here to use deal.II functions. On the
   // other hand, the deal.II DofHandler is limited to the 2nd order polynomials.
-  AssertThrow(prm_fe_degree < 3,
+  AssertThrow(prm_fe_degree < 10,
               dealii::StandardExceptions::ExcMessage(
                 "You cannot output contour plots, deal.II library does not "
                 "provide yet DGFEM spaces with polynomial order > 2."));
 
-  dealii::FE_SimplexDGP<lifex::dim> fe(prm_fe_degree);
+  const unsigned int fe_degree = (prm_fe_degree < 3) ? prm_fe_degree : 2;
+  dealii::FE_SimplexDGP<lifex::dim> fe(fe_degree);
   dealii::DoFHandler<lifex::dim>    dof_handler_fem;
   dof_handler_fem.reinit(triangulation->get());
   dof_handler_fem.distribute_dofs(fe);

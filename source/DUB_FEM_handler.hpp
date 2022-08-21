@@ -107,23 +107,34 @@ DUBFEMHandler<basis>::dubiner_to_fem(
   lifex::LinAlg::MPI::Vector fem_solution;
   fem_solution.reinit(dub_solution);
 
-  std::vector<unsigned int> dof_indices(this->dofs_per_cell);
 
-  const dealii::FE_SimplexDGP<lifex::dim>      fe_dg(this->poly_degree);
+  // This is due to the current deal.II availabilities, see dof_handler_DG.hpp description.
+  const unsigned int fe_degree = (this->poly_degree < 3) ? this->poly_degree : 2;
+
+  const dealii::FE_SimplexDGP<lifex::dim>      fe_dg(fe_degree);
   const std::vector<dealii::Point<lifex::dim>> support_points =
     fe_dg.get_unit_support_points();
+  const unsigned int fe_dofs_per_cell = this->get_dofs_per_cell(fe_degree);
 
-  // To perfom the conversion to FEM, we just need to evaluate the linear
+  dealii::DoFHandler<lifex::dim> dof_handler_fem(dof_handler.get_triangulation());
+  dof_handler_fem.distribute_dofs(fe_dg);
+
+  std::vector<unsigned int> dof_indices(this->dofs_per_cell);
+  std::vector<unsigned int> dof_indices_fem(fe_dofs_per_cell);
+
+
+  // To perform the conversion to FEM, we just need to evaluate the linear
   // combination of Dubiner functions over the dof points.
-  for (const auto &cell : dof_handler.active_cell_iterators())
+  for (const auto &cell : dof_handler_fem.active_cell_iterators())
     {
       dof_indices = dof_handler.get_dof_indices(cell);
+      cell->get_dof_indices(dof_indices_fem);
 
-      for (unsigned int i = 0; i < this->dofs_per_cell; ++i)
+      for (unsigned int i = 0; i < fe_dofs_per_cell; ++i)
         {
           for (unsigned int j = 0; j < this->dofs_per_cell; ++j)
             {
-              fem_solution[dof_indices[i]] +=
+              fem_solution[dof_indices_fem[i]] +=
                 dub_solution[dof_indices[j]] *
                 this->shape_value(j, support_points[i]);
             }

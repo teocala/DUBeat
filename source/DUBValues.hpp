@@ -95,6 +95,10 @@ public:
   unsigned int
   get_dofs_per_cell() const;
 
+  /// Same as get_dofs_per_cell() but with variable space degree.
+  unsigned int
+  get_dofs_per_cell(const unsigned int degree) const;
+
   /// Evaluation of the Dubiner basis functions.
   double
   shape_value(const unsigned int        function_no,
@@ -229,6 +233,26 @@ DUBValues<dim>::get_dofs_per_cell() const
     {
       denominator *= i;
       nominator *= poly_degree + i;
+    }
+
+  return (int)(nominator / denominator);
+}
+
+template <unsigned int dim>
+unsigned int
+DUBValues<dim>::get_dofs_per_cell(const unsigned int degree) const
+{
+  // The analytical formula is:
+  // n_dof_per_cell = (p+1)*(p+2)*...(p+d) / d!,
+  // where p is the space order and d the space dimension..
+
+  unsigned int denominator = 1;
+  unsigned int nominator   = 1;
+
+  for (unsigned int i = 1; i <= dim; i++)
+    {
+      denominator *= i;
+      nominator *= degree + i;
     }
 
   return (int)(nominator / denominator);
