@@ -275,6 +275,10 @@ DUBValues<2>::shape_value(const unsigned int      function_no,
   const double csi = quadrature_point[0];
   const double eta = quadrature_point[1];
 
+  // If the point is outside the reference cell, the evaluation is zero.
+  if (csi+eta>1.0+tol || csi < -tol || eta <-tol)
+    return 0.0;
+
   double a, b;
   a = b = 0;
 
@@ -307,6 +311,10 @@ DUBValues<3>::shape_value(const unsigned int      function_no,
   const double csi = quadrature_point[0];
   const double eta = quadrature_point[1];
   const double ni  = quadrature_point[2];
+
+  // If the point is outside the reference cell, the evaluation is zero.
+  if (csi+eta+ni>1.0+tol || csi < -tol || eta <-tol || ni<-tol)
+    return 0.0;
 
   double a, b, c;
   a = b = c = 0;
@@ -343,6 +351,10 @@ DUBValues<2>::shape_grad(const unsigned int      function_no,
   const int    j   = fun_coeff[1];
   const double csi = quadrature_point[0];
   const double eta = quadrature_point[1];
+
+  // If the point is outside the reference cell, the evaluation is zero.
+  if (csi+eta>1.0+tol || csi < -tol || eta <-tol)
+    return 0.0;
 
   double a, b;
   a = b = 0;
@@ -410,6 +422,10 @@ DUBValues<3>::shape_grad(const unsigned int      function_no,
   const double csi = quadrature_point[0];
   const double eta = quadrature_point[1];
   const double ni  = quadrature_point[2];
+
+  // If the point is outside the reference cell, the evaluation is zero.
+  if (csi+eta+ni>1.0+tol || csi < -tol || eta <-tol || ni<-tol)
+    return 0.0;
 
   double a, b, c;
   a = b = c = 0.0;

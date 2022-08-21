@@ -27,6 +27,8 @@
 #ifndef DUBFEMHandler_HPP_
 #define DUBFEMHandler_HPP_
 
+#include <filesystem>
+#include <deal.II/base/exceptions.h>
 #include <deal.II/base/quadrature.h>
 
 #include <deal.II/dofs/dof_handler.h>
@@ -42,6 +44,7 @@
 #include "DUBValues.hpp"
 #include "dof_handler_DG.hpp"
 #include "source/init.hpp"
+#include "source/geometry/mesh_handler.hpp"
 #include "volume_handler_DG.hpp"
 
 /**
@@ -88,6 +91,15 @@ public:
   /// description for more information.
   lifex::LinAlg::MPI::Vector
   dubiner_to_fem(const lifex::LinAlg::MPI::Vector &dub_solution) const;
+
+  /// Same as dubiner_to_fem but allows to choose the grid refinement and
+  /// polynomial order for the FE evaluations.
+  lifex::LinAlg::MPI::Vector
+  dubiner_to_fem(const lifex::LinAlg::MPI::Vector &dub_solution,
+                 const unsigned int                n_ref_grid,
+                 const std::string &subsection, 
+                 const MPI_Comm &mpi_comm_,
+                 const unsigned int                degree_fem = 1) const;
 
   /// Conversion of a discretized solution vector from FEM coefficients to
   /// Dubiner coefficients.
@@ -149,6 +161,83 @@ DUBFEMHandler<basis>::dubiner_to_fem(
                 this->shape_value(j, support_points[i]);
             }
         }
+    }
+
+  return fem_solution;
+}
+
+
+template <class basis>
+lifex::LinAlg::MPI::Vector
+DUBFEMHandler<basis>::dubiner_to_fem(
+  const lifex::LinAlg::MPI::Vector &dub_solution,
+  const unsigned int                n_ref_grid,
+  const std::string &subsection, 
+  const MPI_Comm &mpi_comm_,
+  const unsigned int                degree_fem) const
+{
+
+  // Creation of the new FEM evaluation mesh.
+  lifex::utils::MeshHandler triangulation_fem(subsection, mpi_comm_);
+  std::string mesh_path = "../meshes/" + std::to_string(lifex::dim) + "D_" +
+                          std::to_string(n_ref_grid) + ".msh";
+  AssertThrow(std::filesystem::exists(mesh_path),
+              dealii::StandardExceptions::ExcMessage(
+                "This mesh file/directory does not exist."));
+  triangulation_fem.initialize_from_file(mesh_path, 1);
+  triangulation_fem.set_element_type(
+    lifex::utils::MeshHandler::ElementType::Tet);
+  triangulation_fem.create_mesh();
+
+  const dealii::FE_SimplexDGP<lifex::dim>      fe_dg(degree_fem);
+  const std::vector<dealii::Point<lifex::dim>> support_points =
+    fe_dg.get_unit_support_points();
+  const unsigned int dofs_per_cell_fem = this->get_dofs_per_cell(degree_fem);
+
+  // Generation of the mapping.
+  const std::unique_ptr<dealii::MappingFE<lifex::dim>> mapping(std::make_unique<dealii::MappingFE<lifex::dim>>(fe_dg));
+
+  // Generation of a new dof_handler for the FE evaluations.
+  dealii::DoFHandler<lifex::dim> dof_handler_fem;
+  dof_handler_fem.reinit(triangulation_fem.get());
+  dof_handler_fem.distribute_dofs(fe_dg);
+
+  // Initialization of the FEM evaluation vector.
+  lifex::LinAlg::MPI::Vector fem_solution;
+  dealii::IndexSet owned_dofs = dof_handler_fem.locally_owned_dofs();
+  fem_solution.reinit(owned_dofs, mpi_comm_);
+
+  // Initialization of the dof_indices.
+  std::vector<unsigned int> dof_indices(this->dofs_per_cell);
+  std::vector<unsigned int> dof_indices_fem(dofs_per_cell_fem);
+
+  // Tolerance.
+  const double tol = 1e-10;
+
+  // To perform the conversion to FEM, we just need to evaluate the linear
+  // combination of Dubiner functions over the dof points.
+  for (const auto &cell_fem : dof_handler_fem.active_cell_iterators())
+    {
+      cell_fem->get_dof_indices(dof_indices_fem);
+      for (unsigned int i = 0; i < dofs_per_cell_fem; ++i)
+          {
+            dealii::Point<lifex::dim> real_support_point = mapping->transform_unit_to_real_cell(cell_fem, support_points[i]);
+            
+            for (const auto &cell : dof_handler.active_cell_iterators())
+              {
+                // This condition needs to guarantee that neighbor elements do not both contribute to the FEM evaluation.
+                if (fem_solution[dof_indices_fem[i]] < tol)
+                {
+                  dealii::Point<lifex::dim> unit_support_point_dub = mapping->transform_real_to_unit_cell(cell, real_support_point);
+                  dof_indices = dof_handler.get_dof_indices(cell);
+                  for (unsigned int j = 0; j < this->dofs_per_cell; ++j)
+                  {
+                      fem_solution[dof_indices_fem[i]] += (dub_solution[dof_indices[j]] *
+                      this->shape_value(j, unit_support_point_dub));
+                  }
+                }
+              }
+          }
     }
 
   return fem_solution;

@@ -53,26 +53,28 @@ INDENT = ./extra/indent
 
 .DEFAULT_GOAL = all
 
-all: $(DEPEND) $(EXEC)
 
-ifeq ("$(wildcard $(LIFEX_PATH))", "")
-	@echo "LIFEX_PATH is not correct, set your local lifex installation path in Makefile.inc"
-endif
+
+all: check_lifex $(DEPEND) $(EXEC)	
+
+check_lifex:
+	@if [ ! -d $(LIFEX_PATH) ]; then echo "LIFEX_PATH is not correct, set your local lifex installation path in Makefile.inc"; fi
 
 clean:
-	$(RM) -f $(EXEC) $(OBJS)
-	cd $(DIR); $(RM) *.out *.bak *~ *.aux *.log
+	@$(RM) -f $(EXEC) $(OBJS)
+	@cd $(DIR); $(RM) *.out *.bak *~ *.aux *.log
 
 distclean:
-	$(MAKE) clean
-	$(RM) -r ./documentation/html ./documentation/latex
-	cd $(DIR); $(RM) -f *.h5 *.xdmf *.prm *.data
+	@$(MAKE) -s clean
+	@$(RM) -r ./documentation/html ./documentation/latex
+	@cd $(DIR); $(RM) -f *.h5 *.xdmf *.prm *.data
 
 doc:
 	doxygen $(DOXYFILE)
 
 indent:
-	$(INDENT)/indent_all
+	@$(INDENT)/indent_all
+	@echo "Indentation completed."
 
 $(EXEC): $(OBJS)
 
