@@ -83,7 +83,9 @@ public:
   DUBFEMHandler<basis>(DUBFEMHandler<basis> &&DUBFEMHandler) = default;
 
   /// Conversion of a discretized solution vector from Dubiner coefficients to
-  /// FEM coefficients.
+  /// FEM coefficients. The output FEM vector belongs to a space of order at
+  /// most 2 due to the deal.II current availabilities. See dof_handler_DG.hpp
+  /// description for more information.
   lifex::LinAlg::MPI::Vector
   dubiner_to_fem(const lifex::LinAlg::MPI::Vector &dub_solution) const;
 
@@ -108,19 +110,27 @@ DUBFEMHandler<basis>::dubiner_to_fem(
   fem_solution.reinit(dub_solution);
 
 
-  // This is due to the current deal.II availabilities, see dof_handler_DG.hpp description.
-  const unsigned int fe_degree = (this->poly_degree < 3) ? this->poly_degree : 2;
+  // Due to the current deal.II availabilities, FE spaces can be of order at
+  // most 2, see dof_handler_DG.hpp description. If the Dubiner space is of
+  // higher order, this method generates a FEM vector of order 2, i.e. the
+  // maximum possible. Hence, due to the possibility that DUB space and FEM
+  // space have different orders, we need to specify two different degrees,
+  // dof_handler, dofs_per_cell...
+  const unsigned int degree_fem =
+    (this->poly_degree < 3) ? this->poly_degree : 2;
 
-  const dealii::FE_SimplexDGP<lifex::dim>      fe_dg(fe_degree);
+  const dealii::FE_SimplexDGP<lifex::dim>      fe_dg(degree_fem);
   const std::vector<dealii::Point<lifex::dim>> support_points =
     fe_dg.get_unit_support_points();
-  const unsigned int fe_dofs_per_cell = this->get_dofs_per_cell(fe_degree);
+  const unsigned int dofs_per_cell_fem = this->get_dofs_per_cell(degree_fem);
 
-  dealii::DoFHandler<lifex::dim> dof_handler_fem(dof_handler.get_triangulation());
+  // Generation of a new dof_handler for the FE evaluations.
+  dealii::DoFHandler<lifex::dim> dof_handler_fem(
+    dof_handler.get_triangulation());
   dof_handler_fem.distribute_dofs(fe_dg);
 
   std::vector<unsigned int> dof_indices(this->dofs_per_cell);
-  std::vector<unsigned int> dof_indices_fem(fe_dofs_per_cell);
+  std::vector<unsigned int> dof_indices_fem(dofs_per_cell_fem);
 
 
   // To perform the conversion to FEM, we just need to evaluate the linear
@@ -130,7 +140,7 @@ DUBFEMHandler<basis>::dubiner_to_fem(
       dof_indices = dof_handler.get_dof_indices(cell);
       cell->get_dof_indices(dof_indices_fem);
 
-      for (unsigned int i = 0; i < fe_dofs_per_cell; ++i)
+      for (unsigned int i = 0; i < dofs_per_cell_fem; ++i)
         {
           for (unsigned int j = 0; j < this->dofs_per_cell; ++j)
             {
