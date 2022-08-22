@@ -152,7 +152,13 @@ protected:
                  const std::shared_ptr<dealii::Function<lifex::dim>> &grad_u_ex,
                  const char *solution_name = (char *)"u") const;
 
-  /// Output of results.
+  /// Output of results. Note that, due to limitations regarding simplex
+  /// elements of order greater or equal than 3 in the deal.II DoF Handler (see
+  /// dof_handler_DG.hpp description for more information), if the polynomial
+  /// order chosen to solve the model is @f$>2@f$, the FE space considered for
+  /// the output will be of order at most 2. This leads to an output vector and
+  /// its corrispondent visualization to be less detailfull.
+  virtual
   void
   output_results() const;
 
@@ -588,7 +594,7 @@ void
 ModelDG<DUBValues<lifex::dim>>::conversion_to_fem(
   lifex::LinAlg::MPI::Vector &sol_owned)
 {
-  sol_owned = dub_fem_values->dubiner_to_fem(sol_owned);
+  sol_owned = dub_fem_values->dubiner_to_fem(sol_owned, 16, prm_subsection_path, mpi_comm, 1);
 }
 
 /// Conversion to FEM coefficients, const version.
