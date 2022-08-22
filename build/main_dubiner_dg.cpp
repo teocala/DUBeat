@@ -27,7 +27,6 @@
 #include "../models/heat_dg.hpp"
 #include "../models/laplace_dg.hpp"
 #include "../models/monodomain_fhn_dg.hpp"
-#include "../models/monodomain_dg.hpp"
 #include "source/init.hpp"
 
 /// This file is an example of main execution script. The model below can be
