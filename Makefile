@@ -54,10 +54,13 @@ INDENT = ./extra/indent
 .DEFAULT_GOAL = all
 
 
-all: check_lifex $(DEPEND) $(EXEC)	
+all: check_lifex $(DEPEND) $(EXEC) end_print
 
 check_lifex:
-	@if [ ! -d $(LIFEX_PATH) ]; then echo "\033[91mLIFEX_PATH is not correct, set your local lifex installation path in Makefile.inc\033[0m"; fi
+	@if [ ! -d $(LIFEX_PATH) ]; then echo "\033[91m\nLIFEX_PATH is not correct, set your local lifex installation path in Makefile.inc\n\033[0m"; fi
+
+end_print:
+	@echo "\nDUBeat version 1.0.0: compilation completed\n"
 
 clean:
 	@$(RM) -f $(EXEC) $(OBJS)
@@ -73,9 +76,9 @@ doc:
 
 indent:
 	@$(INDENT)/indent_all
-	@echo "Indentation completed."
+	@echo "DUBeat version 1.0.0: indentation completed."
 
-$(EXEC): $(OBJS)
+$(EXEC): $(OBJS) 
 
 $(OBJS): $(SRCS)
 

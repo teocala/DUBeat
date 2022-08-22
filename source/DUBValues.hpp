@@ -276,7 +276,7 @@ DUBValues<2>::shape_value(const unsigned int      function_no,
   const double eta = quadrature_point[1];
 
   // If the point is outside the reference cell, the evaluation is zero.
-  if (csi+eta>1.0+tol || csi < -tol || eta <-tol)
+  if (csi + eta > 1.0 + tol || csi < -tol || eta < -tol)
     return 0.0;
 
   double a, b;
@@ -313,7 +313,7 @@ DUBValues<3>::shape_value(const unsigned int      function_no,
   const double ni  = quadrature_point[2];
 
   // If the point is outside the reference cell, the evaluation is zero.
-  if (csi+eta+ni>1.0+tol || csi < -tol || eta <-tol || ni<-tol)
+  if (csi + eta + ni > 1.0 + tol || csi < -tol || eta < -tol || ni < -tol)
     return 0.0;
 
   double a, b, c;
@@ -355,7 +355,7 @@ DUBValues<2>::shape_grad(const unsigned int      function_no,
   dealii::Tensor<1, 2> grad;
 
   // If the point is outside the reference cell, the evaluation is zero.
-  if (csi+eta>1.0+tol || csi < -tol || eta <-tol)
+  if (csi + eta > 1.0 + tol || csi < -tol || eta < -tol)
     return grad;
 
   double a, b;
@@ -424,10 +424,10 @@ DUBValues<3>::shape_grad(const unsigned int      function_no,
   const double eta = quadrature_point[1];
   const double ni  = quadrature_point[2];
 
-   dealii::Tensor<1, 3> grad;
+  dealii::Tensor<1, 3> grad;
 
   // If the point is outside the reference cell, the evaluation is zero.
-  if (csi+eta+ni>1.0+tol || csi < -tol || eta <-tol || ni<-tol)
+  if (csi + eta + ni > 1.0 + tol || csi < -tol || eta < -tol || ni < -tol)
     return grad;
 
   double a, b, c;
@@ -445,7 +445,6 @@ DUBValues<3>::shape_grad(const unsigned int      function_no,
   const double pj = this->eval_jacobi_polynomial(j, 2 * i + 1, 0, b);
   const double pk = this->eval_jacobi_polynomial(k, 2 * i + 2 * j + 2, 0, c);
 
- 
 
   double dPi_csi = 0.0, dPi_eta = 0.0, dPi_ni = 0.0;
   double db_csi = 0.0, db_eta = 0.0, db_ni = 0.0;

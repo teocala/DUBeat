@@ -27,7 +27,6 @@
 #ifndef DUBFEMHandler_HPP_
 #define DUBFEMHandler_HPP_
 
-#include <filesystem>
 #include <deal.II/base/exceptions.h>
 #include <deal.II/base/quadrature.h>
 
@@ -39,12 +38,13 @@
 #include <deal.II/lac/trilinos_vector.h>
 
 #include <cmath>
+#include <filesystem>
 #include <vector>
 
 #include "DUBValues.hpp"
 #include "dof_handler_DG.hpp"
-#include "source/init.hpp"
 #include "source/geometry/mesh_handler.hpp"
+#include "source/init.hpp"
 #include "volume_handler_DG.hpp"
 
 /**
@@ -97,8 +97,8 @@ public:
   lifex::LinAlg::MPI::Vector
   dubiner_to_fem(const lifex::LinAlg::MPI::Vector &dub_solution,
                  const unsigned int                n_ref_grid,
-                 const std::string &subsection, 
-                 const MPI_Comm &mpi_comm_,
+                 const std::string                &subsection,
+                 const MPI_Comm                   &mpi_comm_,
                  const unsigned int                degree_fem = 1) const;
 
   /// Conversion of a discretized solution vector from FEM coefficients to
@@ -172,11 +172,10 @@ lifex::LinAlg::MPI::Vector
 DUBFEMHandler<basis>::dubiner_to_fem(
   const lifex::LinAlg::MPI::Vector &dub_solution,
   const unsigned int                n_ref_grid,
-  const std::string &subsection, 
-  const MPI_Comm &mpi_comm_,
+  const std::string                &subsection,
+  const MPI_Comm                   &mpi_comm_,
   const unsigned int                degree_fem) const
 {
-
   // Creation of the new FEM evaluation mesh.
   lifex::utils::MeshHandler triangulation_fem(subsection, mpi_comm_);
   std::string mesh_path = "../meshes/" + std::to_string(lifex::dim) + "D_" +
@@ -195,7 +194,8 @@ DUBFEMHandler<basis>::dubiner_to_fem(
   const unsigned int dofs_per_cell_fem = this->get_dofs_per_cell(degree_fem);
 
   // Generation of the mapping.
-  const std::unique_ptr<dealii::MappingFE<lifex::dim>> mapping(std::make_unique<dealii::MappingFE<lifex::dim>>(fe_dg));
+  const std::unique_ptr<dealii::MappingFE<lifex::dim>> mapping(
+    std::make_unique<dealii::MappingFE<lifex::dim>>(fe_dg));
 
   // Generation of a new dof_handler for the FE evaluations.
   dealii::DoFHandler<lifex::dim> dof_handler_fem;
@@ -204,7 +204,7 @@ DUBFEMHandler<basis>::dubiner_to_fem(
 
   // Initialization of the FEM evaluation vector.
   lifex::LinAlg::MPI::Vector fem_solution;
-  dealii::IndexSet owned_dofs = dof_handler_fem.locally_owned_dofs();
+  dealii::IndexSet           owned_dofs = dof_handler_fem.locally_owned_dofs();
   fem_solution.reinit(owned_dofs, mpi_comm_);
 
   // Initialization of the dof_indices.
@@ -220,24 +220,29 @@ DUBFEMHandler<basis>::dubiner_to_fem(
     {
       cell_fem->get_dof_indices(dof_indices_fem);
       for (unsigned int i = 0; i < dofs_per_cell_fem; ++i)
-          {
-            dealii::Point<lifex::dim> real_support_point = mapping->transform_unit_to_real_cell(cell_fem, support_points[i]);
-            
-            for (const auto &cell : dof_handler.active_cell_iterators())
-              {
-                // This condition needs to guarantee that neighbor elements do not both contribute to the FEM evaluation.
-                if (fem_solution[dof_indices_fem[i]] < tol)
+        {
+          dealii::Point<lifex::dim> real_support_point =
+            mapping->transform_unit_to_real_cell(cell_fem, support_points[i]);
+
+          for (const auto &cell : dof_handler.active_cell_iterators())
+            {
+              // This condition needs to guarantee that neighbor elements do not
+              // both contribute to the FEM evaluation.
+              if (fem_solution[dof_indices_fem[i]] < tol)
                 {
-                  dealii::Point<lifex::dim> unit_support_point_dub = mapping->transform_real_to_unit_cell(cell, real_support_point);
+                  dealii::Point<lifex::dim> unit_support_point_dub =
+                    mapping->transform_real_to_unit_cell(cell,
+                                                         real_support_point);
                   dof_indices = dof_handler.get_dof_indices(cell);
                   for (unsigned int j = 0; j < this->dofs_per_cell; ++j)
-                  {
-                      fem_solution[dof_indices_fem[i]] += (dub_solution[dof_indices[j]] *
-                      this->shape_value(j, unit_support_point_dub));
-                  }
+                    {
+                      fem_solution[dof_indices_fem[i]] +=
+                        (dub_solution[dof_indices[j]] *
+                         this->shape_value(j, unit_support_point_dub));
+                    }
                 }
-              }
-          }
+            }
+        }
     }
 
   return fem_solution;

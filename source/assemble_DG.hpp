@@ -175,43 +175,47 @@ public:
   local_rhs_edge_neumann(
     const std::shared_ptr<dealii::Function<lifex::dim>> &g) const;
 
-  /// Assembly of the local matrix S: @f[S(i,j)=\int_{\mathcal{F}} \gamma
-  /// \varphi_j^{+} \varphi_i^{+} \, ds @f] where @f$ \gamma @f$ is the
-  /// regularity coefficient.
+  /// Assembly of the component of the local matrix S that is evaluated on the
+  /// same side of the edge: @f[SC(i,j)=\int_{\mathcal{F}} \gamma \varphi_j^{+}
+  /// \varphi_i^{+} \, ds @f] where @f$ \gamma @f$ is the regularity
+  /// coefficient.
   dealii::FullMatrix<double>
-  local_S(const double stability_coefficient) const;
+  local_SC(const double stability_coefficient) const;
 
-  /// Assembly of the local matrix S at the interface with the adjacent
-  /// element:
+  /// Assembly of the component of the local matrix S that is evaluated on the
+  /// two sides of the edge:
   /// @f[ SN(i,j)=- \int_{\mathcal{F}} \gamma \varphi_j^{+} \varphi_i^{-} \, ds
   /// @f]
   dealii::FullMatrix<double>
   local_SN(const double stability_coefficient) const;
 
-  /// Assembly of the local matrix I and its transpose:
+  /// Assembly of the component of the local matrix I that is evaluated on the
+  /// same side of the edge. The method returns the two matrices:
   ///@f[
   /// \begin{aligned}
-  /// I(i,j)= & - \frac{\theta}{2}
+  /// \theta IC(i,j)= & - \frac{\theta}{2}
   /// \int_{\mathcal{F}} \nabla \varphi_i^{+} \cdot  n^{+} \varphi_j^{+}  \, ds
-  /// \\ I_T(i,j)= & - \frac{1}{2} \int_{\mathcal{F}} \nabla \varphi_j^{+}
+  /// \\ IC^T(i,j)= & - \frac{1}{2} \int_{\mathcal{F}} \nabla \varphi_j^{+}
   /// \cdot  n^{+} \varphi_i^{+}  \, ds \end{aligned} @f] where @f$\theta@f$ is
   /// the penalty coefficient.
   std::pair<dealii::FullMatrix<double>, dealii::FullMatrix<double>>
-  local_I(const double theta) const;
+  local_IC(const double theta) const;
 
-  /// Assembly of the local matrix I and its transpose on the boundary edges:
+  /// Assembly of the component of the local matrix I that is evaluated on the
+  /// boundary edges. The method returns the two matrices:
   /// @f[\begin{aligned}
-  /// IB(i,j)=& \: - \theta \int_{\mathcal{F}} \nabla \varphi_i^{+} \cdot n^{+}
-  /// \varphi_j^{+} \, ds \\ IB_T(i,j)=& - \int_{\mathcal{F}} \nabla
+  /// \theta IB(i,j)=& \: - \theta \int_{\mathcal{F}} \nabla \varphi_i^{+} \cdot
+  /// n^{+} \varphi_j^{+} \, ds \\ IB^T(i,j)=& - \int_{\mathcal{F}} \nabla
   /// \varphi_j^{+} \cdot n^{+} \varphi_i^{+} \, ds \end{aligned} @f] where
   /// @f$\theta@f$ is the penalty coefficient.
   std::pair<dealii::FullMatrix<double>, dealii::FullMatrix<double>>
   local_IB(const double theta) const;
 
-  /// Assembly of the local matrix I and its transpose at the interface with
-  /// the adjacent element: @f[\begin{aligned} IN(i,j)=& - \frac{\theta}{2}
+  /// Assembly of the component of the local matrix I that is evaluated on the
+  /// two sides of the edge. The method returns the two matrices:
+  /// @f[\begin{aligned} \theta IN(i,j)=& \frac{\theta}{2}
   /// \int_{\mathcal{F}} \nabla \varphi_i^{+} \cdot n^{+} \varphi_j^{-}  \, ds
-  /// \\ IN_T(i,j)=& -\frac{1}{2} \int_{\mathcal{F}} \nabla \varphi_j^{+} \cdot
+  /// \\ IN^T(i,j)=& \frac{1}{2} \int_{\mathcal{F}} \nabla \varphi_j^{+} \cdot
   /// n^{+} \varphi_i^{-}  \, ds \end{aligned} @f] where @f$\theta@f$ is the
   /// penalty coefficient.
   std::pair<dealii::FullMatrix<double>, dealii::FullMatrix<double>>
@@ -464,7 +468,7 @@ AssembleDG<basis>::local_rhs_edge_neumann(
 
 template <class basis>
 dealii::FullMatrix<double>
-AssembleDG<basis>::local_S(const double stability_coefficient) const
+AssembleDG<basis>::local_SC(const double stability_coefficient) const
 {
   const double face_measure      = face_handler.get_measure();
   const double unit_face_measure = (4.0 - lifex::dim) / 2;
@@ -474,7 +478,7 @@ AssembleDG<basis>::local_S(const double stability_coefficient) const
   const double local_pen_coeff =
     (stability_coefficient * pow(poly_degree, 2)) / h_local;
 
-  dealii::FullMatrix<double> S(dofs_per_cell, dofs_per_cell);
+  dealii::FullMatrix<double> SC(dofs_per_cell, dofs_per_cell);
 
   for (unsigned int q = 0; q < n_quad_points_face; ++q)
     {
@@ -482,7 +486,7 @@ AssembleDG<basis>::local_S(const double stability_coefficient) const
         {
           for (unsigned int j = 0; j < dofs_per_cell; ++j)
             {
-              S(i, j) +=
+              SC(i, j) +=
                 local_pen_coeff *
                 basis_ptr->shape_value(i, face_handler.quadrature_ref(q)) *
                 basis_ptr->shape_value(j, face_handler.quadrature_ref(q)) *
@@ -491,7 +495,7 @@ AssembleDG<basis>::local_S(const double stability_coefficient) const
         }
     }
 
-  return S;
+  return SC;
 }
 
 template <class basis>
@@ -532,7 +536,7 @@ AssembleDG<basis>::local_SN(const double stability_coefficient) const
 
 template <class basis>
 std::pair<dealii::FullMatrix<double>, dealii::FullMatrix<double>>
-AssembleDG<basis>::local_I(const double theta) const
+AssembleDG<basis>::local_IC(const double theta) const
 {
   AssertThrow(theta == 1. || theta == 0. || theta == -1.,
               dealii::StandardExceptions::ExcMessage(
@@ -546,8 +550,8 @@ AssembleDG<basis>::local_I(const double theta) const
   const double unit_face_measure = (4.0 - lifex::dim) / 2;
   const double measure_ratio     = face_measure / unit_face_measure;
 
-  dealii::FullMatrix<double> I(dofs_per_cell, dofs_per_cell);
-  dealii::FullMatrix<double> I_t(dofs_per_cell, dofs_per_cell);
+  dealii::FullMatrix<double> IC(dofs_per_cell, dofs_per_cell);
+  dealii::FullMatrix<double> IC_t(dofs_per_cell, dofs_per_cell);
 
   for (unsigned int q = 0; q < n_quad_points_face; ++q)
     {
@@ -555,7 +559,7 @@ AssembleDG<basis>::local_I(const double theta) const
         {
           for (unsigned int j = 0; j < dofs_per_cell; ++j)
             {
-              I(i, j) +=
+              IC(i, j) +=
                 0.5 *
                 ((basis_ptr->shape_grad(i, face_handler.quadrature_ref(q)) *
                   BJinv) *
@@ -566,12 +570,11 @@ AssembleDG<basis>::local_I(const double theta) const
         }
     }
 
-  I_t.copy_transposed(I);
-  I_t *= (-1);
-  I *= (-1);
-  I *= theta;
+  IC *= (-1);
+  IC_t.copy_transposed(IC);
+  IC *= theta;
 
-  return {I, I_t};
+  return {IC, IC_t};
 }
 
 template <class basis>
@@ -609,9 +612,8 @@ AssembleDG<basis>::local_IB(const double theta) const
         }
     }
 
-  IB_t.copy_transposed(IB);
-  IB_t *= (-1);
   IB *= (-1);
+  IB_t.copy_transposed(IB);
   IB *= theta;
 
   return {IB, IB_t};
@@ -645,7 +647,7 @@ AssembleDG<basis>::local_IN(const double theta) const
               const unsigned int nq =
                 face_handler.corresponding_neigh_index(q, face_handler_neigh);
 
-              IN(i, j) -=
+              IN(i, j) +=
                 0.5 *
                 ((basis_ptr->shape_grad(i, face_handler.quadrature_ref(q)) *
                   BJinv) *
@@ -658,8 +660,6 @@ AssembleDG<basis>::local_IN(const double theta) const
     }
 
   IN_t.copy_transposed(IN);
-  IN_t *= (-1);
-  IN *= (-1);
   IN *= theta;
 
   return {IN, IN_t};

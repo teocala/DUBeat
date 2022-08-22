@@ -191,12 +191,12 @@ namespace DUBeat::models
 
     // See DG_Assemble::local_V().
     dealii::FullMatrix<double> V(this->dofs_per_cell, this->dofs_per_cell);
-    // See DG_Assemble::local_S().
-    dealii::FullMatrix<double> S(this->dofs_per_cell, this->dofs_per_cell);
-    // See DG_Assemble::local_I().
-    dealii::FullMatrix<double> I(this->dofs_per_cell, this->dofs_per_cell);
-    // Transpose of I.
-    dealii::FullMatrix<double> I_t(this->dofs_per_cell, this->dofs_per_cell);
+    // See DG_Assemble::local_SC().
+    dealii::FullMatrix<double> SC(this->dofs_per_cell, this->dofs_per_cell);
+    // See DG_Assemble::local_IC().
+    dealii::FullMatrix<double> IC(this->dofs_per_cell, this->dofs_per_cell);
+    // Transpose of IC.
+    dealii::FullMatrix<double> IC_t(this->dofs_per_cell, this->dofs_per_cell);
     // See DG_Assemble::local_IB().
     dealii::FullMatrix<double> IB(this->dofs_per_cell, this->dofs_per_cell);
     // Transpose of IB.
@@ -235,15 +235,15 @@ namespace DUBeat::models
                 std::vector<lifex::types::global_dof_index> dof_indices_neigh(
                   this->dofs_per_cell);
 
-                S = this->assemble->local_S(this->prm_stability_coeff);
-                this->matrix.add(dof_indices, S);
+                SC = this->assemble->local_SC(this->prm_stability_coeff);
+                this->matrix.add(dof_indices, SC);
 
                 if (!cell->at_boundary(edge))
                   {
-                    std::tie(I, I_t) =
-                      this->assemble->local_I(this->prm_penalty_coeff);
-                    this->matrix.add(dof_indices, I);
-                    this->matrix.add(dof_indices, I_t);
+                    std::tie(IC, IC_t) =
+                      this->assemble->local_IC(this->prm_penalty_coeff);
+                    this->matrix.add(dof_indices, IC);
+                    this->matrix.add(dof_indices, IC_t);
 
                     const auto neighcell = cell->neighbor(edge);
                     dof_indices_neigh =
