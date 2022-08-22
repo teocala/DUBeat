@@ -193,7 +193,7 @@ public:
   /// same side of the edge. The method returns the two matrices:
   ///@f[
   /// \begin{aligned}
-  /// \theta IC(i,j)= & - \frac{\theta}{2}
+  /// \theta \cdot IC(i,j)= & - \frac{\theta}{2}
   /// \int_{\mathcal{F}} \nabla \varphi_i^{+} \cdot  n^{+} \varphi_j^{+}  \, ds
   /// \\ IC^T(i,j)= & - \frac{1}{2} \int_{\mathcal{F}} \nabla \varphi_j^{+}
   /// \cdot  n^{+} \varphi_i^{+}  \, ds \end{aligned} @f] where @f$\theta@f$ is
@@ -204,7 +204,7 @@ public:
   /// Assembly of the component of the local matrix I that is evaluated on the
   /// boundary edges. The method returns the two matrices:
   /// @f[\begin{aligned}
-  /// \theta IB(i,j)=& \: - \theta \int_{\mathcal{F}} \nabla \varphi_i^{+} \cdot
+  /// \theta \cdot IB(i,j)=& \: - \theta \int_{\mathcal{F}} \nabla \varphi_i^{+} \cdot
   /// n^{+} \varphi_j^{+} \, ds \\ IB^T(i,j)=& - \int_{\mathcal{F}} \nabla
   /// \varphi_j^{+} \cdot n^{+} \varphi_i^{+} \, ds \end{aligned} @f] where
   /// @f$\theta@f$ is the penalty coefficient.
@@ -213,7 +213,7 @@ public:
 
   /// Assembly of the component of the local matrix I that is evaluated on the
   /// two sides of the edge. The method returns the two matrices:
-  /// @f[\begin{aligned} \theta IN(i,j)=& \frac{\theta}{2}
+  /// @f[\begin{aligned} \theta \cdot IN(i,j)=& \frac{\theta}{2}
   /// \int_{\mathcal{F}} \nabla \varphi_i^{+} \cdot n^{+} \varphi_j^{-}  \, ds
   /// \\ IN^T(i,j)=& \frac{1}{2} \int_{\mathcal{F}} \nabla \varphi_j^{+} \cdot
   /// n^{+} \varphi_i^{-}  \, ds \end{aligned} @f] where @f$\theta@f$ is the
