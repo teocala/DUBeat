@@ -24,9 +24,9 @@
 SetFactory("OpenCASCADE");
 
 // Parameter to modify ( = Cube edge / element edge ratio)
-N = 1;
+N = 32;
 
-Rectangle(1) = {0, 0, 0, 1, 1, 0};
+Rectangle(1) = {-0.025, -0.025, 0, 0.06, 0.06, 0};
 //+
 Transfinite Curve {4, 1, 2, 3} = N+1 Using Progression 1;
 //+

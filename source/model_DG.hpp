@@ -152,34 +152,33 @@ protected:
                  const std::shared_ptr<dealii::Function<lifex::dim>> &grad_u_ex,
                  const char *solution_name = (char *)"u") const;
 
-  /// Output of results. Note that, due to limitations regarding simplex
-  /// elements of order greater or equal than 3 in the deal.II DoF Handler (see
-  /// dof_handler_DG.hpp description for more information), if the polynomial
-  /// order chosen to solve the model is @f$>2@f$, the FE space considered for
-  /// the output will be of order at most 2. This leads to an output vector and
-  /// its corrispondent visualization to be less detailfull.
+  /// Output of results. Note that, since it exploits dubiner_to_fem from DUB_FEM_handler.hpp,
+  /// if the polynomial order chosen to solve the model is @f$>2@f$, the FE space considered for
+  /// the output will be of order at most 2. This leads to an output vector which
+  /// correspondent visualization might be less refined. See DUB_FEM_handler.hpp for more details.
   virtual
   void
   output_results() const;
 
   /// To convert a discretized solution in FEM basis (does nothing if problem is
-  /// in DGFEM). In-place version.
-  void
+  /// in DGFEM), in-place version. It exploits dubiner_to_fem from DUB_FEM_handler.hpp so
+  /// the same considerations as in output_results hold.
+  virtual void
   conversion_to_fem(lifex::LinAlg::MPI::Vector &sol_owned);
 
   /// To convert a discretized solution in FEM basis (does nothing if problem is
-  /// in DGFEM). Const version.
-  lifex::LinAlg::MPI::Vector
+  /// in DGFEM), const version.
+  virtual lifex::LinAlg::MPI::Vector
   conversion_to_fem(const lifex::LinAlg::MPI::Vector &sol_owned) const;
 
   /// To convert a discretized solution in Dubiner basis (only for problems
   /// using Dubiner basis). In-place version.
-  void
+  virtual void
   conversion_to_dub(lifex::LinAlg::MPI::Vector &sol_owned);
 
   /// To convert a discretized solution in Dubiner basis (only for problems
   /// using Dubiner basis). Const version.
-  lifex::LinAlg::MPI::Vector
+  virtual lifex::LinAlg::MPI::Vector
   conversion_to_dub(const lifex::LinAlg::MPI::Vector &sol_owned) const;
 
   /// Conversion of an analytical solution from FEM to basis coefficients.
@@ -594,7 +593,7 @@ void
 ModelDG<DUBValues<lifex::dim>>::conversion_to_fem(
   lifex::LinAlg::MPI::Vector &sol_owned)
 {
-  sol_owned = dub_fem_values->dubiner_to_fem(sol_owned, 16, prm_subsection_path, mpi_comm, 1);
+  sol_owned = dub_fem_values->dubiner_to_fem(sol_owned);
 }
 
 /// Conversion to FEM coefficients, const version.
@@ -612,8 +611,7 @@ lifex::LinAlg::MPI::Vector
 ModelDG<DUBValues<lifex::dim>>::conversion_to_fem(
   const lifex::LinAlg::MPI::Vector &sol_owned) const
 {
-  lifex::LinAlg::MPI::Vector sol_fem =
-    dub_fem_values->dubiner_to_fem(sol_owned);
+  lifex::LinAlg::MPI::Vector sol_fem = dub_fem_values->dubiner_to_fem(sol_owned);
   return sol_fem;
 }
 

@@ -48,6 +48,10 @@
 #include "source/numerics/preconditioner_handler.hpp"
 #include "source/numerics/tools.hpp"
 
+//##################################
+constexpr unsigned int fem_nref = 32;
+//##################################
+
 namespace DUBeat::models
 {
   namespace monodomain_DG
@@ -130,8 +134,8 @@ namespace DUBeat::models
             const unsigned int /*component*/ = 0) const override
       {
         if (lifex::dim == 2)
-          return 125 * std::pow(10,3) * (this->get_time()>=0.001) * (this->get_time()<0.002) * (p[0]>0.004)
-          * (p[0]<0.006) * (p[1]>0.004) * (p[1]<0.006);
+          return 125 * std::pow(10,3) * (this->get_time()>=0.001) * (this->get_time()<0.002) * (p[0]>=0.0)
+          * (p[0]<=0.01) * (p[1]>=0.0) * (p[1]<=0.01);
         else
           return std::sin(2 * M_PI * p[0] + M_PI / 4) *
                  std::sin(2 * M_PI * p[1] + M_PI / 4) *
@@ -471,6 +475,12 @@ namespace DUBeat::models
     /// BDF extrapolated solution, with ghost entries.
     lifex::LinAlg::MPI::Vector solution_ext_w;
 
+    virtual void conversion_to_fem(lifex::LinAlg::MPI::Vector &sol_owned) override;
+
+    /// To convert a discretized solution in FEM basis (does nothing if problem is
+    /// in DGFEM). Const version.
+    virtual lifex::LinAlg::MPI::Vector conversion_to_fem(const lifex::LinAlg::MPI::Vector &sol_owned) const override;
+
     void
     output_results() const override;
 
@@ -500,7 +510,7 @@ namespace DUBeat::models
     std::shared_ptr<lifex::utils::MeshHandler> triangulation_fem(
         std::make_shared<lifex::utils::MeshHandler>(this->prm_subsection_path, this->mpi_comm));
       std::string mesh_path = "../meshes/" + std::to_string(lifex::dim) + "D_" +
-                              std::to_string(16) + ".msh";
+                              std::to_string(fem_nref) + ".msh";
       AssertThrow(std::filesystem::exists(mesh_path),
                   dealii::StandardExceptions::ExcMessage(
                     "This mesh file/directory does not exist."));
@@ -555,7 +565,7 @@ namespace DUBeat::models
         this->solution_owned = this->solution_ext;
         this->solve_system();
 
-        if(this->timestep_number%100==0)
+        if(this->timestep_number%10==0)
         {
           this->solution = this->solution_owned;
           this->conversion_to_fem(this->solution);
@@ -754,6 +764,30 @@ namespace DUBeat::models
     this->matrix.compress(lifex::VectorOperation::add);
     this->rhs.compress(lifex::VectorOperation::add);
   }
+
+
+
+/// Conversion of a discretized solution from Dubiner coefficients to FEM
+/// coefficients.
+template <class basis>
+void
+MonodomainDG<basis>::conversion_to_fem(
+  lifex::LinAlg::MPI::Vector &sol_owned)
+{
+  sol_owned = this->dub_fem_values->dubiner_to_fem(sol_owned, 32, this->prm_subsection_path, this->mpi_comm, 1);
+}
+
+  template <class basis>
+lifex::LinAlg::MPI::Vector
+MonodomainDG<basis>::conversion_to_fem(
+  const lifex::LinAlg::MPI::Vector &sol_owned) const
+{
+  lifex::LinAlg::MPI::Vector sol_fem = this->dub_fem_values->dubiner_to_fem(sol_owned, fem_nref, this->prm_subsection_path, this->mpi_comm, 1);
+  return sol_fem;
+}
+
+
+
 } // namespace DUBeat::models
 
 #endif /* MONODOMAIN_DG_HPP_*/
