@@ -20,6 +20,8 @@
 // Author: Matteo Calafà <matteo.calafa@mail.polimi.it>.
 
 // This .geo file can be used to generate on gmsh a simple cube mesh with a specific refinement level.
+// The meshes contained in the folder are created using N as powers of 2.
+// For instance, 3D_4 is generated from this file using N=2^(4-1)=8.
 
 // Parameter to modify ( = Cube edge / element edge ratio)
 N = 1;

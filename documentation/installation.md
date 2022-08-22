@@ -10,7 +10,8 @@ The library provides the following two methods:
 1. Standard DGFEM.
 2. DG with Dubiner basis.
 
-They both work in either 2 or 3 dimensions depending on the lifex configuration (i.e., specifying `lifex::dim`).
+They both work in either 2 or 3 dimensions depending on the lifex configuration (i.e., specifying `lifex::dim`).  
+The Dubiner method can be used with every order while the DGFEM basis degree can be at most 2 due to the current [deal.II][] restrictions.
 
 
 ### Dependencies
@@ -36,9 +37,9 @@ In addition to the core libraries, other packages need to be installed for suppl
 
 
 ### Download and install
-1. To download the library, move to the directory where you desire to install `DUBeat` and use the following bash command.
+1. To download the library, move to the directory where you desire to install `DUBeat 1.0.0` and use the following bash command.
   ```bash
-  git clone git@github.com:teocala/DUBeat.git
+  git clone git@github.com:teocala/DUBeat.git --branch v1.0.0
   ```
   Notice that the previous operation requires the SSH key authentication, see the Github [dedicated page][] for more information.
 

@@ -27,5 +27,5 @@
 #PBS -l nodes=1:ppn=1,walltime=120:00:00 -q gigatlong
 
 OUTPUT="/output_dir/"
-cd /dir/electrophysiology_dubiner_dg
+cd /path_to_DUBeat/build
 ./main_dubiner_dg -f main_dubiner_dg.prm -o $OUTPUT >& $OUTPUT/output.txt 2>&1
