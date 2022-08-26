@@ -59,7 +59,7 @@
  * @f[ \|u-u_h\|_{H^1(\Omega)}^2 := \|u-u_h\|_{L^2(\Omega)}^2 + \|\nabla
  * u-\nabla u_h\|_{L^2(\Omega)}^2  @f]
  * @f[ \|u-u_h\|_{DG(\Omega)}^2 := \|\nabla u-\nabla u_h\|_{L^2(\Omega)}^2
- * +\gamma \|[[ u-\nabla u_h]]\|_{L^2(\mathcal{F})}^2  @f] where @f$\gamma @f$
+ * +\gamma \|[[ u- u_h]]\|_{L^2(\mathcal{F})}^2  @f] where @f$\gamma @f$
  * is the stability coefficient and the @f$L^2(\mathcal{F}) @f$ norm is computed
  * on the faces instead of the volume.
  * Furthermore, the class can create and update a datafile containing the errors

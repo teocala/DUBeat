@@ -424,19 +424,19 @@ namespace DUBeat::models
    * assuming that the exact solution is:
    *
    * @f[
-   * \begin{alignat*}{5}
-   * d=2: \: &V_{m_\mathrm{ex}}(x,y) &&= \sin(2\pi x)\sin(2\pi y)e^{-5t},
-   * \hspace{6mm} &&(x,y) &&\in \Omega=(1,1)^2&&, t \in [0,T], \\
-   *  &w_{\mathrm{ex}}(x,y) &&= \frac{\epsilon}{\epsilon\cdot\gamma -5}\sin(2\pi
-   * x)\sin(2\pi y)e^{-5t}, \hspace{6mm} &&(x,y) &&\in \Omega=(1,1)^2&&, t \in
+   * \begin{aligned}
+   * d=2: \: &V_{m_\mathrm{ex}}(x,y) &= \sin(2\pi x)\sin(2\pi y)e^{-5t},
+   * \hspace{6mm} &(x,y) &\in \Omega=(1,1)^2&, t \in [0,T], \\
+   *  &w_{\mathrm{ex}}(x,y) &= \frac{\epsilon}{\epsilon\cdot\gamma -5}\sin(2\pi
+   * x)\sin(2\pi y)e^{-5t}, \hspace{6mm} &(x,y) &\in \Omega=(1,1)^2&, t \in
    * [0,T], \\
-   * d=3: \: &V_{m_\mathrm{ex}}(x,y,z) &&= \sin\left(2\pi x +
+   * d=3: \: &V_{m_\mathrm{ex}}(x,y,z) &= \sin\left(2\pi x +
    * \frac{\pi}{4}\right)\sin\left(2\pi y + \frac{\pi}{4}\right)\sin\left(2\pi z
-   * + \frac{\pi}{4}\right) e^{-5t}, \hspace{6mm} &&(x,y,z) &&\in
-   * \Omega=(1,1)^3&&, t \in [0,T], \\ &w_{\mathrm{ex}}(x,y,z) &&=
+   * + \frac{\pi}{4}\right) e^{-5t}, \hspace{6mm} &(x,y,z) &\in
+   * \Omega=(1,1)^3&, t \in [0,T], \\ &w_{\mathrm{ex}}(x,y,z) &=
    * \frac{\epsilon}{\epsilon\cdot\gamma -5} \sin(2\pi x)\sin(2\pi y)\sin(2\pi
-   * z) e^{-5t}, \hspace{6mm} &&(x,y,z) &&\in \Omega=(1,1)^3&&, t \in [0,T].
-   * \end{alignat*}
+   * z) e^{-5t}, \hspace{6mm} &(x,y,z) &\in \Omega=(1,1)^3&, t \in [0,T].
+   * \end{aligned}
    * @f]
    * Finally, @f$d@f$ is specified in the lifex configuration and @f$T@f$ as
    * well as the monodomain scalar parameters in the .prm parameter file.

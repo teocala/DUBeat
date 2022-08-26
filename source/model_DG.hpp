@@ -152,17 +152,17 @@ protected:
                  const std::shared_ptr<dealii::Function<lifex::dim>> &grad_u_ex,
                  const char *solution_name = (char *)"u") const;
 
-  /// Output of results. Note that, since it exploits dubiner_to_fem from DUB_FEM_handler.hpp,
-  /// if the polynomial order chosen to solve the model is @f$>2@f$, the FE space considered for
-  /// the output will be of order at most 2. This leads to an output vector which
-  /// correspondent visualization might be less refined. See DUB_FEM_handler.hpp for more details.
-  virtual
-  void
+  /// Output of results. Note that, since it exploits dubiner_to_fem from
+  /// DUB_FEM_handler.hpp, if the polynomial order chosen to solve the model is
+  /// @f$>2@f$, the FE space considered for the output will be of order at
+  /// most 2. This leads to an output vector which correspondent visualization
+  /// might be less refined. See DUB_FEM_handler.hpp for more details.
+  virtual void
   output_results() const;
 
   /// To convert a discretized solution in FEM basis (does nothing if problem is
-  /// in DGFEM), in-place version. It exploits dubiner_to_fem from DUB_FEM_handler.hpp so
-  /// the same considerations as in output_results hold.
+  /// in DGFEM), in-place version. It exploits dubiner_to_fem from
+  /// DUB_FEM_handler.hpp so the same considerations as in output_results hold.
   virtual void
   conversion_to_fem(lifex::LinAlg::MPI::Vector &sol_owned);
 
@@ -611,7 +611,8 @@ lifex::LinAlg::MPI::Vector
 ModelDG<DUBValues<lifex::dim>>::conversion_to_fem(
   const lifex::LinAlg::MPI::Vector &sol_owned) const
 {
-  lifex::LinAlg::MPI::Vector sol_fem = dub_fem_values->dubiner_to_fem(sol_owned);
+  lifex::LinAlg::MPI::Vector sol_fem =
+    dub_fem_values->dubiner_to_fem(sol_owned);
   return sol_fem;
 }
 

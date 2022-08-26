@@ -243,13 +243,13 @@ namespace DUBeat::models
    * Boundary conditions, initial condition and source terms are provided
    * assuming that the exact solution is:
    * @f[
-   * \begin{alignat*}{5}
-   * &d=2: \, u_\mathrm{ex}(x,y) &&= \sin(2\pi x)\sin(2\pi y)e^{-5t},
-   * \hspace{6mm} &&(x,y)  &&\in \Omega=(1,1)^2&&, t \in [0,T], \\ &d=3: \,
-   * u_\mathrm{ex}(x,y,z) &&= \sin\left(2\pi x +
+   * \begin{aligned}
+   * &d=2: \, u_\mathrm{ex}(x,y) &= \sin(2\pi x)\sin(2\pi y)e^{-5t},
+   * \hspace{6mm} &(x,y)  &\in \Omega=(1,1)^2&, t \in [0,T], \\ &d=3: \,
+   * u_\mathrm{ex}(x,y,z) &= \sin\left(2\pi x +
    * \frac{\pi}{4}\right)\sin\left(2\pi y + \frac{\pi}{4}\right)\sin\left(2\pi z
-   * + \frac{\pi}{4}\right) e^{-5t}, \hspace{6mm} &&(x,y,z) &&\in
-   * \Omega=(1,1)^3&&, t \in [0,T]. \end{alignat*}
+   * + \frac{\pi}{4}\right) e^{-5t}, \hspace{6mm} &(x,y,z) &\in
+   * \Omega=(1,1)^3&, t \in [0,T]. \end{aligned}
    * @f]
    * Finally, @f$d@f$ is specified in the lifex configuration and @f$T@f$ in the
    * .prm parameter file.

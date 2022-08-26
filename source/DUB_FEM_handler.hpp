@@ -93,8 +93,9 @@ public:
   dubiner_to_fem(const lifex::LinAlg::MPI::Vector &dub_solution) const;
 
   /// Same as dubiner_to_fem but allows to choose the grid refinement and
-  /// polynomial order for the FE evaluations. This generalization overcomes the issue of a contour visualization that might be less refined
-  /// than the numerical solution itself. 
+  /// polynomial order for the FE evaluations. This generalization overcomes the
+  /// issue of a contour visualization that might be less refined than the
+  /// numerical solution itself.
   lifex::LinAlg::MPI::Vector
   dubiner_to_fem(const lifex::LinAlg::MPI::Vector &dub_solution,
                  const unsigned int                n_ref_grid,

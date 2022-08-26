@@ -204,8 +204,8 @@ public:
   /// Assembly of the component of the local matrix I that is evaluated on the
   /// boundary edges. The method returns the two matrices:
   /// @f[\begin{aligned}
-  /// \theta \cdot IB(i,j)=& \: - \theta \int_{\mathcal{F}} \nabla \varphi_i^{+} \cdot
-  /// n^{+} \varphi_j^{+} \, ds \\ IB^T(i,j)=& - \int_{\mathcal{F}} \nabla
+  /// \theta \cdot IB(i,j)=& \: - \theta \int_{\mathcal{F}} \nabla \varphi_i^{+}
+  /// \cdot n^{+} \varphi_j^{+} \, ds \\ IB^T(i,j)=& - \int_{\mathcal{F}} \nabla
   /// \varphi_j^{+} \cdot n^{+} \varphi_i^{+} \, ds \end{aligned} @f] where
   /// @f$\theta@f$ is the penalty coefficient.
   std::pair<dealii::FullMatrix<double>, dealii::FullMatrix<double>>
