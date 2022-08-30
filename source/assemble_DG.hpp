@@ -143,6 +143,11 @@ public:
   dealii::FullMatrix<double>
   local_V() const;
 
+  /// Assembly of stiffness matrix with diffusion parameter: @f[V(i,j)=\int_{\mathcal{K}} \nabla
+  /// \varphi_j \cdot \Sigma \nabla \varphi_i \,dx @f], where @f$\Sigma@f$ is the diffusion tensor.
+  dealii::FullMatrix<double>
+  local_V(const dealii::Tensor<2, lifex::dim>& Sigma) const;
+
   /// Assembly of local mass matrix: @f[M(i,j)=\int_{\mathcal{K}} \varphi_j
   /// \varphi_i
   /// \, dx @f]
@@ -183,11 +188,26 @@ public:
   local_SC(const double stability_coefficient) const;
 
   /// Assembly of the component of the local matrix S that is evaluated on the
+  /// same side of the edge with diffusion parameter: @f[SC(i,j)=\int_{\mathcal{F}} \Gamma \varphi_j^{+}
+  /// \varphi_i^{+} \, ds @f] where @f$ \Gamma = (n_F^T \Sigma n_F)\gamma @f$, @f$\gamma@f$ is the regularity
+  /// coefficient and @f$\Sigma@f$ is the diffusion tensor.
+  dealii::FullMatrix<double>
+  local_SC(const double stability_coefficient, const dealii::Tensor<2, lifex::dim>& Sigma) const;
+
+  /// Assembly of the component of the local matrix S that is evaluated on the
   /// two sides of the edge:
   /// @f[ SN(i,j)=- \int_{\mathcal{F}} \gamma \varphi_j^{+} \varphi_i^{-} \, ds
   /// @f]
   dealii::FullMatrix<double>
   local_SN(const double stability_coefficient) const;
+
+  /// Assembly of the component of the local matrix S that is evaluated on the
+  /// two sides of the edge with diffusion parameter:
+  /// @f[ SN(i,j)=- \int_{\mathcal{F}} \Gamma \varphi_j^{+} \varphi_i^{-} \, ds
+  /// @f] where @f$ \Gamma = (n_F^T \Sigma n_F)\gamma @f$, @f$\gamma@f$ is the regularity
+  /// coefficient and @f$\Sigma@f$ is the diffusion tensor.
+  dealii::FullMatrix<double>
+  local_SN(const double stability_coefficient, const dealii::Tensor<2, lifex::dim>& Sigma) const;
 
   /// Assembly of the component of the local matrix I that is evaluated on the
   /// same side of the edge. The method returns the two matrices:
@@ -202,6 +222,18 @@ public:
   local_IC(const double theta) const;
 
   /// Assembly of the component of the local matrix I that is evaluated on the
+  /// same side of the edge with diffusion parameter. The method returns the two matrices:
+  ///@f[
+  /// \begin{aligned}
+  /// \theta \cdot IC(i,j)= & - \frac{\theta}{2}
+  /// \int_{\mathcal{F}} \Sigma \nabla \varphi_i^{+} \cdot  n^{+} \varphi_j^{+}  \, ds
+  /// \\ IC^T(i,j)= & - \frac{1}{2} \int_{\mathcal{F}} \Sigma \nabla \varphi_j^{+}
+  /// \cdot  n^{+} \varphi_i^{+}  \, ds \end{aligned} @f] where @f$\theta@f$ is
+  /// the penalty coefficient and @f$\Sigma@f$ is the diffusion tensor.
+  std::pair<dealii::FullMatrix<double>, dealii::FullMatrix<double>>
+  local_IC(const double theta, const dealii::Tensor<2, lifex::dim>& Sigma) const;
+
+  /// Assembly of the component of the local matrix I that is evaluated on the
   /// boundary edges. The method returns the two matrices:
   /// @f[\begin{aligned}
   /// \theta \cdot IB(i,j)=& \: - \theta \int_{\mathcal{F}} \nabla \varphi_i^{+}
@@ -212,6 +244,16 @@ public:
   local_IB(const double theta) const;
 
   /// Assembly of the component of the local matrix I that is evaluated on the
+  /// boundary edges with diffusion parameter. The method returns the two matrices:
+  /// @f[\begin{aligned}
+  /// \theta \cdot IB(i,j)=& \: - \theta \int_{\mathcal{F}} \Sigma \nabla \varphi_i^{+}
+  /// \cdot n^{+} \varphi_j^{+} \, ds \\ IB^T(i,j)=& - \int_{\mathcal{F}} \Sigma \nabla
+  /// \varphi_j^{+} \cdot n^{+} \varphi_i^{+} \, ds \end{aligned} @f] where
+  /// @f$\theta@f$ is the penalty coefficient and @f$\Sigma@f$ is the diffusion tensor.
+  std::pair<dealii::FullMatrix<double>, dealii::FullMatrix<double>>
+  local_IB(const double theta, const dealii::Tensor<2, lifex::dim>& Sigma) const;
+
+  /// Assembly of the component of the local matrix I that is evaluated on the
   /// two sides of the edge. The method returns the two matrices:
   /// @f[\begin{aligned} \theta \cdot IN(i,j)=& \frac{\theta}{2}
   /// \int_{\mathcal{F}} \nabla \varphi_i^{+} \cdot n^{+} \varphi_j^{-}  \, ds
@@ -220,6 +262,16 @@ public:
   /// penalty coefficient.
   std::pair<dealii::FullMatrix<double>, dealii::FullMatrix<double>>
   local_IN(const double theta) const;
+
+  /// Assembly of the component of the local matrix I that is evaluated on the
+  /// two sides of the edge with diffusion parameter. The method returns the two matrices:
+  /// @f[\begin{aligned} \theta \cdot IN(i,j)=& \frac{\theta}{2}
+  /// \int_{\mathcal{F}} \Sigma \nabla \varphi_i^{+} \cdot n^{+} \varphi_j^{-}  \, ds
+  /// \\ IN^T(i,j)=& \frac{1}{2} \int_{\mathcal{F}} \Sigma \nabla \varphi_j^{+} \cdot
+  /// n^{+} \varphi_i^{-}  \, ds \end{aligned} @f] where @f$\theta@f$ is the
+  /// penalty coefficient and @f$\Sigma@f$ is the diffusion tensor.
+  std::pair<dealii::FullMatrix<double>, dealii::FullMatrix<double>>
+  local_IN(const double theta, const dealii::Tensor<2, lifex::dim>& Sigma) const;
 
   /// Assembly of the right hand side term associated to the previous time-step
   /// solution in time-dependent problems:
@@ -324,6 +376,37 @@ AssembleDG<basis>::local_V() const
                  BJinv) *
                 (basis_ptr->shape_grad(j, vol_handler.quadrature_ref(q)) *
                  BJinv) *
+                vol_handler.quadrature_weight(q) * det;
+            }
+        }
+    }
+
+  return V;
+}
+
+
+template <class basis>
+dealii::FullMatrix<double>
+AssembleDG<basis>::local_V(const dealii::Tensor<2, lifex::dim>& Sigma) const
+{
+  dealii::FullMatrix<double>          V(dofs_per_cell, dofs_per_cell);
+  const dealii::Tensor<2, lifex::dim> BJinv =
+    vol_handler.get_jacobian_inverse();
+  const double det = 1 / determinant(BJinv);
+
+  const dealii::Tensor<2, lifex::dim> Sigma_tr = transpose(Sigma);
+
+  for (unsigned int q = 0; q < n_quad_points; ++q)
+    {
+      for (unsigned int i = 0; i < dofs_per_cell; ++i)
+        {
+          for (unsigned int j = 0; j < dofs_per_cell; ++j)
+            {
+              V(i, j) +=
+                (basis_ptr->shape_grad(i, vol_handler.quadrature_ref(q)) *
+                 BJinv) *
+                (basis_ptr->shape_grad(j, vol_handler.quadrature_ref(q)) *
+                 BJinv * Sigma_tr) *
                 vol_handler.quadrature_weight(q) * det;
             }
         }
@@ -500,6 +583,41 @@ AssembleDG<basis>::local_SC(const double stability_coefficient) const
 
 template <class basis>
 dealii::FullMatrix<double>
+AssembleDG<basis>::local_SC(const double stability_coefficient, const dealii::Tensor<2, lifex::dim>& Sigma) const
+{
+  const double face_measure      = face_handler.get_measure();
+  const double unit_face_measure = (4.0 - lifex::dim) / 2;
+  const double measure_ratio     = face_measure / unit_face_measure;
+  const double h_local           = (cell->measure()) / face_measure;
+
+  const double local_pen_coeff =
+    (stability_coefficient * pow(poly_degree, 2)) / h_local;
+
+  const double penalty_sigma = std::abs(face_handler.get_normal() * Sigma * face_handler.get_normal());
+
+  dealii::FullMatrix<double> SC(dofs_per_cell, dofs_per_cell);
+
+  for (unsigned int q = 0; q < n_quad_points_face; ++q)
+    {
+      for (unsigned int i = 0; i < dofs_per_cell; ++i)
+        {
+          for (unsigned int j = 0; j < dofs_per_cell; ++j)
+            {
+              SC(i, j) +=
+                local_pen_coeff * penalty_sigma *
+                basis_ptr->shape_value(i, face_handler.quadrature_ref(q)) *
+                basis_ptr->shape_value(j, face_handler.quadrature_ref(q)) *
+                face_handler.quadrature_weight(q) * measure_ratio;
+            }
+        }
+    }
+
+  return SC;
+}
+
+
+template <class basis>
+dealii::FullMatrix<double>
 AssembleDG<basis>::local_SN(const double stability_coefficient) const
 {
   const double face_measure      = face_handler.get_measure();
@@ -523,6 +641,44 @@ AssembleDG<basis>::local_SN(const double stability_coefficient) const
 
               SN(i, j) -=
                 local_pen_coeff *
+                basis_ptr->shape_value(i, face_handler.quadrature_ref(q)) *
+                basis_ptr->shape_value(j,
+                                       face_handler_neigh.quadrature_ref(nq)) *
+                face_handler.quadrature_weight(q) * measure_ratio;
+            }
+        }
+    }
+
+  return SN;
+}
+
+template <class basis>
+dealii::FullMatrix<double>
+AssembleDG<basis>::local_SN(const double stability_coefficient, const dealii::Tensor<2, lifex::dim>& Sigma) const
+{
+  const double face_measure      = face_handler.get_measure();
+  const double unit_face_measure = (4.0 - lifex::dim) / 2;
+  const double measure_ratio     = face_measure / unit_face_measure;
+  const double h_local           = (cell->measure()) / face_measure;
+
+  const double local_pen_coeff =
+    (stability_coefficient * pow(poly_degree, 2)) / h_local;
+
+    const double penalty_sigma = std::abs(face_handler.get_normal() * Sigma * face_handler.get_normal());
+
+  dealii::FullMatrix<double> SN(dofs_per_cell, dofs_per_cell);
+
+  for (unsigned int q = 0; q < n_quad_points_face; ++q)
+    {
+      for (unsigned int i = 0; i < dofs_per_cell; ++i)
+        {
+          for (unsigned int j = 0; j < dofs_per_cell; ++j)
+            {
+              const unsigned int nq =
+                face_handler.corresponding_neigh_index(q, face_handler_neigh);
+
+              SN(i, j) -=
+                local_pen_coeff * penalty_sigma *
                 basis_ptr->shape_value(i, face_handler.quadrature_ref(q)) *
                 basis_ptr->shape_value(j,
                                        face_handler_neigh.quadrature_ref(nq)) *
@@ -563,6 +719,51 @@ AssembleDG<basis>::local_IC(const double theta) const
                 0.5 *
                 ((basis_ptr->shape_grad(i, face_handler.quadrature_ref(q)) *
                   BJinv) *
+                 face_handler.get_normal()) *
+                basis_ptr->shape_value(j, face_handler.quadrature_ref(q)) *
+                face_handler.quadrature_weight(q) * measure_ratio;
+            }
+        }
+    }
+
+  IC *= (-1);
+  IC_t.copy_transposed(IC);
+  IC *= theta;
+
+  return {IC, IC_t};
+}
+
+template <class basis>
+std::pair<dealii::FullMatrix<double>, dealii::FullMatrix<double>>
+AssembleDG<basis>::local_IC(const double theta, const dealii::Tensor<2, lifex::dim>& Sigma) const
+{
+  AssertThrow(theta == 1. || theta == 0. || theta == -1.,
+              dealii::StandardExceptions::ExcMessage(
+                "Penalty coefficient must be 1 (SIP method) or 0 (IIP method) "
+                "or -1 (NIP method)."));
+
+  const dealii::Tensor<2, lifex::dim> BJinv =
+    face_handler.get_jacobian_inverse();
+
+  const double face_measure      = face_handler.get_measure();
+  const double unit_face_measure = (4.0 - lifex::dim) / 2;
+  const double measure_ratio     = face_measure / unit_face_measure;
+
+  const dealii::Tensor<2, lifex::dim> Sigma_tr = transpose(Sigma);
+
+  dealii::FullMatrix<double> IC(dofs_per_cell, dofs_per_cell);
+  dealii::FullMatrix<double> IC_t(dofs_per_cell, dofs_per_cell);
+
+  for (unsigned int q = 0; q < n_quad_points_face; ++q)
+    {
+      for (unsigned int i = 0; i < dofs_per_cell; ++i)
+        {
+          for (unsigned int j = 0; j < dofs_per_cell; ++j)
+            {
+              IC(i, j) +=
+                0.5 *
+                ((basis_ptr->shape_grad(i, face_handler.quadrature_ref(q)) *
+                  BJinv * Sigma_tr) *
                  face_handler.get_normal()) *
                 basis_ptr->shape_value(j, face_handler.quadrature_ref(q)) *
                 face_handler.quadrature_weight(q) * measure_ratio;
@@ -621,6 +822,50 @@ AssembleDG<basis>::local_IB(const double theta) const
 
 template <class basis>
 std::pair<dealii::FullMatrix<double>, dealii::FullMatrix<double>>
+AssembleDG<basis>::local_IB(const double theta, const dealii::Tensor<2, lifex::dim>& Sigma) const
+{
+  AssertThrow(theta == 1. || theta == 0. || theta == -1.,
+              dealii::StandardExceptions::ExcMessage(
+                "Penalty coefficient must be 1 (SIP method) or 0 (IIP method) "
+                "or -1 (NIP method)."));
+
+  const dealii::Tensor<2, lifex::dim> BJinv =
+    face_handler.get_jacobian_inverse();
+
+  const double face_measure      = face_handler.get_measure();
+  const double unit_face_measure = (4.0 - lifex::dim) / 2;
+  const double measure_ratio     = face_measure / unit_face_measure;
+
+  const dealii::Tensor<2, lifex::dim> Sigma_tr = transpose(Sigma);
+
+  dealii::FullMatrix<double> IB(dofs_per_cell, dofs_per_cell);
+  dealii::FullMatrix<double> IB_t(dofs_per_cell, dofs_per_cell);
+
+  for (unsigned int q = 0; q < n_quad_points_face; ++q)
+    {
+      for (unsigned int i = 0; i < dofs_per_cell; ++i)
+        {
+          for (unsigned int j = 0; j < dofs_per_cell; ++j)
+            {
+              IB(i, j) +=
+                ((basis_ptr->shape_grad(i, face_handler.quadrature_ref(q)) *
+                  BJinv * Sigma_tr) *
+                 face_handler.get_normal()) *
+                basis_ptr->shape_value(j, face_handler.quadrature_ref(q)) *
+                face_handler.quadrature_weight(q) * measure_ratio;
+            }
+        }
+    }
+
+  IB *= (-1);
+  IB_t.copy_transposed(IB);
+  IB *= theta;
+
+  return {IB, IB_t};
+}
+
+template <class basis>
+std::pair<dealii::FullMatrix<double>, dealii::FullMatrix<double>>
 AssembleDG<basis>::local_IN(const double theta) const
 {
   AssertThrow(theta == 1. || theta == 0. || theta == -1.,
@@ -651,6 +896,54 @@ AssembleDG<basis>::local_IN(const double theta) const
                 0.5 *
                 ((basis_ptr->shape_grad(i, face_handler.quadrature_ref(q)) *
                   BJinv) *
+                 face_handler.get_normal()) *
+                basis_ptr->shape_value(j,
+                                       face_handler_neigh.quadrature_ref(nq)) *
+                face_handler.quadrature_weight(q) * measure_ratio;
+            }
+        }
+    }
+
+  IN_t.copy_transposed(IN);
+  IN *= theta;
+
+  return {IN, IN_t};
+}
+
+template <class basis>
+std::pair<dealii::FullMatrix<double>, dealii::FullMatrix<double>>
+AssembleDG<basis>::local_IN(const double theta, const dealii::Tensor<2, lifex::dim>& Sigma) const
+{
+  AssertThrow(theta == 1. || theta == 0. || theta == -1.,
+              dealii::StandardExceptions::ExcMessage(
+                "Penalty coefficient must be 1 (SIP method) or 0 (IIP method) "
+                "or -1 (NIP method)."));
+
+  const dealii::Tensor<2, lifex::dim> BJinv =
+    face_handler.get_jacobian_inverse();
+
+  const double face_measure      = face_handler.get_measure();
+  const double unit_face_measure = (4.0 - lifex::dim) / 2;
+  const double measure_ratio     = face_measure / unit_face_measure;
+
+    const dealii::Tensor<2, lifex::dim> Sigma_tr = transpose(Sigma);
+
+  dealii::FullMatrix<double> IN(dofs_per_cell, dofs_per_cell);
+  dealii::FullMatrix<double> IN_t(dofs_per_cell, dofs_per_cell);
+
+  for (unsigned int q = 0; q < n_quad_points_face; ++q)
+    {
+      for (unsigned int i = 0; i < dofs_per_cell; ++i)
+        {
+          for (unsigned int j = 0; j < dofs_per_cell; ++j)
+            {
+              const unsigned int nq =
+                face_handler.corresponding_neigh_index(q, face_handler_neigh);
+
+              IN(i, j) +=
+                0.5 *
+                ((basis_ptr->shape_grad(i, face_handler.quadrature_ref(q)) *
+                  BJinv * Sigma_tr) *
                  face_handler.get_normal()) *
                 basis_ptr->shape_value(j,
                                        face_handler_neigh.quadrature_ref(nq)) *

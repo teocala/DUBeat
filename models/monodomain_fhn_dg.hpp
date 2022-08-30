@@ -449,26 +449,7 @@ namespace DUBeat::models
     /// Constructor.
     MonodomainFHNDG<basis>()
       : ModelDG_t<basis>("Monodomain Fitzhugh-Nagumo")
-      , ChiM(1e5)
-      , Sigma(0.12)
-      , Cm(1e-2)
-      , kappa(19.5)
-      , epsilon(1.2)
-      , gamma(0.1)
-      , a(13e-3)
-    {
-      this->u_ex = std::make_shared<monodomain_fhn_DG::ExactSolution>();
-      this->grad_u_ex =
-        std::make_shared<monodomain_fhn_DG::GradExactSolution>();
-      this->f_ex = std::make_shared<monodomain_fhn_DG::RightHandSide>(
-        ChiM, Sigma, Cm, kappa, epsilon, gamma, a);
-      this->g_n = std::make_shared<monodomain_fhn_DG::BCNeumann>(Sigma);
-      w_ex =
-        std::make_shared<monodomain_fhn_DG::ExactSolution_w>(epsilon, gamma);
-      grad_w_ex =
-        std::make_shared<monodomain_fhn_DG::GradExactSolution_w>(epsilon,
-                                                                 gamma);
-    }
+    {}
 
   private:
     /// Monodomain equation parameter.
@@ -504,6 +485,14 @@ namespace DUBeat::models
     /// BDF extrapolated solution, with ghost entries.
     lifex::LinAlg::MPI::Vector solution_ext_w;
 
+    /// Override for declaration of additional parameters.
+    virtual void
+    declare_parameters(lifex::ParamHandler &params) const override;
+
+    /// Override to parse additional parameters.
+    virtual void
+    parse_parameters(lifex::ParamHandler &params) override;
+
     /// Override for the simulation run.
     void
     run() override;
@@ -520,6 +509,127 @@ namespace DUBeat::models
     void
     assemble_system() override;
   };
+
+  template <class basis>
+  void
+  MonodomainFHNDG<basis>::declare_parameters(lifex::ParamHandler &params) const
+  {
+    // Default parameters.
+    this->linear_solver.declare_parameters(params);
+    this->preconditioner.declare_parameters(params);
+
+    // Extra parameters.
+    params.enter_subsection("Mesh and space discretization");
+    {
+      params.declare_entry(
+        "Number of refinements",
+        "2",
+        dealii::Patterns::Integer(0),
+        "Number of global mesh refinement steps applied to initial grid.");
+      params.declare_entry("FE space degree",
+                           "1",
+                           dealii::Patterns::Integer(1),
+                           "Degree of the FE space.");
+    }
+    params.leave_subsection();
+
+    params.enter_subsection("Discontinuous Galerkin");
+    {
+      params.declare_entry(
+        "Penalty coefficient",
+        "1",
+        dealii::Patterns::Double(-1, 1),
+        "Penalty coefficient in the Discontinuous Galerkin formulation.");
+      params.declare_entry(
+        "Stability coefficient",
+        "10",
+        dealii::Patterns::Double(0),
+        "Stabilization term in the Discontinuous Galerkin formulation.");
+    }
+    params.leave_subsection();
+
+    params.enter_subsection("Time solver");
+    {
+      params.declare_entry("Initial time",
+                           "0",
+                           dealii::Patterns::Double(0),
+                           "Initial time.");
+      params.declare_entry("Final time",
+                           "0.001",
+                           dealii::Patterns::Double(0),
+                           "Final time.");
+      params.declare_entry("Time step",
+                           "0.0001",
+                           dealii::Patterns::Double(0),
+                           "Time step.");
+      params.declare_entry("BDF order",
+                           "1",
+                           dealii::Patterns::Integer(1, 3),
+                           "BDF order: 1, 2, 3.");
+    }
+    params.leave_subsection();
+
+    params.enter_subsection("Parameters of the model");
+    {
+      params.declare_entry("ChiM", "1e5", dealii::Patterns::Double(0), "Surface-to-volume ratio of cells parameter.");
+      params.declare_entry("Cm", "1e-2", dealii::Patterns::Double(0), "Membrane capacity.");
+      params.declare_entry("Sigma", "0.12", dealii::Patterns::Double(0), "Diffusion parameter in the principal directions.");
+      params.declare_entry("kappa", "19.5", dealii::Patterns::Double(0), "Factor for the nonlinear reaction in Fitzhugh Nagumo model.");
+      params.declare_entry("epsilon", "1.2", dealii::Patterns::Double(0), "Parameter for Fitzhugh Nagumo model.");
+      params.declare_entry("gamma", "0.1", dealii::Patterns::Double(0), "Parameter for Fitzhugh Nagumo model.");
+      params.declare_entry("a", "13e-3", dealii::Patterns::Double(0), "Parameter for Fitzhugh Nagumo model.");
+    }
+    params.leave_subsection();
+  }
+
+  template <class basis>
+  void
+  MonodomainFHNDG<basis>::parse_parameters(lifex::ParamHandler &params)
+  {
+    // Parse input file.
+    params.parse();
+    // Read input parameters.
+    this->linear_solver.parse_parameters(params);
+    this->preconditioner.parse_parameters(params);
+
+    // Extra parameters.
+    params.enter_subsection("Mesh and space discretization");
+    this->prm_n_refinements = params.get_integer("Number of refinements");
+    this->prm_fe_degree     = params.get_integer("FE space degree");
+    params.leave_subsection();
+
+    params.enter_subsection("Discontinuous Galerkin");
+    this->prm_penalty_coeff = params.get_double("Penalty coefficient");
+    AssertThrow(this->prm_penalty_coeff == 1. || this->prm_penalty_coeff == 0. ||
+                  this->prm_penalty_coeff == -1.,
+                dealii::StandardExceptions::ExcMessage(
+                  "Penalty coefficient must be 1 (SIP method) or 0 (IIP method) "
+                  "or -1 (NIP method)."));
+
+    this->prm_stability_coeff = params.get_double("Stability coefficient");
+    params.leave_subsection();
+
+    params.enter_subsection("Time solver");
+    this->prm_time_init  = params.get_double("Initial time");
+    this->prm_time_final = params.get_double("Final time");
+    AssertThrow(this->prm_time_final > this->prm_time_init,
+                dealii::StandardExceptions::ExcMessage(
+                  "Final time must be greater than initial time."));
+
+    this->prm_time_step = params.get_double("Time step");
+    this->prm_bdf_order = params.get_integer("BDF order");
+    params.leave_subsection();
+
+    params.enter_subsection("Parameters of the model");
+    ChiM = params.get_double("ChiM");
+    Cm = params.get_double("Cm");
+    Sigma = params.get_double("Sigma");
+    kappa = params.get_double("kappa");
+    epsilon = params.get_double("epsilon");
+    gamma = params.get_double("gamma");
+    a = params.get_double("a");
+    params.leave_subsection();
+  }
 
   template <class basis>
   void
@@ -609,6 +719,18 @@ namespace DUBeat::models
   void
   MonodomainFHNDG<basis>::time_initialization()
   {
+    this->u_ex = std::make_shared<monodomain_fhn_DG::ExactSolution>();
+    this->grad_u_ex =
+      std::make_shared<monodomain_fhn_DG::GradExactSolution>();
+    this->f_ex = std::make_shared<monodomain_fhn_DG::RightHandSide>(
+      ChiM, Sigma, Cm, kappa, epsilon, gamma, a);
+    this->g_n = std::make_shared<monodomain_fhn_DG::BCNeumann>(Sigma);
+    w_ex =
+      std::make_shared<monodomain_fhn_DG::ExactSolution_w>(epsilon, gamma);
+    grad_w_ex =
+      std::make_shared<monodomain_fhn_DG::GradExactSolution_w>(epsilon,
+                                                               gamma);
+
     this->u_ex->set_time(this->prm_time_init);
     this->discretize_analytical_solution(this->u_ex, this->solution_ex_owned);
     this->solution_ex = this->solution_ex_owned;
