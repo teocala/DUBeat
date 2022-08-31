@@ -1,0 +1,13 @@
+digraph "FaceHandlerDG&lt; dim &gt;"
+{
+ // LATEX_PDF_SIZE
+  edge [fontname="Helvetica",fontsize="10",labelfontname="Helvetica",labelfontsize="10"];
+  node [fontname="Helvetica",fontsize="10",shape=record];
+  Node1 [label="FaceHandlerDG\< dim \>",height=0.2,width=0.4,color="black", fillcolor="grey75", style="filled", fontcolor="black",tooltip="Class for the main operations on the faces of a discontinuous Galerkin element."];
+  Node2 -> Node1 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node2 [label="VolumeHandlerDG\< dim \>",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$class_volume_handler_d_g.html",tooltip="Class for the main operations on a discontinuous Galerkin volume element."];
+  Node3 -> Node1 [dir="back",color="darkorchid3",fontsize="10",style="dashed",label=" QGLpoints_face" ,fontname="Helvetica"];
+  Node3 [label="QGaussLegendreSimplex\l\< dim - 1 \>",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$class_q_gauss_legendre_simplex.html",tooltip=" "];
+  Node4 -> Node3 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node4 [label="dealii::Quadrature\l\< dim \>",height=0.2,width=0.4,color="grey75", fillcolor="white", style="filled",tooltip=" "];
+}

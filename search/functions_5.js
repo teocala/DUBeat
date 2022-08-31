@@ -1,0 +1,6 @@
+var searchData=
+[
+  ['facehandlerdg_262',['FaceHandlerDG',['../class_face_handler_d_g.html#a3a1402978c2e0759ea51204344141488',1,'FaceHandlerDG::FaceHandlerDG(const unsigned int degree)'],['../class_face_handler_d_g.html#af799adf8710dcb8a1a3c7f28f6ab7d61',1,'FaceHandlerDG::FaceHandlerDG(FaceHandlerDG&lt; dim &gt; &amp;FaceHandlerDG)=default'],['../class_face_handler_d_g.html#a7235131d88c9b8358873eaecdee78ab7',1,'FaceHandlerDG::FaceHandlerDG(const FaceHandlerDG&lt; dim &gt; &amp;FaceHandlerDG)=default'],['../class_face_handler_d_g.html#a7762e883b4b2290ebb504d03b1d38dd0',1,'FaceHandlerDG::FaceHandlerDG(FaceHandlerDG&lt; dim &gt; &amp;&amp;FaceHandlerDG)=default']]],
+  ['fem_5fto_5fdubiner_263',['fem_to_dubiner',['../class_d_u_b_f_e_m_handler.html#a0be712f0ee7fcb92bc8e02a73dbb55ff',1,'DUBFEMHandler']]],
+  ['fun_5fcoeff_5fconversion_264',['fun_coeff_conversion',['../class_d_u_b_values.html#a7ff361c332cb922772893a17160bd8c5',1,'DUBValues::fun_coeff_conversion(const unsigned int n) const'],['../class_d_u_b_values.html#ae6bc1964981ef0c1d73642b61b7189d3',1,'DUBValues::fun_coeff_conversion(const unsigned int n) const'],['../class_d_u_b_values.html#acf085641c689b723638c6fac8a91d37b',1,'DUBValues::fun_coeff_conversion(const unsigned int n) const']]]
+];

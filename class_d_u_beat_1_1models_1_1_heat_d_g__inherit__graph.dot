@@ -1,0 +1,13 @@
+digraph "DUBeat::models::HeatDG&lt; basis &gt;"
+{
+ // LATEX_PDF_SIZE
+  edge [fontname="Helvetica",fontsize="10",labelfontname="Helvetica",labelfontsize="10"];
+  node [fontname="Helvetica",fontsize="10",shape=record];
+  Node1 [label="DUBeat::models::HeatDG\l\< basis \>",height=0.2,width=0.4,color="black", fillcolor="grey75", style="filled", fontcolor="black",tooltip="Class to solve the heat equation using the Discontinuous Galerkin method."];
+  Node2 -> Node1 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node2 [label="ModelDG_t\< basis \>",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$class_model_d_g__t.html",tooltip="Class representing the resolution of time-dependent problems using discontinuous Galerkin methods."];
+  Node3 -> Node2 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node3 [label="ModelDG\< basis \>",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$class_model_d_g.html",tooltip="Class representing the resolution of problems using discontinuous Galerkin methods."];
+  Node4 -> Node3 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node4 [label="lifex::CoreModel",height=0.2,width=0.4,color="grey75", fillcolor="white", style="filled",tooltip=" "];
+}
