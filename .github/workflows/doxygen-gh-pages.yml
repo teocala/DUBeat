@@ -10,7 +10,7 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
-      - uses: teocala/doxygen-github-pages-actions
+      - uses: teocala/doxygen-github-pages-action
         with:
           github_token: ${{ secrets.HUB_TOKEN }}
           branch: gh-pages
