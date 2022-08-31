@@ -62,7 +62,7 @@
  *  - The @f$-@f$ superscript to indicate that a function evaluated on the face
  * is the one associated to the neighbor element.
  *  - @f$n^+, n^-@f$ as the outward/inward normal vector with respect to one
- * element face.
+ * element face (@f$n=n^+@f$ by default).
  */
 template <class basis>
 class AssembleDG
@@ -144,7 +144,7 @@ public:
   local_V() const;
 
   /// Assembly of stiffness matrix with diffusion parameter: @f[V(i,j)=\int_{\mathcal{K}} \nabla
-  /// \varphi_j \cdot \Sigma \nabla \varphi_i \,dx @f], where @f$\Sigma@f$ is the diffusion tensor.
+  /// \varphi_j \cdot \Sigma \nabla \varphi_i \,dx @f] where @f$\Sigma@f$ is the diffusion tensor.
   dealii::FullMatrix<double>
   local_V(const dealii::Tensor<2, lifex::dim>& Sigma) const;
 
@@ -189,7 +189,7 @@ public:
 
   /// Assembly of the component of the local matrix S that is evaluated on the
   /// same side of the edge with diffusion parameter: @f[SC(i,j)=\int_{\mathcal{F}} \Gamma \varphi_j^{+}
-  /// \varphi_i^{+} \, ds @f] where @f$ \Gamma = (n_F^T \Sigma n_F)\gamma @f$, @f$\gamma@f$ is the regularity
+  /// \varphi_i^{+} \, ds @f] where @f$ \Gamma = \gamma(n^T \Sigma n) @f$, @f$\gamma@f$ is the regularity
   /// coefficient and @f$\Sigma@f$ is the diffusion tensor.
   dealii::FullMatrix<double>
   local_SC(const double stability_coefficient, const dealii::Tensor<2, lifex::dim>& Sigma) const;
@@ -204,7 +204,7 @@ public:
   /// Assembly of the component of the local matrix S that is evaluated on the
   /// two sides of the edge with diffusion parameter:
   /// @f[ SN(i,j)=- \int_{\mathcal{F}} \Gamma \varphi_j^{+} \varphi_i^{-} \, ds
-  /// @f] where @f$ \Gamma = (n_F^T \Sigma n_F)\gamma @f$, @f$\gamma@f$ is the regularity
+  /// @f] where @f$ \Gamma = \gamma(n^T \Sigma n) @f$, @f$\gamma@f$ is the regularity
   /// coefficient and @f$\Sigma@f$ is the diffusion tensor.
   dealii::FullMatrix<double>
   local_SN(const double stability_coefficient, const dealii::Tensor<2, lifex::dim>& Sigma) const;
