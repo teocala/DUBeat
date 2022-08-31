@@ -1,0 +1,8 @@
+<map id="ModelDG&lt; basis &gt;" name="ModelDG&lt; basis &gt;">
+<area shape="rect" id="node1" title="Class representing the resolution of problems using discontinuous Galerkin methods." alt="" coords="138,80,285,107"/>
+<area shape="rect" id="node3" href="$class_d_u_beat_1_1models_1_1_laplace_d_g.html" title="Class to solve the Laplace equation using the Discontinuous Galerkin method." alt="" coords="5,155,212,196"/>
+<area shape="rect" id="node4" href="$class_model_d_g__t.html" title="Class representing the resolution of time&#45;dependent problems using discontinuous Galerkin methods." alt="" coords="236,162,395,189"/>
+<area shape="rect" id="node2" title=" " alt="" coords="147,5,276,32"/>
+<area shape="rect" id="node5" href="$class_d_u_beat_1_1models_1_1_heat_d_g.html" title="Class to solve the heat equation using the Discontinuous Galerkin method." alt="" coords="107,244,294,285"/>
+<area shape="rect" id="node6" href="$class_d_u_beat_1_1models_1_1_monodomain_f_h_n_d_g.html" title="Class to solve the monodomain equation with Fitzhugh&#45;Nagumo ionic model for the cardiac electrophysio..." alt="" coords="318,244,539,285"/>
+</map>
