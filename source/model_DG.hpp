@@ -138,6 +138,10 @@ protected:
   void
   create_mesh(std::string mesh_path);
 
+  /// Load the mesh from a user-defined path and specific scaling factor, otherwise the default is 1.
+  void
+  create_mesh(std::string mesh_path, const double scaling_factor);
+
   /// System solving.
   void
   solve_system();
@@ -506,6 +510,22 @@ ModelDG<basis>::create_mesh(std::string mesh_path)
   // they can currently be imported only from file. This version of create_mesh
   // picks the mesh file from a user-defined path.
   triangulation->initialize_from_file(mesh_path, 1);
+  triangulation->set_element_type(lifex::utils::MeshHandler::ElementType::Tet);
+  triangulation->create_mesh();
+}
+
+template <class basis>
+void
+ModelDG<basis>::create_mesh(std::string mesh_path, const double scaling_factor)
+{
+  AssertThrow(std::filesystem::exists(mesh_path),
+              dealii::StandardExceptions::ExcMessage(
+                "This mesh file/directory does not exist."));
+
+  // deal.II does not provide runtime generation of tetrahedral meshes, hence
+  // they can currently be imported only from file. This version of create_mesh
+  // picks the mesh file from a user-defined path.
+  triangulation->initialize_from_file(mesh_path, scaling_factor);
   triangulation->set_element_type(lifex::utils::MeshHandler::ElementType::Tet);
   triangulation->create_mesh();
 }
