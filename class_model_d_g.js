@@ -17,6 +17,7 @@ var class_model_d_g =
     [ "conversion_to_fem", "class_model_d_g.html#a77b1c9de47694f05f8858eab67f6e20d", null ],
     [ "create_mesh", "class_model_d_g.html#a7a4ea8ee52cf28a861b02ae914d816d9", null ],
     [ "create_mesh", "class_model_d_g.html#a0b6e15d4c04a39c2a25ec9af638728df", null ],
+    [ "create_mesh", "class_model_d_g.html#a3aa5e32045651227b8ae0c75ee5558c7", null ],
     [ "declare_parameters", "class_model_d_g.html#a655975a279471391d085e645b3dd0ecf", null ],
     [ "discretize_analytical_solution", "class_model_d_g.html#aec2e82c5f5e5f330ba9e476f0e330344", null ],
     [ "discretize_analytical_solution", "class_model_d_g.html#a6a285a523e9a21cb789cc36e1e99d512", null ],
