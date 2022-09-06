@@ -101,7 +101,8 @@ public:
                  const unsigned int                n_ref_grid,
                  const std::string                &subsection,
                  const MPI_Comm                   &mpi_comm_,
-                 const unsigned int                degree_fem = 1) const;
+                 const unsigned int                degree_fem = 1,
+                 const double scaling_factor = 1) const;
 
   /// Conversion of a discretized solution vector from FEM coefficients to
   /// Dubiner coefficients.
@@ -176,7 +177,8 @@ DUBFEMHandler<basis>::dubiner_to_fem(
   const unsigned int                n_ref_grid,
   const std::string                &subsection,
   const MPI_Comm                   &mpi_comm_,
-  const unsigned int                degree_fem) const
+  const unsigned int                degree_fem,
+  const double scaling_factor) const
 {
   // Creation of the new FEM evaluation mesh.
   lifex::utils::MeshHandler triangulation_fem(subsection, mpi_comm_);
@@ -185,7 +187,7 @@ DUBFEMHandler<basis>::dubiner_to_fem(
   AssertThrow(std::filesystem::exists(mesh_path),
               dealii::StandardExceptions::ExcMessage(
                 "This mesh file/directory does not exist."));
-  triangulation_fem.initialize_from_file(mesh_path, 1);
+  triangulation_fem.initialize_from_file(mesh_path, scaling_factor);
   triangulation_fem.set_element_type(
     lifex::utils::MeshHandler::ElementType::Tet);
   triangulation_fem.create_mesh();

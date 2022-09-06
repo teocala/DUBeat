@@ -138,10 +138,6 @@ protected:
   void
   create_mesh(std::string mesh_path);
 
-  /// Load the mesh from a user-defined path and specific scaling factor, otherwise the default is 1.
-  void
-  create_mesh(std::string mesh_path, const double scaling_factor);
-
   /// System solving.
   void
   solve_system();
@@ -201,6 +197,8 @@ protected:
   double prm_penalty_coeff;
   /// DG stabilty coefficient.
   double prm_stability_coeff;
+  /// Scaling factor
+  double scaling_factor = 1;
   /// Triangulation (internal use for useful already implemented methods).
   std::shared_ptr<lifex::utils::MeshHandler> triangulation;
   /// Number of degrees of freedom per cell.
@@ -493,7 +491,7 @@ ModelDG<basis>::create_mesh()
   // deal.II does not provide runtime generation of tetrahedral meshes, hence
   // they can currently be imported only from file. This version of create_mesh
   // picks the mesh file from the default path.
-  triangulation->initialize_from_file(mesh_path, 1);
+  triangulation->initialize_from_file(mesh_path, this->scaling_factor);
   triangulation->set_element_type(lifex::utils::MeshHandler::ElementType::Tet);
   triangulation->create_mesh();
 }
@@ -509,23 +507,7 @@ ModelDG<basis>::create_mesh(std::string mesh_path)
   // deal.II does not provide runtime generation of tetrahedral meshes, hence
   // they can currently be imported only from file. This version of create_mesh
   // picks the mesh file from a user-defined path.
-  triangulation->initialize_from_file(mesh_path, 1);
-  triangulation->set_element_type(lifex::utils::MeshHandler::ElementType::Tet);
-  triangulation->create_mesh();
-}
-
-template <class basis>
-void
-ModelDG<basis>::create_mesh(std::string mesh_path, const double scaling_factor)
-{
-  AssertThrow(std::filesystem::exists(mesh_path),
-              dealii::StandardExceptions::ExcMessage(
-                "This mesh file/directory does not exist."));
-
-  // deal.II does not provide runtime generation of tetrahedral meshes, hence
-  // they can currently be imported only from file. This version of create_mesh
-  // picks the mesh file from a user-defined path.
-  triangulation->initialize_from_file(mesh_path, scaling_factor);
+  triangulation->initialize_from_file(mesh_path, this->scaling_factor);
   triangulation->set_element_type(lifex::utils::MeshHandler::ElementType::Tet);
   triangulation->create_mesh();
 }
