@@ -25,7 +25,7 @@
 
 
 # Modify the LIFEX_PATH variable and assign the path to your local lifex installation.
-LIFEX_PATH?=/home/path_to_lifex/lifex
+LIFEX_PATH?=/home/matteo/lifex
 
 
 lifexInc=$(LIFEX_PATH)

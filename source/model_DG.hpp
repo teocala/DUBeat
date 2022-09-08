@@ -171,6 +171,11 @@ protected:
   virtual lifex::LinAlg::MPI::Vector
   conversion_to_fem(const lifex::LinAlg::MPI::Vector &sol_owned) const;
 
+  // As conversion_to_fem but used when converting to more refined FEM meshes. See the description of the equivalent method in DUBFEMHandler. Notice that it works only when using Dubiner basis and
+  // it requires that the Dubiner mesh is nested in the FEM mesh.
+  virtual void
+  conversion_to_fem(lifex::LinAlg::MPI::Vector &sol_owned, const std::string fem_file_path);
+
   /// To convert a discretized solution in Dubiner basis (only for problems
   /// using Dubiner basis). In-place version.
   virtual void
@@ -180,6 +185,11 @@ protected:
   /// using Dubiner basis). Const version.
   virtual lifex::LinAlg::MPI::Vector
   conversion_to_dub(const lifex::LinAlg::MPI::Vector &sol_owned) const;
+
+  // As conversion_to_dub but used when converting from more refined FEM meshes. See the description of the equivalent method in DUBFEMHandler. Notice that it works only when using Dubiner basis and
+  // it requires that the Dubiner mesh is nested in the FEM mesh.
+  virtual void
+  conversion_to_dub(lifex::LinAlg::MPI::Vector &sol_owned, const std::string fem_file_path);
 
   /// Conversion of an analytical solution from FEM to basis coefficients.
   void
@@ -616,6 +626,13 @@ ModelDG<DUBValues<lifex::dim>>::conversion_to_fem(
   return sol_fem;
 }
 
+template <class basis>
+void
+ModelDG<basis>::conversion_to_fem(lifex::LinAlg::MPI::Vector &sol_owned, const std::string fem_file_path)
+  {
+    sol_owned = dub_fem_values->dubiner_to_fem(sol_owned, fem_file_path, prm_subsection_path, mpi_comm);
+  }
+
 /// Conversion of a discretized solution from FEM coefficients to Dubiner
 /// coefficients. Useless if we are not using Dubiner basis functions.
 template <class basis>
@@ -654,6 +671,13 @@ ModelDG<DUBValues<lifex::dim>>::conversion_to_dub(
     dub_fem_values->fem_to_dubiner(sol_owned);
   return sol_dub;
 }
+
+template <class basis>
+void
+ModelDG<basis>::conversion_to_dub(lifex::LinAlg::MPI::Vector &sol_owned, const std::string fem_file_path)
+  {
+    sol_owned = dub_fem_values->fem_to_dubiner(sol_owned, fem_file_path, prm_subsection_path, mpi_comm);
+  }
 
 /// Conversion of an analytical solution from FEM to basis coefficients.
 /// Specialization for FEM basis.

@@ -98,7 +98,7 @@ public:
   /// numerical solution itself.
   lifex::LinAlg::MPI::Vector
   dubiner_to_fem(const lifex::LinAlg::MPI::Vector &dub_solution,
-                 const unsigned int                n_ref_grid,
+                 const std::string              &FEM_mesh_path,
                  const std::string                &subsection,
                  const MPI_Comm                   &mpi_comm_,
                  const unsigned int                degree_fem = 1) const;
@@ -107,6 +107,14 @@ public:
   /// Dubiner coefficients.
   lifex::LinAlg::MPI::Vector
   fem_to_dubiner(const lifex::LinAlg::MPI::Vector &fem_solution) const;
+
+  /// As fem_to_dubiner but it works with a FEM different grid refinement.
+  lifex::LinAlg::MPI::Vector
+  fem_to_dubiner(const lifex::LinAlg::MPI::Vector &fem_solution,
+                 const std::string                &FEM_mesh_path,
+                 const std::string                &subsection,
+                 const MPI_Comm                   &mpi_comm_,
+                 const unsigned int                degree_fem = 1) const;
 
   /// Conversion of an analytical solution to a vector of Dubiner coefficients.
   lifex::LinAlg::MPI::Vector
@@ -173,19 +181,17 @@ template <class basis>
 lifex::LinAlg::MPI::Vector
 DUBFEMHandler<basis>::dubiner_to_fem(
   const lifex::LinAlg::MPI::Vector &dub_solution,
-  const unsigned int                n_ref_grid,
+  const std::string &FEM_mesh_path,
   const std::string                &subsection,
   const MPI_Comm                   &mpi_comm_,
   const unsigned int                degree_fem) const
 {
   // Creation of the new FEM evaluation mesh.
   lifex::utils::MeshHandler triangulation_fem(subsection, mpi_comm_);
-  std::string mesh_path = "../meshes/" + std::to_string(lifex::dim) + "D_" +
-                          std::to_string(n_ref_grid) + ".msh";
-  AssertThrow(std::filesystem::exists(mesh_path),
+  AssertThrow(std::filesystem::exists(FEM_mesh_path),
               dealii::StandardExceptions::ExcMessage(
                 "This mesh file/directory does not exist."));
-  triangulation_fem.initialize_from_file(mesh_path, 1);
+  triangulation_fem.initialize_from_file(FEM_mesh_path, 1);
   triangulation_fem.set_element_type(
     lifex::utils::MeshHandler::ElementType::Tet);
   triangulation_fem.create_mesh();
@@ -298,6 +304,103 @@ DUBFEMHandler<basis>::fem_to_dubiner(
 
   return dub_solution;
 }
+
+
+template <class basis>
+lifex::LinAlg::MPI::Vector
+DUBFEMHandler<basis>::fem_to_dubiner(
+  const lifex::LinAlg::MPI::Vector &fem_solution,
+  const std::string                &FEM_mesh_path,
+  const std::string                &subsection,
+  const MPI_Comm                   &mpi_comm_,
+  const unsigned int                degree_fem) const
+{
+  // Creation of the new FEM evaluation mesh.
+  lifex::utils::MeshHandler triangulation_fem(subsection, mpi_comm_);
+  AssertThrow(std::filesystem::exists(FEM_mesh_path),
+              dealii::StandardExceptions::ExcMessage(
+                "This mesh file/directory does not exist."));
+  triangulation_fem.initialize_from_file(FEM_mesh_path, 1);
+  triangulation_fem.set_element_type(
+    lifex::utils::MeshHandler::ElementType::Tet);
+  triangulation_fem.create_mesh();
+
+  const dealii::FE_SimplexDGP<lifex::dim>      fe_dg(degree_fem);
+  const std::vector<dealii::Point<lifex::dim>> support_points =
+    fe_dg.get_unit_support_points();
+  const unsigned int dofs_per_cell_fem = this->get_dofs_per_cell(degree_fem);
+
+  // Generation of the mapping.
+  const std::unique_ptr<dealii::MappingFE<lifex::dim>> mapping(
+    std::make_unique<dealii::MappingFE<lifex::dim>>(fe_dg));
+
+  // Generation of a new dof_handler for the FE evaluations.
+  dealii::DoFHandler<lifex::dim> dof_handler_fem;
+  dof_handler_fem.reinit(triangulation_fem.get());
+  dof_handler_fem.distribute_dofs(fe_dg);
+
+  // Initialization of the dof_indices.
+  std::vector<unsigned int> dof_indices(this->dofs_per_cell);
+  std::vector<unsigned int> dof_indices_fem(dofs_per_cell_fem);
+
+  // Tolerance.
+  const double tol = 1e-10;
+  
+  VolumeHandlerDG<lifex::dim>   vol_handler(this->poly_degree);
+
+  lifex::LinAlg::MPI::Vector dub_solution;
+  dealii::IndexSet           owned_dofs = dof_handler.locally_owned_dofs();
+  dub_solution.reinit(owned_dofs, mpi_comm_);
+
+  double                    eval_on_quad;
+
+
+  // To perform the conversion to Dubiner, we just need to perform a (numerical)
+  // L2 scalar product between the discretized solution and the Dubiner
+  // functions. More precisely, thanks to the L2-orthonormality of the Dubiner
+  // basis, the i-th coefficient w.r.t. the Dubiner basis is the L2 scalar
+  // product between the solution and the i-th Dubiner function.
+  for (const auto &cell : dof_handler.active_cell_iterators())
+    {
+      dof_indices = dof_handler.get_dof_indices(cell);
+      vol_handler.reinit(cell);
+
+      for (unsigned int i = 0; i < this->dofs_per_cell; ++i)
+        {
+          for (unsigned int q = 0; q < n_quad_points; ++q)
+            {
+              dealii::Point<lifex::dim> real_q = mapping->transform_unit_to_real_cell(cell, vol_handler.quadrature_ref(q));
+
+              for (const auto & cell_fem : dof_handler_fem.active_cell_iterators())
+                {
+                  // The following condition is to ensure that every Dubiner quadrature point belongs to only one FEM cell (and not the neighbor too).
+                  if (eval_on_quad < tol)
+                    {
+                      dealii::Point<lifex::dim> unit_q = mapping->transform_unit_to_real_cell(cell_fem, real_q);
+
+                      for (unsigned int j = 0; j < dofs_per_cell_fem; ++j)
+                        {
+                          eval_on_quad +=
+                            fem_solution[dof_indices_fem[j]] *
+                            fe_dg.shape_value(j, unit_q);
+                        }
+
+                      dub_solution[dof_indices[i]] +=
+                        eval_on_quad *
+                        this->shape_value(i, vol_handler.quadrature_ref(q)) *
+                        vol_handler.quadrature_weight(q);
+                    }
+                }
+              eval_on_quad = 0;
+            }
+        }
+    }
+
+  return dub_solution;
+}
+
+
+
 
 template <class basis>
 lifex::LinAlg::MPI::Vector
