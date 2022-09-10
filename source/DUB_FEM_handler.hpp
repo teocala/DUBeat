@@ -191,7 +191,7 @@ DUBFEMHandler<basis>::dubiner_to_fem(
   AssertThrow(std::filesystem::exists(FEM_mesh_path),
               dealii::StandardExceptions::ExcMessage(
                 "This mesh file/directory does not exist."));
-  triangulation_fem.initialize_from_file(FEM_mesh_path, 1);
+  triangulation_fem.initialize_from_file(FEM_mesh_path,1);
   triangulation_fem.set_element_type(
     lifex::utils::MeshHandler::ElementType::Tet);
   triangulation_fem.create_mesh();
