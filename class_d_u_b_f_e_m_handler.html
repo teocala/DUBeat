@@ -141,12 +141,15 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a091b63d3e1cce2e62c7fe28c44ec8cc5"><td class="memItemLeft" align="right" valign="top">lifex::LinAlg::MPI::Vector&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_d_u_b_f_e_m_handler.html#a091b63d3e1cce2e62c7fe28c44ec8cc5">dubiner_to_fem</a> (const lifex::LinAlg::MPI::Vector &amp;dub_solution) const</td></tr>
 <tr class="memdesc:a091b63d3e1cce2e62c7fe28c44ec8cc5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Conversion of a discretized solution vector from Dubiner coefficients to FEM coefficients.  <a href="class_d_u_b_f_e_m_handler.html#a091b63d3e1cce2e62c7fe28c44ec8cc5">More...</a><br /></td></tr>
 <tr class="separator:a091b63d3e1cce2e62c7fe28c44ec8cc5"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:abb885fdff9d3b07b809af01b8163d3c7"><td class="memItemLeft" align="right" valign="top">lifex::LinAlg::MPI::Vector&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_d_u_b_f_e_m_handler.html#abb885fdff9d3b07b809af01b8163d3c7">dubiner_to_fem</a> (const lifex::LinAlg::MPI::Vector &amp;dub_solution, const unsigned int n_ref_grid, const std::string &amp;subsection, const MPI_Comm &amp;mpi_comm_, const unsigned int degree_fem=1, const double scaling_factor=1) const</td></tr>
-<tr class="memdesc:abb885fdff9d3b07b809af01b8163d3c7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Same as dubiner_to_fem but allows to choose the grid refinement and polynomial order for the FE evaluations.  <a href="class_d_u_b_f_e_m_handler.html#abb885fdff9d3b07b809af01b8163d3c7">More...</a><br /></td></tr>
-<tr class="separator:abb885fdff9d3b07b809af01b8163d3c7"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:acb56ae0ec1eba70fff0a0f2a11a2123f"><td class="memItemLeft" align="right" valign="top">lifex::LinAlg::MPI::Vector&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_d_u_b_f_e_m_handler.html#acb56ae0ec1eba70fff0a0f2a11a2123f">dubiner_to_fem</a> (const lifex::LinAlg::MPI::Vector &amp;dub_solution, const std::string &amp;FEM_mesh_path, const std::string &amp;subsection, const MPI_Comm &amp;mpi_comm_, const unsigned int degree_fem=1) const</td></tr>
+<tr class="memdesc:acb56ae0ec1eba70fff0a0f2a11a2123f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Same as dubiner_to_fem but allows to choose the grid refinement and polynomial order for the FE evaluations.  <a href="class_d_u_b_f_e_m_handler.html#acb56ae0ec1eba70fff0a0f2a11a2123f">More...</a><br /></td></tr>
+<tr class="separator:acb56ae0ec1eba70fff0a0f2a11a2123f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a0be712f0ee7fcb92bc8e02a73dbb55ff"><td class="memItemLeft" align="right" valign="top">lifex::LinAlg::MPI::Vector&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_d_u_b_f_e_m_handler.html#a0be712f0ee7fcb92bc8e02a73dbb55ff">fem_to_dubiner</a> (const lifex::LinAlg::MPI::Vector &amp;fem_solution) const</td></tr>
 <tr class="memdesc:a0be712f0ee7fcb92bc8e02a73dbb55ff"><td class="mdescLeft">&#160;</td><td class="mdescRight">Conversion of a discretized solution vector from FEM coefficients to Dubiner coefficients.  <a href="class_d_u_b_f_e_m_handler.html#a0be712f0ee7fcb92bc8e02a73dbb55ff">More...</a><br /></td></tr>
 <tr class="separator:a0be712f0ee7fcb92bc8e02a73dbb55ff"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac1464cba85ce685dfc6143e98761d371"><td class="memItemLeft" align="right" valign="top">lifex::LinAlg::MPI::Vector&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_d_u_b_f_e_m_handler.html#ac1464cba85ce685dfc6143e98761d371">fem_to_dubiner</a> (const lifex::LinAlg::MPI::Vector &amp;fem_solution, const std::string &amp;FEM_mesh_path, const std::string &amp;subsection, const MPI_Comm &amp;mpi_comm_, const unsigned int degree_fem=1) const</td></tr>
+<tr class="memdesc:ac1464cba85ce685dfc6143e98761d371"><td class="mdescLeft">&#160;</td><td class="mdescRight">As fem_to_dubiner but it works with a FEM different grid refinement.  <a href="class_d_u_b_f_e_m_handler.html#ac1464cba85ce685dfc6143e98761d371">More...</a><br /></td></tr>
+<tr class="separator:ac1464cba85ce685dfc6143e98761d371"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad2445c817b06a8cf73a0331b435fc48b"><td class="memItemLeft" align="right" valign="top">lifex::LinAlg::MPI::Vector&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_d_u_b_f_e_m_handler.html#ad2445c817b06a8cf73a0331b435fc48b">analytical_to_dubiner</a> (lifex::LinAlg::MPI::Vector dub_solution, const std::shared_ptr&lt; dealii::Function&lt; lifex::dim &gt;&gt; &amp;u_analytical) const</td></tr>
 <tr class="memdesc:ad2445c817b06a8cf73a0331b435fc48b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Conversion of an analytical solution to a vector of Dubiner coefficients.  <a href="class_d_u_b_f_e_m_handler.html#ad2445c817b06a8cf73a0331b435fc48b">More...</a><br /></td></tr>
 <tr class="separator:ad2445c817b06a8cf73a0331b435fc48b"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -399,7 +402,7 @@ template&lt;class basis &gt; </div>
 
 <p>Conversion of an analytical solution to a vector of Dubiner coefficients. </p>
 
-<p class="definition">Definition at line <a class="el" href="_d_u_b___f_e_m__handler_8hpp_source.html#l00306">306</a> of file <a class="el" href="_d_u_b___f_e_m__handler_8hpp_source.html">DUB_FEM_handler.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_d_u_b___f_e_m__handler_8hpp_source.html#l00407">407</a> of file <a class="el" href="_d_u_b___f_e_m__handler_8hpp_source.html">DUB_FEM_handler.hpp</a>.</p>
 
 </div>
 </div>
@@ -424,12 +427,12 @@ template&lt;class basis &gt; </div>
 <p>Conversion of a discretized solution vector from Dubiner coefficients to FEM coefficients. </p>
 <p>The output FEM vector belongs to a space of order at most 2 due to the deal.II current availabilities. See <a class="el" href="dof__handler___d_g_8hpp.html">dof_handler_DG.hpp</a> description for more information. </p>
 
-<p class="definition">Definition at line <a class="el" href="_d_u_b___f_e_m__handler_8hpp_source.html#l00121">121</a> of file <a class="el" href="_d_u_b___f_e_m__handler_8hpp_source.html">DUB_FEM_handler.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_d_u_b___f_e_m__handler_8hpp_source.html#l00128">128</a> of file <a class="el" href="_d_u_b___f_e_m__handler_8hpp_source.html">DUB_FEM_handler.hpp</a>.</p>
 
 </div>
 </div>
-<a id="abb885fdff9d3b07b809af01b8163d3c7"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#abb885fdff9d3b07b809af01b8163d3c7">&#9670;&nbsp;</a></span>dubiner_to_fem() <span class="overload">[2/2]</span></h2>
+<a id="acb56ae0ec1eba70fff0a0f2a11a2123f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#acb56ae0ec1eba70fff0a0f2a11a2123f">&#9670;&nbsp;</a></span>dubiner_to_fem() <span class="overload">[2/2]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -445,8 +448,8 @@ template&lt;class basis &gt; </div>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const unsigned int&#160;</td>
-          <td class="paramname"><em>n_ref_grid</em>, </td>
+          <td class="paramtype">const std::string &amp;&#160;</td>
+          <td class="paramname"><em>FEM_mesh_path</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -464,13 +467,7 @@ template&lt;class basis &gt; </div>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">const unsigned int&#160;</td>
-          <td class="paramname"><em>degree_fem</em> = <code>1</code>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">const double&#160;</td>
-          <td class="paramname"><em>scaling_factor</em> = <code>1</code>&#160;</td>
+          <td class="paramname"><em>degree_fem</em> = <code>1</code>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -483,12 +480,12 @@ template&lt;class basis &gt; </div>
 <p>Same as dubiner_to_fem but allows to choose the grid refinement and polynomial order for the FE evaluations. </p>
 <p>This generalization overcomes the issue of a contour visualization that might be less refined than the numerical solution itself. </p>
 
-<p class="definition">Definition at line <a class="el" href="_d_u_b___f_e_m__handler_8hpp_source.html#l00175">175</a> of file <a class="el" href="_d_u_b___f_e_m__handler_8hpp_source.html">DUB_FEM_handler.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_d_u_b___f_e_m__handler_8hpp_source.html#l00182">182</a> of file <a class="el" href="_d_u_b___f_e_m__handler_8hpp_source.html">DUB_FEM_handler.hpp</a>.</p>
 
 </div>
 </div>
 <a id="a0be712f0ee7fcb92bc8e02a73dbb55ff"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a0be712f0ee7fcb92bc8e02a73dbb55ff">&#9670;&nbsp;</a></span>fem_to_dubiner()</h2>
+<h2 class="memtitle"><span class="permalink"><a href="#a0be712f0ee7fcb92bc8e02a73dbb55ff">&#9670;&nbsp;</a></span>fem_to_dubiner() <span class="overload">[1/2]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -507,7 +504,59 @@ template&lt;class basis &gt; </div>
 
 <p>Conversion of a discretized solution vector from FEM coefficients to Dubiner coefficients. </p>
 
-<p class="definition">Definition at line <a class="el" href="_d_u_b___f_e_m__handler_8hpp_source.html#l00257">257</a> of file <a class="el" href="_d_u_b___f_e_m__handler_8hpp_source.html">DUB_FEM_handler.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_d_u_b___f_e_m__handler_8hpp_source.html#l00261">261</a> of file <a class="el" href="_d_u_b___f_e_m__handler_8hpp_source.html">DUB_FEM_handler.hpp</a>.</p>
+
+</div>
+</div>
+<a id="ac1464cba85ce685dfc6143e98761d371"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac1464cba85ce685dfc6143e98761d371">&#9670;&nbsp;</a></span>fem_to_dubiner() <span class="overload">[2/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;class basis &gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname">lifex::LinAlg::MPI::Vector <a class="el" href="class_d_u_b_f_e_m_handler.html">DUBFEMHandler</a>&lt; basis &gt;::fem_to_dubiner </td>
+          <td>(</td>
+          <td class="paramtype">const lifex::LinAlg::MPI::Vector &amp;&#160;</td>
+          <td class="paramname"><em>fem_solution</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const std::string &amp;&#160;</td>
+          <td class="paramname"><em>FEM_mesh_path</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const std::string &amp;&#160;</td>
+          <td class="paramname"><em>subsection</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const MPI_Comm &amp;&#160;</td>
+          <td class="paramname"><em>mpi_comm_</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const unsigned int&#160;</td>
+          <td class="paramname"><em>degree_fem</em> = <code>1</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td> const</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>As fem_to_dubiner but it works with a FEM different grid refinement. </p>
+
+<p class="definition">Definition at line <a class="el" href="_d_u_b___f_e_m__handler_8hpp_source.html#l00311">311</a> of file <a class="el" href="_d_u_b___f_e_m__handler_8hpp_source.html">DUB_FEM_handler.hpp</a>.</p>
 
 </div>
 </div>

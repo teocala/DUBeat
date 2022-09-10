@@ -6,8 +6,9 @@ var class_d_u_b_f_e_m_handler =
     [ "DUBFEMHandler", "class_d_u_b_f_e_m_handler.html#a0c6e9bc257b065bac4a63f7407217ff2", null ],
     [ "analytical_to_dubiner", "class_d_u_b_f_e_m_handler.html#ad2445c817b06a8cf73a0331b435fc48b", null ],
     [ "dubiner_to_fem", "class_d_u_b_f_e_m_handler.html#a091b63d3e1cce2e62c7fe28c44ec8cc5", null ],
-    [ "dubiner_to_fem", "class_d_u_b_f_e_m_handler.html#abb885fdff9d3b07b809af01b8163d3c7", null ],
+    [ "dubiner_to_fem", "class_d_u_b_f_e_m_handler.html#acb56ae0ec1eba70fff0a0f2a11a2123f", null ],
     [ "fem_to_dubiner", "class_d_u_b_f_e_m_handler.html#a0be712f0ee7fcb92bc8e02a73dbb55ff", null ],
+    [ "fem_to_dubiner", "class_d_u_b_f_e_m_handler.html#ac1464cba85ce685dfc6143e98761d371", null ],
     [ "dof_handler", "class_d_u_b_f_e_m_handler.html#a1c68731c0d98fb4969a7ab3468164992", null ],
     [ "n_quad_points", "class_d_u_b_f_e_m_handler.html#a044784832395e6242ae199d504d878c2", null ]
 ];
