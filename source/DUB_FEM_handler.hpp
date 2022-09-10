@@ -101,7 +101,8 @@ public:
                  const std::string              &FEM_mesh_path,
                  const std::string                &subsection,
                  const MPI_Comm                   &mpi_comm_,
-                 const unsigned int                degree_fem = 1) const;
+                 const unsigned int                degree_fem = 1,
+                 const double scaling_factor = 1) const;
 
   /// Conversion of a discretized solution vector from FEM coefficients to
   /// Dubiner coefficients.
@@ -114,7 +115,8 @@ public:
                  const std::string                &FEM_mesh_path,
                  const std::string                &subsection,
                  const MPI_Comm                   &mpi_comm_,
-                 const unsigned int                degree_fem = 1) const;
+                 const unsigned int                degree_fem = 1,
+                 const double scaling_factor = 1) const;
 
   /// Conversion of an analytical solution to a vector of Dubiner coefficients.
   lifex::LinAlg::MPI::Vector
@@ -184,14 +186,15 @@ DUBFEMHandler<basis>::dubiner_to_fem(
   const std::string &FEM_mesh_path,
   const std::string                &subsection,
   const MPI_Comm                   &mpi_comm_,
-  const unsigned int                degree_fem) const
+  const unsigned int                degree_fem,
+  const double scaling_factor) const
 {
   // Creation of the new FEM evaluation mesh.
   lifex::utils::MeshHandler triangulation_fem(subsection, mpi_comm_);
   AssertThrow(std::filesystem::exists(FEM_mesh_path),
               dealii::StandardExceptions::ExcMessage(
                 "This mesh file/directory does not exist."));
-  triangulation_fem.initialize_from_file(FEM_mesh_path,1);
+  triangulation_fem.initialize_from_file(FEM_mesh_path,scaling_factor);
   triangulation_fem.set_element_type(
     lifex::utils::MeshHandler::ElementType::Tet);
   triangulation_fem.create_mesh();
@@ -313,14 +316,15 @@ DUBFEMHandler<basis>::fem_to_dubiner(
   const std::string                &FEM_mesh_path,
   const std::string                &subsection,
   const MPI_Comm                   &mpi_comm_,
-  const unsigned int                degree_fem) const
+  const unsigned int                degree_fem,
+  const double scaling_factor) const
 {
   // Creation of the new FEM evaluation mesh.
   lifex::utils::MeshHandler triangulation_fem(subsection, mpi_comm_);
   AssertThrow(std::filesystem::exists(FEM_mesh_path),
               dealii::StandardExceptions::ExcMessage(
                 "This mesh file/directory does not exist."));
-  triangulation_fem.initialize_from_file(FEM_mesh_path, 1);
+  triangulation_fem.initialize_from_file(FEM_mesh_path, scaling_factor);
   triangulation_fem.set_element_type(
     lifex::utils::MeshHandler::ElementType::Tet);
   triangulation_fem.create_mesh();
