@@ -98,11 +98,11 @@ public:
   /// numerical solution itself.
   lifex::LinAlg::MPI::Vector
   dubiner_to_fem(const lifex::LinAlg::MPI::Vector &dub_solution,
-                 const std::string              &FEM_mesh_path,
+                 const std::string                &FEM_mesh_path,
                  const std::string                &subsection,
                  const MPI_Comm                   &mpi_comm_,
-                 const unsigned int                degree_fem = 1,
-                 const double scaling_factor = 1) const;
+                 const unsigned int                degree_fem     = 1,
+                 const double                      scaling_factor = 1) const;
 
   /// Conversion of a discretized solution vector from FEM coefficients to
   /// Dubiner coefficients.
@@ -115,14 +115,19 @@ public:
                  const std::string                &FEM_mesh_path,
                  const std::string                &subsection,
                  const MPI_Comm                   &mpi_comm_,
-                 const unsigned int                degree_fem = 1,
-                 const double scaling_factor = 1) const;
+                 const unsigned int                degree_fem     = 1,
+                 const double                      scaling_factor = 1) const;
 
   /// Conversion of an analytical solution to a vector of Dubiner coefficients.
   lifex::LinAlg::MPI::Vector
   analytical_to_dubiner(
     lifex::LinAlg::MPI::Vector                           dub_solution,
     const std::shared_ptr<dealii::Function<lifex::dim>> &u_analytical) const;
+
+  /// To check if a point is inside the reference cell, needed in other methods.
+  bool
+  is_in_unit_cell(const dealii::Point<lifex::dim> &unit_q,
+                  const double                     tol = 0) const;
 };
 
 template <class basis>
@@ -183,18 +188,18 @@ template <class basis>
 lifex::LinAlg::MPI::Vector
 DUBFEMHandler<basis>::dubiner_to_fem(
   const lifex::LinAlg::MPI::Vector &dub_solution,
-  const std::string &FEM_mesh_path,
+  const std::string                &FEM_mesh_path,
   const std::string                &subsection,
   const MPI_Comm                   &mpi_comm_,
   const unsigned int                degree_fem,
-  const double scaling_factor) const
+  const double                      scaling_factor) const
 {
   // Creation of the new FEM evaluation mesh.
   lifex::utils::MeshHandler triangulation_fem(subsection, mpi_comm_);
   AssertThrow(std::filesystem::exists(FEM_mesh_path),
               dealii::StandardExceptions::ExcMessage(
                 "This mesh file/directory does not exist."));
-  triangulation_fem.initialize_from_file(FEM_mesh_path,scaling_factor);
+  triangulation_fem.initialize_from_file(FEM_mesh_path, scaling_factor);
   triangulation_fem.set_element_type(
     lifex::utils::MeshHandler::ElementType::Tet);
   triangulation_fem.create_mesh();
@@ -239,17 +244,20 @@ DUBFEMHandler<basis>::dubiner_to_fem(
             {
               // This condition needs to guarantee that neighbor elements do not
               // both contribute to the FEM evaluation.
-              if (fem_solution[dof_indices_fem[i]] < tol)
+              if (std::abs(fem_solution[dof_indices_fem[i]]) < tol)
                 {
                   dealii::Point<lifex::dim> unit_support_point_dub =
                     mapping->transform_real_to_unit_cell(cell,
                                                          real_support_point);
-                  dof_indices = dof_handler.get_dof_indices(cell);
-                  for (unsigned int j = 0; j < this->dofs_per_cell; ++j)
+                  if (is_in_unit_cell(unit_support_point_dub, tol))
                     {
-                      fem_solution[dof_indices_fem[i]] +=
-                        (dub_solution[dof_indices[j]] *
-                         this->shape_value(j, unit_support_point_dub));
+                      dof_indices = dof_handler.get_dof_indices(cell);
+                      for (unsigned int j = 0; j < this->dofs_per_cell; ++j)
+                        {
+                          fem_solution[dof_indices_fem[i]] +=
+                            (dub_solution[dof_indices[j]] *
+                             this->shape_value(j, unit_support_point_dub));
+                        }
                     }
                 }
             }
@@ -317,7 +325,7 @@ DUBFEMHandler<basis>::fem_to_dubiner(
   const std::string                &subsection,
   const MPI_Comm                   &mpi_comm_,
   const unsigned int                degree_fem,
-  const double scaling_factor) const
+  const double                      scaling_factor) const
 {
   // Creation of the new FEM evaluation mesh.
   lifex::utils::MeshHandler triangulation_fem(subsection, mpi_comm_);
@@ -349,14 +357,14 @@ DUBFEMHandler<basis>::fem_to_dubiner(
 
   // Tolerance.
   const double tol = 1e-10;
-  
-  VolumeHandlerDG<lifex::dim>   vol_handler(this->poly_degree);
+
+  VolumeHandlerDG<lifex::dim> vol_handler(this->poly_degree);
 
   lifex::LinAlg::MPI::Vector dub_solution;
   dealii::IndexSet           owned_dofs = dof_handler.locally_owned_dofs();
   dub_solution.reinit(owned_dofs, mpi_comm_);
 
-  double                    eval_on_quad;
+  double eval_on_quad;
 
 
   // To perform the conversion to Dubiner, we just need to perform a (numerical)
@@ -373,26 +381,35 @@ DUBFEMHandler<basis>::fem_to_dubiner(
         {
           for (unsigned int q = 0; q < n_quad_points; ++q)
             {
-              dealii::Point<lifex::dim> real_q = mapping->transform_unit_to_real_cell(cell, vol_handler.quadrature_ref(q));
+              dealii::Point<lifex::dim> real_q =
+                mapping->transform_unit_to_real_cell(
+                  cell, vol_handler.quadrature_ref(q));
 
-              for (const auto & cell_fem : dof_handler_fem.active_cell_iterators())
+              for (const auto &cell_fem :
+                   dof_handler_fem.active_cell_iterators())
                 {
-                  // The following condition is to ensure that every Dubiner quadrature point belongs to only one FEM cell (and not the neighbor too).
-                  if (eval_on_quad < tol)
+                  // The following condition is to ensure that every Dubiner
+                  // quadrature point belongs to only one FEM cell (and not the
+                  // neighbor too).
+                  if (std::abs(eval_on_quad) < tol)
                     {
-                      dealii::Point<lifex::dim> unit_q = mapping->transform_unit_to_real_cell(cell_fem, real_q);
-
-                      for (unsigned int j = 0; j < dofs_per_cell_fem; ++j)
+                      cell_fem->get_dof_indices(dof_indices_fem);
+                      dealii::Point<lifex::dim> unit_q =
+                        mapping->transform_real_to_unit_cell(cell_fem, real_q);
+                      if (is_in_unit_cell(unit_q, tol))
                         {
-                          eval_on_quad +=
-                            fem_solution[dof_indices_fem[j]] *
-                            fe_dg.shape_value(j, unit_q);
-                        }
+                          for (unsigned int j = 0; j < dofs_per_cell_fem; ++j)
+                            {
+                              eval_on_quad += fem_solution[dof_indices_fem[j]] *
+                                              fe_dg.shape_value(j, unit_q);
+                            }
 
-                      dub_solution[dof_indices[i]] +=
-                        eval_on_quad *
-                        this->shape_value(i, vol_handler.quadrature_ref(q)) *
-                        vol_handler.quadrature_weight(q);
+                          dub_solution[dof_indices[i]] +=
+                            eval_on_quad *
+                            this->shape_value(i,
+                                              vol_handler.quadrature_ref(q)) *
+                            vol_handler.quadrature_weight(q);
+                        }
                     }
                 }
               eval_on_quad = 0;
@@ -402,8 +419,6 @@ DUBFEMHandler<basis>::fem_to_dubiner(
 
   return dub_solution;
 }
-
-
 
 
 template <class basis>
@@ -418,6 +433,7 @@ DUBFEMHandler<basis>::analytical_to_dubiner(
 
   std::vector<unsigned int> dof_indices(this->dofs_per_cell);
   double                    eval_on_quad;
+
 
   // Here, we apply the same idea as in fem_to_dubiner. The only difference is
   // that here we can directly evaluate the solution on the quadrature point
@@ -444,6 +460,24 @@ DUBFEMHandler<basis>::analytical_to_dubiner(
     }
 
   return dub_solution;
+}
+
+
+template <class basis>
+bool
+DUBFEMHandler<basis>::is_in_unit_cell(const dealii::Point<lifex::dim> &unit_q,
+                                      const double tol) const
+{
+  if (lifex::dim == 2)
+    {
+      return (unit_q[0] + unit_q[1] < 1.0 + tol && unit_q[0] > -tol &&
+              unit_q[1] > -tol);
+    }
+  else if (lifex::dim == 3)
+    {
+      return (unit_q[0] + unit_q[1] + unit_q[2] < 1.0 + tol &&
+              unit_q[0] > -tol && unit_q[1] > -tol && unit_q[2] > -tol);
+    }
 }
 
 #endif /* DUBFEMHandler_HPP_*/
