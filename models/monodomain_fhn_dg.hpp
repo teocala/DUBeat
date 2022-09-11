@@ -571,13 +571,35 @@ namespace DUBeat::models
 
     params.enter_subsection("Parameters of the model");
     {
-      params.declare_entry("ChiM", "1e5", dealii::Patterns::Double(0), "Surface-to-volume ratio of cells parameter.");
-      params.declare_entry("Cm", "1e-2", dealii::Patterns::Double(0), "Membrane capacity.");
-      params.declare_entry("Sigma", "0.12", dealii::Patterns::Double(0), "Diffusion parameter in the principal directions.");
-      params.declare_entry("kappa", "19.5", dealii::Patterns::Double(0), "Factor for the nonlinear reaction in Fitzhugh Nagumo model.");
-      params.declare_entry("epsilon", "1.2", dealii::Patterns::Double(0), "Parameter for Fitzhugh Nagumo model.");
-      params.declare_entry("gamma", "0.1", dealii::Patterns::Double(0), "Parameter for Fitzhugh Nagumo model.");
-      params.declare_entry("a", "13e-3", dealii::Patterns::Double(0), "Parameter for Fitzhugh Nagumo model.");
+      params.declare_entry("ChiM",
+                           "1e5",
+                           dealii::Patterns::Double(0),
+                           "Surface-to-volume ratio of cells parameter.");
+      params.declare_entry("Cm",
+                           "1e-2",
+                           dealii::Patterns::Double(0),
+                           "Membrane capacity.");
+      params.declare_entry("Sigma",
+                           "0.12",
+                           dealii::Patterns::Double(0),
+                           "Diffusion parameter in the principal directions.");
+      params.declare_entry(
+        "kappa",
+        "19.5",
+        dealii::Patterns::Double(0),
+        "Factor for the nonlinear reaction in Fitzhugh Nagumo model.");
+      params.declare_entry("epsilon",
+                           "1.2",
+                           dealii::Patterns::Double(0),
+                           "Parameter for Fitzhugh Nagumo model.");
+      params.declare_entry("gamma",
+                           "0.1",
+                           dealii::Patterns::Double(0),
+                           "Parameter for Fitzhugh Nagumo model.");
+      params.declare_entry("a",
+                           "13e-3",
+                           dealii::Patterns::Double(0),
+                           "Parameter for Fitzhugh Nagumo model.");
     }
     params.leave_subsection();
   }
@@ -600,11 +622,12 @@ namespace DUBeat::models
 
     params.enter_subsection("Discontinuous Galerkin");
     this->prm_penalty_coeff = params.get_double("Penalty coefficient");
-    AssertThrow(this->prm_penalty_coeff == 1. || this->prm_penalty_coeff == 0. ||
-                  this->prm_penalty_coeff == -1.,
-                dealii::StandardExceptions::ExcMessage(
-                  "Penalty coefficient must be 1 (SIP method) or 0 (IIP method) "
-                  "or -1 (NIP method)."));
+    AssertThrow(
+      this->prm_penalty_coeff == 1. || this->prm_penalty_coeff == 0. ||
+        this->prm_penalty_coeff == -1.,
+      dealii::StandardExceptions::ExcMessage(
+        "Penalty coefficient must be 1 (SIP method) or 0 (IIP method) "
+        "or -1 (NIP method)."));
 
     this->prm_stability_coeff = params.get_double("Stability coefficient");
     params.leave_subsection();
@@ -621,13 +644,13 @@ namespace DUBeat::models
     params.leave_subsection();
 
     params.enter_subsection("Parameters of the model");
-    ChiM = params.get_double("ChiM");
-    Cm = params.get_double("Cm");
-    Sigma = params.get_double("Sigma");
-    kappa = params.get_double("kappa");
+    ChiM    = params.get_double("ChiM");
+    Cm      = params.get_double("Cm");
+    Sigma   = params.get_double("Sigma");
+    kappa   = params.get_double("kappa");
     epsilon = params.get_double("epsilon");
-    gamma = params.get_double("gamma");
-    a = params.get_double("a");
+    gamma   = params.get_double("gamma");
+    a       = params.get_double("a");
     params.leave_subsection();
   }
 
@@ -719,17 +742,14 @@ namespace DUBeat::models
   void
   MonodomainFHNDG<basis>::time_initialization()
   {
-    this->u_ex = std::make_shared<monodomain_fhn_DG::ExactSolution>();
-    this->grad_u_ex =
-      std::make_shared<monodomain_fhn_DG::GradExactSolution>();
-    this->f_ex = std::make_shared<monodomain_fhn_DG::RightHandSide>(
+    this->u_ex      = std::make_shared<monodomain_fhn_DG::ExactSolution>();
+    this->grad_u_ex = std::make_shared<monodomain_fhn_DG::GradExactSolution>();
+    this->f_ex      = std::make_shared<monodomain_fhn_DG::RightHandSide>(
       ChiM, Sigma, Cm, kappa, epsilon, gamma, a);
     this->g_n = std::make_shared<monodomain_fhn_DG::BCNeumann>(Sigma);
-    w_ex =
-      std::make_shared<monodomain_fhn_DG::ExactSolution_w>(epsilon, gamma);
+    w_ex = std::make_shared<monodomain_fhn_DG::ExactSolution_w>(epsilon, gamma);
     grad_w_ex =
-      std::make_shared<monodomain_fhn_DG::GradExactSolution_w>(epsilon,
-                                                               gamma);
+      std::make_shared<monodomain_fhn_DG::GradExactSolution_w>(epsilon, gamma);
 
     this->u_ex->set_time(this->prm_time_init);
     this->discretize_analytical_solution(this->u_ex, this->solution_ex_owned);

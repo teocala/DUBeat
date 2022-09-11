@@ -143,10 +143,11 @@ public:
   dealii::FullMatrix<double>
   local_V() const;
 
-  /// Assembly of stiffness matrix with diffusion parameter: @f[V(i,j)=\int_{\mathcal{K}} \nabla
-  /// \varphi_j \cdot \Sigma \nabla \varphi_i \,dx @f] where @f$\Sigma@f$ is the diffusion tensor.
+  /// Assembly of stiffness matrix with diffusion parameter:
+  /// @f[V(i,j)=\int_{\mathcal{K}} \nabla \varphi_j \cdot \Sigma \nabla
+  /// \varphi_i \,dx @f] where @f$\Sigma@f$ is the diffusion tensor.
   dealii::FullMatrix<double>
-  local_V(const dealii::Tensor<2, lifex::dim>& Sigma) const;
+  local_V(const dealii::Tensor<2, lifex::dim> &Sigma) const;
 
   /// Assembly of local mass matrix: @f[M(i,j)=\int_{\mathcal{K}} \varphi_j
   /// \varphi_i
@@ -188,11 +189,13 @@ public:
   local_SC(const double stability_coefficient) const;
 
   /// Assembly of the component of the local matrix S that is evaluated on the
-  /// same side of the edge with diffusion parameter: @f[SC(i,j)=\int_{\mathcal{F}} \Gamma \varphi_j^{+}
-  /// \varphi_i^{+} \, ds @f] where @f$ \Gamma = \gamma(n^T \Sigma n) @f$, @f$\gamma@f$ is the regularity
-  /// coefficient and @f$\Sigma@f$ is the diffusion tensor.
+  /// same side of the edge with diffusion parameter:
+  /// @f[SC(i,j)=\int_{\mathcal{F}} \Gamma \varphi_j^{+} \varphi_i^{+} \, ds @f]
+  /// where @f$ \Gamma = \gamma(n^T \Sigma n) @f$, @f$\gamma@f$ is the
+  /// regularity coefficient and @f$\Sigma@f$ is the diffusion tensor.
   dealii::FullMatrix<double>
-  local_SC(const double stability_coefficient, const dealii::Tensor<2, lifex::dim>& Sigma) const;
+  local_SC(const double                         stability_coefficient,
+           const dealii::Tensor<2, lifex::dim> &Sigma) const;
 
   /// Assembly of the component of the local matrix S that is evaluated on the
   /// two sides of the edge:
@@ -204,10 +207,11 @@ public:
   /// Assembly of the component of the local matrix S that is evaluated on the
   /// two sides of the edge with diffusion parameter:
   /// @f[ SN(i,j)=- \int_{\mathcal{F}} \Gamma \varphi_j^{+} \varphi_i^{-} \, ds
-  /// @f] where @f$ \Gamma = \gamma(n^T \Sigma n) @f$, @f$\gamma@f$ is the regularity
-  /// coefficient and @f$\Sigma@f$ is the diffusion tensor.
+  /// @f] where @f$ \Gamma = \gamma(n^T \Sigma n) @f$, @f$\gamma@f$ is the
+  /// regularity coefficient and @f$\Sigma@f$ is the diffusion tensor.
   dealii::FullMatrix<double>
-  local_SN(const double stability_coefficient, const dealii::Tensor<2, lifex::dim>& Sigma) const;
+  local_SN(const double                         stability_coefficient,
+           const dealii::Tensor<2, lifex::dim> &Sigma) const;
 
   /// Assembly of the component of the local matrix I that is evaluated on the
   /// same side of the edge. The method returns the two matrices:
@@ -222,16 +226,20 @@ public:
   local_IC(const double theta) const;
 
   /// Assembly of the component of the local matrix I that is evaluated on the
-  /// same side of the edge with diffusion parameter. The method returns the two matrices:
+  /// same side of the edge with diffusion parameter. The method returns the two
+  /// matrices:
   ///@f[
   /// \begin{aligned}
   /// \theta \cdot IC(i,j)= & - \frac{\theta}{2}
-  /// \int_{\mathcal{F}} \Sigma \nabla \varphi_i^{+} \cdot  n^{+} \varphi_j^{+}  \, ds
-  /// \\ IC^T(i,j)= & - \frac{1}{2} \int_{\mathcal{F}} \Sigma \nabla \varphi_j^{+}
-  /// \cdot  n^{+} \varphi_i^{+}  \, ds \end{aligned} @f] where @f$\theta@f$ is
-  /// the penalty coefficient and @f$\Sigma@f$ is the diffusion tensor.
+  /// \int_{\mathcal{F}} \Sigma \nabla \varphi_i^{+} \cdot  n^{+} \varphi_j^{+}
+  /// \, ds
+  /// \\ IC^T(i,j)= & - \frac{1}{2} \int_{\mathcal{F}} \Sigma \nabla
+  /// \varphi_j^{+} \cdot  n^{+} \varphi_i^{+}  \, ds \end{aligned} @f] where
+  /// @f$\theta@f$ is the penalty coefficient and @f$\Sigma@f$ is the diffusion
+  /// tensor.
   std::pair<dealii::FullMatrix<double>, dealii::FullMatrix<double>>
-  local_IC(const double theta, const dealii::Tensor<2, lifex::dim>& Sigma) const;
+  local_IC(const double                         theta,
+           const dealii::Tensor<2, lifex::dim> &Sigma) const;
 
   /// Assembly of the component of the local matrix I that is evaluated on the
   /// boundary edges. The method returns the two matrices:
@@ -244,14 +252,18 @@ public:
   local_IB(const double theta) const;
 
   /// Assembly of the component of the local matrix I that is evaluated on the
-  /// boundary edges with diffusion parameter. The method returns the two matrices:
+  /// boundary edges with diffusion parameter. The method returns the two
+  /// matrices:
   /// @f[\begin{aligned}
-  /// \theta \cdot IB(i,j)=& \: - \theta \int_{\mathcal{F}} \Sigma \nabla \varphi_i^{+}
-  /// \cdot n^{+} \varphi_j^{+} \, ds \\ IB^T(i,j)=& - \int_{\mathcal{F}} \Sigma \nabla
-  /// \varphi_j^{+} \cdot n^{+} \varphi_i^{+} \, ds \end{aligned} @f] where
-  /// @f$\theta@f$ is the penalty coefficient and @f$\Sigma@f$ is the diffusion tensor.
+  /// \theta \cdot IB(i,j)=& \: - \theta \int_{\mathcal{F}} \Sigma \nabla
+  /// \varphi_i^{+} \cdot n^{+} \varphi_j^{+} \, ds \\ IB^T(i,j)=& -
+  /// \int_{\mathcal{F}} \Sigma \nabla \varphi_j^{+} \cdot n^{+} \varphi_i^{+}
+  /// \, ds \end{aligned} @f] where
+  /// @f$\theta@f$ is the penalty coefficient and @f$\Sigma@f$ is the diffusion
+  /// tensor.
   std::pair<dealii::FullMatrix<double>, dealii::FullMatrix<double>>
-  local_IB(const double theta, const dealii::Tensor<2, lifex::dim>& Sigma) const;
+  local_IB(const double                         theta,
+           const dealii::Tensor<2, lifex::dim> &Sigma) const;
 
   /// Assembly of the component of the local matrix I that is evaluated on the
   /// two sides of the edge. The method returns the two matrices:
@@ -264,14 +276,17 @@ public:
   local_IN(const double theta) const;
 
   /// Assembly of the component of the local matrix I that is evaluated on the
-  /// two sides of the edge with diffusion parameter. The method returns the two matrices:
+  /// two sides of the edge with diffusion parameter. The method returns the two
+  /// matrices:
   /// @f[\begin{aligned} \theta \cdot IN(i,j)=& \frac{\theta}{2}
-  /// \int_{\mathcal{F}} \Sigma \nabla \varphi_i^{+} \cdot n^{+} \varphi_j^{-}  \, ds
-  /// \\ IN^T(i,j)=& \frac{1}{2} \int_{\mathcal{F}} \Sigma \nabla \varphi_j^{+} \cdot
-  /// n^{+} \varphi_i^{-}  \, ds \end{aligned} @f] where @f$\theta@f$ is the
-  /// penalty coefficient and @f$\Sigma@f$ is the diffusion tensor.
+  /// \int_{\mathcal{F}} \Sigma \nabla \varphi_i^{+} \cdot n^{+} \varphi_j^{-}
+  /// \, ds
+  /// \\ IN^T(i,j)=& \frac{1}{2} \int_{\mathcal{F}} \Sigma \nabla \varphi_j^{+}
+  /// \cdot n^{+} \varphi_i^{-}  \, ds \end{aligned} @f] where @f$\theta@f$ is
+  /// the penalty coefficient and @f$\Sigma@f$ is the diffusion tensor.
   std::pair<dealii::FullMatrix<double>, dealii::FullMatrix<double>>
-  local_IN(const double theta, const dealii::Tensor<2, lifex::dim>& Sigma) const;
+  local_IN(const double                         theta,
+           const dealii::Tensor<2, lifex::dim> &Sigma) const;
 
   /// Assembly of the right hand side term associated to the previous time-step
   /// solution in time-dependent problems:
@@ -387,7 +402,7 @@ AssembleDG<basis>::local_V() const
 
 template <class basis>
 dealii::FullMatrix<double>
-AssembleDG<basis>::local_V(const dealii::Tensor<2, lifex::dim>& Sigma) const
+AssembleDG<basis>::local_V(const dealii::Tensor<2, lifex::dim> &Sigma) const
 {
   dealii::FullMatrix<double>          V(dofs_per_cell, dofs_per_cell);
   const dealii::Tensor<2, lifex::dim> BJinv =
@@ -583,7 +598,8 @@ AssembleDG<basis>::local_SC(const double stability_coefficient) const
 
 template <class basis>
 dealii::FullMatrix<double>
-AssembleDG<basis>::local_SC(const double stability_coefficient, const dealii::Tensor<2, lifex::dim>& Sigma) const
+AssembleDG<basis>::local_SC(const double stability_coefficient,
+                            const dealii::Tensor<2, lifex::dim> &Sigma) const
 {
   const double face_measure      = face_handler.get_measure();
   const double unit_face_measure = (4.0 - lifex::dim) / 2;
@@ -593,7 +609,8 @@ AssembleDG<basis>::local_SC(const double stability_coefficient, const dealii::Te
   const double local_pen_coeff =
     (stability_coefficient * pow(poly_degree, 2)) / h_local;
 
-  const double penalty_sigma = std::abs(face_handler.get_normal() * Sigma * face_handler.get_normal());
+  const double penalty_sigma =
+    std::abs(face_handler.get_normal() * Sigma * face_handler.get_normal());
 
   dealii::FullMatrix<double> SC(dofs_per_cell, dofs_per_cell);
 
@@ -654,7 +671,8 @@ AssembleDG<basis>::local_SN(const double stability_coefficient) const
 
 template <class basis>
 dealii::FullMatrix<double>
-AssembleDG<basis>::local_SN(const double stability_coefficient, const dealii::Tensor<2, lifex::dim>& Sigma) const
+AssembleDG<basis>::local_SN(const double stability_coefficient,
+                            const dealii::Tensor<2, lifex::dim> &Sigma) const
 {
   const double face_measure      = face_handler.get_measure();
   const double unit_face_measure = (4.0 - lifex::dim) / 2;
@@ -664,7 +682,8 @@ AssembleDG<basis>::local_SN(const double stability_coefficient, const dealii::Te
   const double local_pen_coeff =
     (stability_coefficient * pow(poly_degree, 2)) / h_local;
 
-    const double penalty_sigma = std::abs(face_handler.get_normal() * Sigma * face_handler.get_normal());
+  const double penalty_sigma =
+    std::abs(face_handler.get_normal() * Sigma * face_handler.get_normal());
 
   dealii::FullMatrix<double> SN(dofs_per_cell, dofs_per_cell);
 
@@ -735,7 +754,8 @@ AssembleDG<basis>::local_IC(const double theta) const
 
 template <class basis>
 std::pair<dealii::FullMatrix<double>, dealii::FullMatrix<double>>
-AssembleDG<basis>::local_IC(const double theta, const dealii::Tensor<2, lifex::dim>& Sigma) const
+AssembleDG<basis>::local_IC(const double                         theta,
+                            const dealii::Tensor<2, lifex::dim> &Sigma) const
 {
   AssertThrow(theta == 1. || theta == 0. || theta == -1.,
               dealii::StandardExceptions::ExcMessage(
@@ -822,7 +842,8 @@ AssembleDG<basis>::local_IB(const double theta) const
 
 template <class basis>
 std::pair<dealii::FullMatrix<double>, dealii::FullMatrix<double>>
-AssembleDG<basis>::local_IB(const double theta, const dealii::Tensor<2, lifex::dim>& Sigma) const
+AssembleDG<basis>::local_IB(const double                         theta,
+                            const dealii::Tensor<2, lifex::dim> &Sigma) const
 {
   AssertThrow(theta == 1. || theta == 0. || theta == -1.,
               dealii::StandardExceptions::ExcMessage(
@@ -912,7 +933,8 @@ AssembleDG<basis>::local_IN(const double theta) const
 
 template <class basis>
 std::pair<dealii::FullMatrix<double>, dealii::FullMatrix<double>>
-AssembleDG<basis>::local_IN(const double theta, const dealii::Tensor<2, lifex::dim>& Sigma) const
+AssembleDG<basis>::local_IN(const double                         theta,
+                            const dealii::Tensor<2, lifex::dim> &Sigma) const
 {
   AssertThrow(theta == 1. || theta == 0. || theta == -1.,
               dealii::StandardExceptions::ExcMessage(
@@ -926,7 +948,7 @@ AssembleDG<basis>::local_IN(const double theta, const dealii::Tensor<2, lifex::d
   const double unit_face_measure = (4.0 - lifex::dim) / 2;
   const double measure_ratio     = face_measure / unit_face_measure;
 
-    const dealii::Tensor<2, lifex::dim> Sigma_tr = transpose(Sigma);
+  const dealii::Tensor<2, lifex::dim> Sigma_tr = transpose(Sigma);
 
   dealii::FullMatrix<double> IN(dofs_per_cell, dofs_per_cell);
   dealii::FullMatrix<double> IN_t(dofs_per_cell, dofs_per_cell);

@@ -239,7 +239,7 @@ ModelDG_t<basis>::time_initialization()
   // discretization of the analytical u_ex.
   this->discretize_analytical_solution(this->u_ex, this->solution_owned);
   this->solution_ex_owned = this->solution_owned;
-  this->solution = this->solution_owned;
+  this->solution          = this->solution_owned;
 
   // Initialization of the initial solution.
   const std::vector<lifex::LinAlg::MPI::Vector> sol_init(this->prm_bdf_order,

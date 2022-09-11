@@ -171,10 +171,15 @@ protected:
   virtual lifex::LinAlg::MPI::Vector
   conversion_to_fem(const lifex::LinAlg::MPI::Vector &sol_owned) const;
 
-  // As conversion_to_fem but used when converting to more refined FEM meshes. See the description of the equivalent method in DUBFEMHandler. Notice that it works only when using Dubiner basis and
-  // it requires that the Dubiner mesh is nested in the FEM mesh.
+  // As conversion_to_fem but used when converting to more refined FEM meshes.
+  // See the description of the equivalent method in DUBFEMHandler. Notice that
+  // it works only when using Dubiner basis and it requires that the Dubiner
+  // mesh is nested in the FEM mesh.
   virtual void
-  conversion_to_fem(lifex::LinAlg::MPI::Vector &sol_owned, const std::string fem_file_path);
+  conversion_to_fem(lifex::LinAlg::MPI::Vector &sol_owned,
+                    const std::string           fem_file_path,
+                    const unsigned int          degree_fem     = 1,
+                    const double                scaling_factor = 1);
 
   /// To convert a discretized solution in Dubiner basis (only for problems
   /// using Dubiner basis). In-place version.
@@ -186,10 +191,15 @@ protected:
   virtual lifex::LinAlg::MPI::Vector
   conversion_to_dub(const lifex::LinAlg::MPI::Vector &sol_owned) const;
 
-  // As conversion_to_dub but used when converting from more refined FEM meshes. See the description of the equivalent method in DUBFEMHandler. Notice that it works only when using Dubiner basis and
-  // it requires that the Dubiner mesh is nested in the FEM mesh.
+  // As conversion_to_dub but used when converting from more refined FEM meshes.
+  // See the description of the equivalent method in DUBFEMHandler. Notice that
+  // it works only when using Dubiner basis and it requires that the Dubiner
+  // mesh is nested in the FEM mesh.
   virtual void
-  conversion_to_dub(lifex::LinAlg::MPI::Vector &sol_owned, const std::string fem_file_path);
+  conversion_to_dub(lifex::LinAlg::MPI::Vector &sol_owned,
+                    const std::string           fem_file_path,
+                    const unsigned int          degree_fem     = 1,
+                    const double                scaling_factor = 1);
 
   /// Conversion of an analytical solution from FEM to basis coefficients.
   void
@@ -630,10 +640,18 @@ ModelDG<DUBValues<lifex::dim>>::conversion_to_fem(
 
 template <class basis>
 void
-ModelDG<basis>::conversion_to_fem(lifex::LinAlg::MPI::Vector &sol_owned, const std::string fem_file_path)
-  {
-    sol_owned = dub_fem_values->dubiner_to_fem(sol_owned, fem_file_path, prm_subsection_path, mpi_comm);
-  }
+ModelDG<basis>::conversion_to_fem(lifex::LinAlg::MPI::Vector &sol_owned,
+                                  const std::string           fem_file_path,
+                                  const unsigned int          degree_fem,
+                                  const double                scaling_factor)
+{
+  sol_owned = dub_fem_values->dubiner_to_fem(sol_owned,
+                                             fem_file_path,
+                                             prm_subsection_path,
+                                             mpi_comm,
+                                             degree_fem,
+                                             scaling_factor);
+}
 
 /// Conversion of a discretized solution from FEM coefficients to Dubiner
 /// coefficients. Useless if we are not using Dubiner basis functions.
@@ -676,10 +694,18 @@ ModelDG<DUBValues<lifex::dim>>::conversion_to_dub(
 
 template <class basis>
 void
-ModelDG<basis>::conversion_to_dub(lifex::LinAlg::MPI::Vector &sol_owned, const std::string fem_file_path)
-  {
-    sol_owned = dub_fem_values->fem_to_dubiner(sol_owned, fem_file_path, prm_subsection_path, mpi_comm);
-  }
+ModelDG<basis>::conversion_to_dub(lifex::LinAlg::MPI::Vector &sol_owned,
+                                  const std::string           fem_file_path,
+                                  const unsigned int          degree_fem,
+                                  const double                scaling_factor)
+{
+  sol_owned = dub_fem_values->fem_to_dubiner(sol_owned,
+                                             fem_file_path,
+                                             prm_subsection_path,
+                                             mpi_comm,
+                                             degree_fem,
+                                             scaling_factor);
+}
 
 /// Conversion of an analytical solution from FEM to basis coefficients.
 /// Specialization for FEM basis.
