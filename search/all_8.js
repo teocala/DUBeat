@@ -5,5 +5,6 @@ var searchData=
   ['initialize_5fsolution_86',['initialize_solution',['../class_model_d_g.html#a2a27782f0b9a9b92c743f23d4d99e911',1,'ModelDG']]],
   ['initialized_87',['initialized',['../class_volume_handler_d_g.html#adb6b894d014ba2872ab23b7c7706d81d',1,'VolumeHandlerDG']]],
   ['installation_2emd_88',['installation.md',['../installation_8md.html',1,'']]],
-  ['intermediate_5ferror_5fprint_89',['intermediate_error_print',['../class_model_d_g__t.html#a8ab14b91dd762063984a445cabfb4782',1,'ModelDG_t']]]
+  ['intermediate_5ferror_5fprint_89',['intermediate_error_print',['../class_model_d_g__t.html#a8ab14b91dd762063984a445cabfb4782',1,'ModelDG_t']]],
+  ['is_5fin_5funit_5fcell_90',['is_in_unit_cell',['../class_d_u_b_f_e_m_handler.html#af8a7091ab3904e588afd8ba4ad1f1d48',1,'DUBFEMHandler']]]
 ];

@@ -194,16 +194,16 @@ Protected Member Functions</h2></td></tr>
 <tr class="memitem:a9b9fc2a05bd4a5c965ca8cd57a14a3fc"><td class="memItemLeft" align="right" valign="top">virtual lifex::LinAlg::MPI::Vector&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_model_d_g.html#a9b9fc2a05bd4a5c965ca8cd57a14a3fc">conversion_to_fem</a> (const lifex::LinAlg::MPI::Vector &amp;sol_owned) const</td></tr>
 <tr class="memdesc:a9b9fc2a05bd4a5c965ca8cd57a14a3fc"><td class="mdescLeft">&#160;</td><td class="mdescRight">To convert a discretized solution in FEM basis (does nothing if problem is in DGFEM), const version.  <a href="class_model_d_g.html#a9b9fc2a05bd4a5c965ca8cd57a14a3fc">More...</a><br /></td></tr>
 <tr class="separator:a9b9fc2a05bd4a5c965ca8cd57a14a3fc"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a9d8bffd46b840c8d9c2d4ffb343780b2"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_model_d_g.html#a9d8bffd46b840c8d9c2d4ffb343780b2">conversion_to_fem</a> (lifex::LinAlg::MPI::Vector &amp;sol_owned, const std::string fem_file_path)</td></tr>
-<tr class="separator:a9d8bffd46b840c8d9c2d4ffb343780b2"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a222131a77886bd0aa59a97a6541ded19"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_model_d_g.html#a222131a77886bd0aa59a97a6541ded19">conversion_to_fem</a> (lifex::LinAlg::MPI::Vector &amp;sol_owned, const std::string fem_file_path, const unsigned int degree_fem=1, const double <a class="el" href="class_model_d_g.html#ac72a79778ca84d62cf202afd00011e9d">scaling_factor</a>=1)</td></tr>
+<tr class="separator:a222131a77886bd0aa59a97a6541ded19"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a264da798d7b7b5cc4092e4ce6624a611"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_model_d_g.html#a264da798d7b7b5cc4092e4ce6624a611">conversion_to_dub</a> (lifex::LinAlg::MPI::Vector &amp;sol_owned)</td></tr>
 <tr class="memdesc:a264da798d7b7b5cc4092e4ce6624a611"><td class="mdescLeft">&#160;</td><td class="mdescRight">To convert a discretized solution in Dubiner basis (only for problems using Dubiner basis).  <a href="class_model_d_g.html#a264da798d7b7b5cc4092e4ce6624a611">More...</a><br /></td></tr>
 <tr class="separator:a264da798d7b7b5cc4092e4ce6624a611"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a9c02346538e07821eaa87aaf2d6d443d"><td class="memItemLeft" align="right" valign="top">virtual lifex::LinAlg::MPI::Vector&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_model_d_g.html#a9c02346538e07821eaa87aaf2d6d443d">conversion_to_dub</a> (const lifex::LinAlg::MPI::Vector &amp;sol_owned) const</td></tr>
 <tr class="memdesc:a9c02346538e07821eaa87aaf2d6d443d"><td class="mdescLeft">&#160;</td><td class="mdescRight">To convert a discretized solution in Dubiner basis (only for problems using Dubiner basis).  <a href="class_model_d_g.html#a9c02346538e07821eaa87aaf2d6d443d">More...</a><br /></td></tr>
 <tr class="separator:a9c02346538e07821eaa87aaf2d6d443d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a05a3cc17934d5c29dd2d519c1d8e7784"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_model_d_g.html#a05a3cc17934d5c29dd2d519c1d8e7784">conversion_to_dub</a> (lifex::LinAlg::MPI::Vector &amp;sol_owned, const std::string fem_file_path)</td></tr>
-<tr class="separator:a05a3cc17934d5c29dd2d519c1d8e7784"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a581b87e09241a9c7b0335357e2168fb6"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_model_d_g.html#a581b87e09241a9c7b0335357e2168fb6">conversion_to_dub</a> (lifex::LinAlg::MPI::Vector &amp;sol_owned, const std::string fem_file_path, const unsigned int degree_fem=1, const double <a class="el" href="class_model_d_g.html#ac72a79778ca84d62cf202afd00011e9d">scaling_factor</a>=1)</td></tr>
+<tr class="separator:a581b87e09241a9c7b0335357e2168fb6"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aec2e82c5f5e5f330ba9e476f0e330344"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_model_d_g.html#aec2e82c5f5e5f330ba9e476f0e330344">discretize_analytical_solution</a> (const std::shared_ptr&lt; dealii::Function&lt; lifex::dim &gt;&gt; &amp;u_analytical, lifex::LinAlg::MPI::Vector &amp;sol_owned)</td></tr>
 <tr class="memdesc:aec2e82c5f5e5f330ba9e476f0e330344"><td class="mdescLeft">&#160;</td><td class="mdescRight">Conversion of an analytical solution from FEM to basis coefficients.  <a href="class_model_d_g.html#aec2e82c5f5e5f330ba9e476f0e330344">More...</a><br /></td></tr>
 <tr class="separator:aec2e82c5f5e5f330ba9e476f0e330344"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -546,7 +546,7 @@ template&lt;class basis &gt; </div>
 
 <p>To compute the \(L^\infty\) error, the \(L^2\) error, the \(H^1\) error and the \(DG\) error at the end of system solving, it exploits the DGComputeErrors&lt;basis&gt; class. </p>
 
-<p class="definition">Definition at line <a class="el" href="model___d_g_8hpp_source.html#l00536">536</a> of file <a class="el" href="model___d_g_8hpp_source.html">model_DG.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="model___d_g_8hpp_source.html#l00546">546</a> of file <a class="el" href="model___d_g_8hpp_source.html">model_DG.hpp</a>.</p>
 
 </div>
 </div>
@@ -580,7 +580,7 @@ template&lt;class basis &gt; </div>
 <p>Conversion to DUB coefficients, const version.</p>
 <p>Const version. </p>
 
-<p class="definition">Definition at line <a class="el" href="model___d_g_8hpp_source.html#l00660">660</a> of file <a class="el" href="model___d_g_8hpp_source.html">model_DG.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="model___d_g_8hpp_source.html#l00678">678</a> of file <a class="el" href="model___d_g_8hpp_source.html">model_DG.hpp</a>.</p>
 
 </div>
 </div>
@@ -610,7 +610,7 @@ template&lt;class basis &gt; </div>
 
 <p>Conversion to DUB coefficients, const version. </p>
 
-<p class="definition">Definition at line <a class="el" href="model___d_g_8hpp_source.html#l00669">669</a> of file <a class="el" href="model___d_g_8hpp_source.html">model_DG.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="model___d_g_8hpp_source.html#l00687">687</a> of file <a class="el" href="model___d_g_8hpp_source.html">model_DG.hpp</a>.</p>
 
 </div>
 </div>
@@ -645,7 +645,7 @@ template&lt;class basis &gt; </div>
 <p>In-place version.</p>
 <p>Useless if we are not using Dubiner basis functions. </p>
 
-<p class="definition">Definition at line <a class="el" href="model___d_g_8hpp_source.html#l00642">642</a> of file <a class="el" href="model___d_g_8hpp_source.html">model_DG.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="model___d_g_8hpp_source.html#l00660">660</a> of file <a class="el" href="model___d_g_8hpp_source.html">model_DG.hpp</a>.</p>
 
 </div>
 </div>
@@ -675,12 +675,12 @@ template&lt;class basis &gt; </div>
 
 <p>Conversion of a discretized solution from FEM coefficients to Dubiner coefficients. </p>
 
-<p class="definition">Definition at line <a class="el" href="model___d_g_8hpp_source.html#l00651">651</a> of file <a class="el" href="model___d_g_8hpp_source.html">model_DG.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="model___d_g_8hpp_source.html#l00669">669</a> of file <a class="el" href="model___d_g_8hpp_source.html">model_DG.hpp</a>.</p>
 
 </div>
 </div>
-<a id="a05a3cc17934d5c29dd2d519c1d8e7784"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a05a3cc17934d5c29dd2d519c1d8e7784">&#9670;&nbsp;</a></span>conversion_to_dub() <span class="overload">[5/5]</span></h2>
+<a id="a581b87e09241a9c7b0335357e2168fb6"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a581b87e09241a9c7b0335357e2168fb6">&#9670;&nbsp;</a></span>conversion_to_dub() <span class="overload">[5/5]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -700,7 +700,19 @@ template&lt;class basis &gt; </div>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">const std::string&#160;</td>
-          <td class="paramname"><em>fem_file_path</em>&#160;</td>
+          <td class="paramname"><em>fem_file_path</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const unsigned int&#160;</td>
+          <td class="paramname"><em>degree_fem</em> = <code>1</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const double&#160;</td>
+          <td class="paramname"><em>scaling_factor</em> = <code>1</code>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -715,7 +727,7 @@ template&lt;class basis &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="model___d_g_8hpp_source.html#l00679">679</a> of file <a class="el" href="model___d_g_8hpp_source.html">model_DG.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="model___d_g_8hpp_source.html#l00697">697</a> of file <a class="el" href="model___d_g_8hpp_source.html">model_DG.hpp</a>.</p>
 
 </div>
 </div>
@@ -748,7 +760,7 @@ template&lt;class basis &gt; </div>
 <p>To convert a discretized solution in FEM basis (does nothing if problem is in DGFEM), const version. </p>
 <p>Conversion to FEM coefficients, const version. </p>
 
-<p class="definition">Definition at line <a class="el" href="model___d_g_8hpp_source.html#l00614">614</a> of file <a class="el" href="model___d_g_8hpp_source.html">model_DG.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="model___d_g_8hpp_source.html#l00624">624</a> of file <a class="el" href="model___d_g_8hpp_source.html">model_DG.hpp</a>.</p>
 
 </div>
 </div>
@@ -778,7 +790,7 @@ template&lt;class basis &gt; </div>
 
 <p>Conversion to FEM coefficients, const version. </p>
 
-<p class="definition">Definition at line <a class="el" href="model___d_g_8hpp_source.html#l00623">623</a> of file <a class="el" href="model___d_g_8hpp_source.html">model_DG.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="model___d_g_8hpp_source.html#l00633">633</a> of file <a class="el" href="model___d_g_8hpp_source.html">model_DG.hpp</a>.</p>
 
 </div>
 </div>
@@ -813,7 +825,7 @@ template&lt;class basis &gt; </div>
 <p>It exploits dubiner_to_fem from <a class="el" href="_d_u_b___f_e_m__handler_8hpp.html">DUB_FEM_handler.hpp</a> so the same considerations as in output_results hold.</p>
 <p>Useless if we are not using Dubiner basis functions. </p>
 
-<p class="definition">Definition at line <a class="el" href="model___d_g_8hpp_source.html#l00596">596</a> of file <a class="el" href="model___d_g_8hpp_source.html">model_DG.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="model___d_g_8hpp_source.html#l00606">606</a> of file <a class="el" href="model___d_g_8hpp_source.html">model_DG.hpp</a>.</p>
 
 </div>
 </div>
@@ -843,12 +855,12 @@ template&lt;class basis &gt; </div>
 
 <p>Conversion of a discretized solution from Dubiner coefficients to FEM coefficients. </p>
 
-<p class="definition">Definition at line <a class="el" href="model___d_g_8hpp_source.html#l00605">605</a> of file <a class="el" href="model___d_g_8hpp_source.html">model_DG.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="model___d_g_8hpp_source.html#l00615">615</a> of file <a class="el" href="model___d_g_8hpp_source.html">model_DG.hpp</a>.</p>
 
 </div>
 </div>
-<a id="a9d8bffd46b840c8d9c2d4ffb343780b2"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a9d8bffd46b840c8d9c2d4ffb343780b2">&#9670;&nbsp;</a></span>conversion_to_fem() <span class="overload">[5/5]</span></h2>
+<a id="a222131a77886bd0aa59a97a6541ded19"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a222131a77886bd0aa59a97a6541ded19">&#9670;&nbsp;</a></span>conversion_to_fem() <span class="overload">[5/5]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -868,7 +880,19 @@ template&lt;class basis &gt; </div>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">const std::string&#160;</td>
-          <td class="paramname"><em>fem_file_path</em>&#160;</td>
+          <td class="paramname"><em>fem_file_path</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const unsigned int&#160;</td>
+          <td class="paramname"><em>degree_fem</em> = <code>1</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const double&#160;</td>
+          <td class="paramname"><em>scaling_factor</em> = <code>1</code>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -883,7 +907,7 @@ template&lt;class basis &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="model___d_g_8hpp_source.html#l00633">633</a> of file <a class="el" href="model___d_g_8hpp_source.html">model_DG.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="model___d_g_8hpp_source.html#l00643">643</a> of file <a class="el" href="model___d_g_8hpp_source.html">model_DG.hpp</a>.</p>
 
 </div>
 </div>
@@ -911,7 +935,7 @@ template&lt;class basis &gt; </div>
 
 <p>Load the mesh from the default path. </p>
 
-<p class="definition">Definition at line <a class="el" href="model___d_g_8hpp_source.html#l00493">493</a> of file <a class="el" href="model___d_g_8hpp_source.html">model_DG.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="model___d_g_8hpp_source.html#l00503">503</a> of file <a class="el" href="model___d_g_8hpp_source.html">model_DG.hpp</a>.</p>
 
 </div>
 </div>
@@ -943,7 +967,7 @@ template&lt;class basis &gt; </div>
 
 <p>Load the mesh from a user-defined path. </p>
 
-<p class="definition">Definition at line <a class="el" href="model___d_g_8hpp_source.html#l00511">511</a> of file <a class="el" href="model___d_g_8hpp_source.html">model_DG.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="model___d_g_8hpp_source.html#l00521">521</a> of file <a class="el" href="model___d_g_8hpp_source.html">model_DG.hpp</a>.</p>
 
 </div>
 </div>
@@ -977,7 +1001,7 @@ template&lt;class basis &gt; </div>
 
 <p>Reimplemented in <a class="el" href="class_d_u_beat_1_1models_1_1_monodomain_f_h_n_d_g.html#a93f9d4cac88327df4d7f924d75ec6e11">DUBeat::models::MonodomainFHNDG&lt; basis &gt;</a>, and <a class="el" href="class_model_d_g__t.html#a06e262dc86ef9a3908e7d5e6c36a6008">ModelDG_t&lt; basis &gt;</a>.</p>
 
-<p class="definition">Definition at line <a class="el" href="model___d_g_8hpp_source.html#l00251">251</a> of file <a class="el" href="model___d_g_8hpp_source.html">model_DG.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="model___d_g_8hpp_source.html#l00261">261</a> of file <a class="el" href="model___d_g_8hpp_source.html">model_DG.hpp</a>.</p>
 
 </div>
 </div>
@@ -1058,7 +1082,7 @@ template&lt;class basis &gt; </div>
 <p>Conversion of an analytical solution from FEM to basis coefficients. </p>
 <p>Specialization for FEM basis. </p>
 
-<p class="definition">Definition at line <a class="el" href="model___d_g_8hpp_source.html#l00688">688</a> of file <a class="el" href="model___d_g_8hpp_source.html">model_DG.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="model___d_g_8hpp_source.html#l00714">714</a> of file <a class="el" href="model___d_g_8hpp_source.html">model_DG.hpp</a>.</p>
 
 </div>
 </div>
@@ -1099,7 +1123,7 @@ template&lt;class basis &gt; </div>
 <p>Conversion of an analytical solution from FEM to basis coefficients. </p>
 <p>Specialization for Dubiner basis. </p>
 
-<p class="definition">Definition at line <a class="el" href="model___d_g_8hpp_source.html#l00699">699</a> of file <a class="el" href="model___d_g_8hpp_source.html">model_DG.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="model___d_g_8hpp_source.html#l00725">725</a> of file <a class="el" href="model___d_g_8hpp_source.html">model_DG.hpp</a>.</p>
 
 </div>
 </div>
@@ -1119,7 +1143,7 @@ template&lt;class basis &gt; </div>
 
 <p>Return the number of degrees of freedom per element. </p>
 
-<p class="definition">Definition at line <a class="el" href="model___d_g_8hpp_source.html#l00319">319</a> of file <a class="el" href="model___d_g_8hpp_source.html">model_DG.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="model___d_g_8hpp_source.html#l00329">329</a> of file <a class="el" href="model___d_g_8hpp_source.html">model_DG.hpp</a>.</p>
 
 </div>
 </div>
@@ -1161,7 +1185,7 @@ template&lt;class basis &gt; </div>
 
 <p>To inizialize the solutions using the deal.II reinit. </p>
 
-<p class="definition">Definition at line <a class="el" href="model___d_g_8hpp_source.html#l00481">481</a> of file <a class="el" href="model___d_g_8hpp_source.html">model_DG.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="model___d_g_8hpp_source.html#l00491">491</a> of file <a class="el" href="model___d_g_8hpp_source.html">model_DG.hpp</a>.</p>
 
 </div>
 </div>
@@ -1222,7 +1246,7 @@ template&lt;class basis &gt; </div>
 <p>Creation of the sparsity pattern to assign to the system matrix before assembling. </p>
 <p>It has been readapted from the deal.II DoFTools::make_sparsity_pattern() method. </p>
 
-<p class="definition">Definition at line <a class="el" href="model___d_g_8hpp_source.html#l00429">429</a> of file <a class="el" href="model___d_g_8hpp_source.html">model_DG.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="model___d_g_8hpp_source.html#l00439">439</a> of file <a class="el" href="model___d_g_8hpp_source.html">model_DG.hpp</a>.</p>
 
 </div>
 </div>
@@ -1251,7 +1275,7 @@ template&lt;class basis &gt; </div>
 <p>Output of results. </p>
 <p>Note that, since it exploits dubiner_to_fem from <a class="el" href="_d_u_b___f_e_m__handler_8hpp.html">DUB_FEM_handler.hpp</a>, if the polynomial order chosen to solve the model is \(&gt;2\), the FE space considered for the output will be of order at most 2. This leads to an output vector which correspondent visualization might be less refined. See <a class="el" href="_d_u_b___f_e_m__handler_8hpp.html">DUB_FEM_handler.hpp</a> for more details. </p>
 
-<p class="definition">Definition at line <a class="el" href="model___d_g_8hpp_source.html#l00570">570</a> of file <a class="el" href="model___d_g_8hpp_source.html">model_DG.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="model___d_g_8hpp_source.html#l00580">580</a> of file <a class="el" href="model___d_g_8hpp_source.html">model_DG.hpp</a>.</p>
 
 </div>
 </div>
@@ -1285,7 +1309,7 @@ template&lt;class basis &gt; </div>
 
 <p>Reimplemented in <a class="el" href="class_d_u_beat_1_1models_1_1_monodomain_f_h_n_d_g.html#addb592bb1c4ad470b8cd38c0288cb736">DUBeat::models::MonodomainFHNDG&lt; basis &gt;</a>, and <a class="el" href="class_model_d_g__t.html#a60bf1d5452f74a490eeb6faf1ff31dcf">ModelDG_t&lt; basis &gt;</a>.</p>
 
-<p class="definition">Definition at line <a class="el" href="model___d_g_8hpp_source.html#l00290">290</a> of file <a class="el" href="model___d_g_8hpp_source.html">model_DG.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="model___d_g_8hpp_source.html#l00300">300</a> of file <a class="el" href="model___d_g_8hpp_source.html">model_DG.hpp</a>.</p>
 
 </div>
 </div>
@@ -1315,7 +1339,7 @@ template&lt;class basis &gt; </div>
 
 <p>Reimplemented in <a class="el" href="class_d_u_beat_1_1models_1_1_monodomain_f_h_n_d_g.html#a995d9a46ffbaaf07b93add3e385ef269">DUBeat::models::MonodomainFHNDG&lt; basis &gt;</a>, and <a class="el" href="class_model_d_g__t.html#a76f7e0c6606c3bcbe59a33a7910b3c11">ModelDG_t&lt; basis &gt;</a>.</p>
 
-<p class="definition">Definition at line <a class="el" href="model___d_g_8hpp_source.html#l00340">340</a> of file <a class="el" href="model___d_g_8hpp_source.html">model_DG.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="model___d_g_8hpp_source.html#l00350">350</a> of file <a class="el" href="model___d_g_8hpp_source.html">model_DG.hpp</a>.</p>
 
 </div>
 </div>
@@ -1343,7 +1367,7 @@ template&lt;class basis &gt; </div>
 
 <p>Setup of the problem before the resolution. </p>
 
-<p class="definition">Definition at line <a class="el" href="model___d_g_8hpp_source.html#l00371">371</a> of file <a class="el" href="model___d_g_8hpp_source.html">model_DG.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="model___d_g_8hpp_source.html#l00381">381</a> of file <a class="el" href="model___d_g_8hpp_source.html">model_DG.hpp</a>.</p>
 
 </div>
 </div>
@@ -1371,7 +1395,7 @@ template&lt;class basis &gt; </div>
 
 <p>System solving. </p>
 
-<p class="definition">Definition at line <a class="el" href="model___d_g_8hpp_source.html#l00527">527</a> of file <a class="el" href="model___d_g_8hpp_source.html">model_DG.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="model___d_g_8hpp_source.html#l00537">537</a> of file <a class="el" href="model___d_g_8hpp_source.html">model_DG.hpp</a>.</p>
 
 </div>
 </div>
@@ -1400,7 +1424,7 @@ template&lt;class basis &gt; </div>
 
 <p>Matrix assembler. </p>
 
-<p class="definition">Definition at line <a class="el" href="model___d_g_8hpp_source.html#l00222">222</a> of file <a class="el" href="model___d_g_8hpp_source.html">model_DG.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="model___d_g_8hpp_source.html#l00232">232</a> of file <a class="el" href="model___d_g_8hpp_source.html">model_DG.hpp</a>.</p>
 
 </div>
 </div>
@@ -1428,7 +1452,7 @@ template&lt;class basis &gt; </div>
 
 <p>DoFHandler (internal use for useful already implemented methods). </p>
 
-<p class="definition">Definition at line <a class="el" href="model___d_g_8hpp_source.html#l00217">217</a> of file <a class="el" href="model___d_g_8hpp_source.html">model_DG.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="model___d_g_8hpp_source.html#l00227">227</a> of file <a class="el" href="model___d_g_8hpp_source.html">model_DG.hpp</a>.</p>
 
 </div>
 </div>
@@ -1456,7 +1480,7 @@ template&lt;class basis &gt; </div>
 
 <p>Number of degrees of freedom per cell. </p>
 
-<p class="definition">Definition at line <a class="el" href="model___d_g_8hpp_source.html#l00215">215</a> of file <a class="el" href="model___d_g_8hpp_source.html">model_DG.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="model___d_g_8hpp_source.html#l00225">225</a> of file <a class="el" href="model___d_g_8hpp_source.html">model_DG.hpp</a>.</p>
 
 </div>
 </div>
@@ -1484,7 +1508,7 @@ template&lt;class basis &gt; </div>
 
 <p>Member used for conversions between analytical, nodal and modal representations of the solutions. </p>
 
-<p class="definition">Definition at line <a class="el" href="model___d_g_8hpp_source.html#l00220">220</a> of file <a class="el" href="model___d_g_8hpp_source.html">model_DG.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="model___d_g_8hpp_source.html#l00230">230</a> of file <a class="el" href="model___d_g_8hpp_source.html">model_DG.hpp</a>.</p>
 
 </div>
 </div>
@@ -1512,7 +1536,7 @@ template&lt;class basis &gt; </div>
 
 <p>Known forcing term. </p>
 
-<p class="definition">Definition at line <a class="el" href="model___d_g_8hpp_source.html#l00244">244</a> of file <a class="el" href="model___d_g_8hpp_source.html">model_DG.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="model___d_g_8hpp_source.html#l00254">254</a> of file <a class="el" href="model___d_g_8hpp_source.html">model_DG.hpp</a>.</p>
 
 </div>
 </div>
@@ -1540,7 +1564,7 @@ template&lt;class basis &gt; </div>
 
 <p>Neumann boundary conditions. </p>
 
-<p class="definition">Definition at line <a class="el" href="model___d_g_8hpp_source.html#l00246">246</a> of file <a class="el" href="model___d_g_8hpp_source.html">model_DG.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="model___d_g_8hpp_source.html#l00256">256</a> of file <a class="el" href="model___d_g_8hpp_source.html">model_DG.hpp</a>.</p>
 
 </div>
 </div>
@@ -1568,7 +1592,7 @@ template&lt;class basis &gt; </div>
 
 <p>Pointer to exact gradient solution Function. </p>
 
-<p class="definition">Definition at line <a class="el" href="model___d_g_8hpp_source.html#l00242">242</a> of file <a class="el" href="model___d_g_8hpp_source.html">model_DG.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="model___d_g_8hpp_source.html#l00252">252</a> of file <a class="el" href="model___d_g_8hpp_source.html">model_DG.hpp</a>.</p>
 
 </div>
 </div>
@@ -1596,7 +1620,7 @@ template&lt;class basis &gt; </div>
 
 <p>Linear solver handler. </p>
 
-<p class="definition">Definition at line <a class="el" href="model___d_g_8hpp_source.html#l00224">224</a> of file <a class="el" href="model___d_g_8hpp_source.html">model_DG.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="model___d_g_8hpp_source.html#l00234">234</a> of file <a class="el" href="model___d_g_8hpp_source.html">model_DG.hpp</a>.</p>
 
 </div>
 </div>
@@ -1624,7 +1648,7 @@ template&lt;class basis &gt; </div>
 
 <p>Distributed matrix of the linear system. </p>
 
-<p class="definition">Definition at line <a class="el" href="model___d_g_8hpp_source.html#l00228">228</a> of file <a class="el" href="model___d_g_8hpp_source.html">model_DG.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="model___d_g_8hpp_source.html#l00238">238</a> of file <a class="el" href="model___d_g_8hpp_source.html">model_DG.hpp</a>.</p>
 
 </div>
 </div>
@@ -1652,7 +1676,7 @@ template&lt;class basis &gt; </div>
 
 <p>Name of the class/problem. </p>
 
-<p class="definition">Definition at line <a class="el" href="model___d_g_8hpp_source.html#l00201">201</a> of file <a class="el" href="model___d_g_8hpp_source.html">model_DG.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="model___d_g_8hpp_source.html#l00211">211</a> of file <a class="el" href="model___d_g_8hpp_source.html">model_DG.hpp</a>.</p>
 
 </div>
 </div>
@@ -1680,7 +1704,7 @@ template&lt;class basis &gt; </div>
 
 <p>Preconditioner handler. </p>
 
-<p class="definition">Definition at line <a class="el" href="model___d_g_8hpp_source.html#l00226">226</a> of file <a class="el" href="model___d_g_8hpp_source.html">model_DG.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="model___d_g_8hpp_source.html#l00236">236</a> of file <a class="el" href="model___d_g_8hpp_source.html">model_DG.hpp</a>.</p>
 
 </div>
 </div>
@@ -1708,7 +1732,7 @@ template&lt;class basis &gt; </div>
 
 <p>Polynomials degree. </p>
 
-<p class="definition">Definition at line <a class="el" href="model___d_g_8hpp_source.html#l00203">203</a> of file <a class="el" href="model___d_g_8hpp_source.html">model_DG.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="model___d_g_8hpp_source.html#l00213">213</a> of file <a class="el" href="model___d_g_8hpp_source.html">model_DG.hpp</a>.</p>
 
 </div>
 </div>
@@ -1736,7 +1760,7 @@ template&lt;class basis &gt; </div>
 
 <p>Mesh refinement level (&gt;=1). </p>
 
-<p class="definition">Definition at line <a class="el" href="model___d_g_8hpp_source.html#l00205">205</a> of file <a class="el" href="model___d_g_8hpp_source.html">model_DG.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="model___d_g_8hpp_source.html#l00215">215</a> of file <a class="el" href="model___d_g_8hpp_source.html">model_DG.hpp</a>.</p>
 
 </div>
 </div>
@@ -1764,7 +1788,7 @@ template&lt;class basis &gt; </div>
 
 <p>DG Penalty coefficient. </p>
 
-<p class="definition">Definition at line <a class="el" href="model___d_g_8hpp_source.html#l00207">207</a> of file <a class="el" href="model___d_g_8hpp_source.html">model_DG.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="model___d_g_8hpp_source.html#l00217">217</a> of file <a class="el" href="model___d_g_8hpp_source.html">model_DG.hpp</a>.</p>
 
 </div>
 </div>
@@ -1792,7 +1816,7 @@ template&lt;class basis &gt; </div>
 
 <p>DG stabilty coefficient. </p>
 
-<p class="definition">Definition at line <a class="el" href="model___d_g_8hpp_source.html#l00209">209</a> of file <a class="el" href="model___d_g_8hpp_source.html">model_DG.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="model___d_g_8hpp_source.html#l00219">219</a> of file <a class="el" href="model___d_g_8hpp_source.html">model_DG.hpp</a>.</p>
 
 </div>
 </div>
@@ -1820,7 +1844,7 @@ template&lt;class basis &gt; </div>
 
 <p>Distributed right hand side vector of the linear system. </p>
 
-<p class="definition">Definition at line <a class="el" href="model___d_g_8hpp_source.html#l00230">230</a> of file <a class="el" href="model___d_g_8hpp_source.html">model_DG.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="model___d_g_8hpp_source.html#l00240">240</a> of file <a class="el" href="model___d_g_8hpp_source.html">model_DG.hpp</a>.</p>
 
 </div>
 </div>
@@ -1848,7 +1872,7 @@ template&lt;class basis &gt; </div>
 
 <p>Scaling factor. </p>
 
-<p class="definition">Definition at line <a class="el" href="model___d_g_8hpp_source.html#l00211">211</a> of file <a class="el" href="model___d_g_8hpp_source.html">model_DG.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="model___d_g_8hpp_source.html#l00221">221</a> of file <a class="el" href="model___d_g_8hpp_source.html">model_DG.hpp</a>.</p>
 
 </div>
 </div>
@@ -1876,7 +1900,7 @@ template&lt;class basis &gt; </div>
 
 <p>Distributed solution vector, with ghost entries. </p>
 
-<p class="definition">Definition at line <a class="el" href="model___d_g_8hpp_source.html#l00234">234</a> of file <a class="el" href="model___d_g_8hpp_source.html">model_DG.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="model___d_g_8hpp_source.html#l00244">244</a> of file <a class="el" href="model___d_g_8hpp_source.html">model_DG.hpp</a>.</p>
 
 </div>
 </div>
@@ -1904,7 +1928,7 @@ template&lt;class basis &gt; </div>
 
 <p>Distributed exact solution vector, without ghost entries. </p>
 
-<p class="definition">Definition at line <a class="el" href="model___d_g_8hpp_source.html#l00238">238</a> of file <a class="el" href="model___d_g_8hpp_source.html">model_DG.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="model___d_g_8hpp_source.html#l00248">248</a> of file <a class="el" href="model___d_g_8hpp_source.html">model_DG.hpp</a>.</p>
 
 </div>
 </div>
@@ -1932,7 +1956,7 @@ template&lt;class basis &gt; </div>
 
 <p>Distributed exact solution vector, without ghost entries. </p>
 
-<p class="definition">Definition at line <a class="el" href="model___d_g_8hpp_source.html#l00236">236</a> of file <a class="el" href="model___d_g_8hpp_source.html">model_DG.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="model___d_g_8hpp_source.html#l00246">246</a> of file <a class="el" href="model___d_g_8hpp_source.html">model_DG.hpp</a>.</p>
 
 </div>
 </div>
@@ -1960,7 +1984,7 @@ template&lt;class basis &gt; </div>
 
 <p>Distributed solution vector, without ghost entries. </p>
 
-<p class="definition">Definition at line <a class="el" href="model___d_g_8hpp_source.html#l00232">232</a> of file <a class="el" href="model___d_g_8hpp_source.html">model_DG.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="model___d_g_8hpp_source.html#l00242">242</a> of file <a class="el" href="model___d_g_8hpp_source.html">model_DG.hpp</a>.</p>
 
 </div>
 </div>
@@ -1988,7 +2012,7 @@ template&lt;class basis &gt; </div>
 
 <p>Triangulation (internal use for useful already implemented methods). </p>
 
-<p class="definition">Definition at line <a class="el" href="model___d_g_8hpp_source.html#l00213">213</a> of file <a class="el" href="model___d_g_8hpp_source.html">model_DG.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="model___d_g_8hpp_source.html#l00223">223</a> of file <a class="el" href="model___d_g_8hpp_source.html">model_DG.hpp</a>.</p>
 
 </div>
 </div>
@@ -2016,7 +2040,7 @@ template&lt;class basis &gt; </div>
 
 <p>Pointer to exact solution function. </p>
 
-<p class="definition">Definition at line <a class="el" href="model___d_g_8hpp_source.html#l00240">240</a> of file <a class="el" href="model___d_g_8hpp_source.html">model_DG.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="model___d_g_8hpp_source.html#l00250">250</a> of file <a class="el" href="model___d_g_8hpp_source.html">model_DG.hpp</a>.</p>
 
 </div>
 </div>

@@ -1,8 +1,8 @@
 var searchData=
 [
-  ['n_364',['n',['../namespacegenerate__convergence__plots.html#a662778f0f522ece58f6542c5745c234b',1,'generate_convergence_plots']]],
-  ['n_5fquad_5fpoints_365',['n_quad_points',['../class_assemble_d_g.html#af939b7f1440d9c71d133f0f5e6e60c9e',1,'AssembleDG::n_quad_points()'],['../class_compute_errors_d_g.html#a87754136c91842d7774afe5e5fd83604',1,'ComputeErrorsDG::n_quad_points()'],['../class_d_u_b_f_e_m_handler.html#a044784832395e6242ae199d504d878c2',1,'DUBFEMHandler::n_quad_points()']]],
-  ['n_5fquad_5fpoints_5f1d_366',['n_quad_points_1D',['../class_assemble_d_g.html#a548023e21595322aedf7abb3a862b3df',1,'AssembleDG::n_quad_points_1D()'],['../class_volume_handler_d_g.html#a15fc7836269d3505f8f774945e542d67',1,'VolumeHandlerDG::n_quad_points_1D()']]],
-  ['n_5fquad_5fpoints_5fface_367',['n_quad_points_face',['../class_assemble_d_g.html#ad233656be8ecc553a0b64c2db8e61d9b',1,'AssembleDG::n_quad_points_face()'],['../class_compute_errors_d_g.html#a2b42ee7794a4af335b5b6e32eeb47167',1,'ComputeErrorsDG::n_quad_points_face()']]],
-  ['nref_368',['nref',['../class_compute_errors_d_g.html#a8e3959abd404cf3c39535dd15ca53095',1,'ComputeErrorsDG']]]
+  ['n_366',['n',['../namespacegenerate__convergence__plots.html#a662778f0f522ece58f6542c5745c234b',1,'generate_convergence_plots']]],
+  ['n_5fquad_5fpoints_367',['n_quad_points',['../class_assemble_d_g.html#af939b7f1440d9c71d133f0f5e6e60c9e',1,'AssembleDG::n_quad_points()'],['../class_compute_errors_d_g.html#a87754136c91842d7774afe5e5fd83604',1,'ComputeErrorsDG::n_quad_points()'],['../class_d_u_b_f_e_m_handler.html#a044784832395e6242ae199d504d878c2',1,'DUBFEMHandler::n_quad_points()']]],
+  ['n_5fquad_5fpoints_5f1d_368',['n_quad_points_1D',['../class_assemble_d_g.html#a548023e21595322aedf7abb3a862b3df',1,'AssembleDG::n_quad_points_1D()'],['../class_volume_handler_d_g.html#a15fc7836269d3505f8f774945e542d67',1,'VolumeHandlerDG::n_quad_points_1D()']]],
+  ['n_5fquad_5fpoints_5fface_369',['n_quad_points_face',['../class_assemble_d_g.html#ad233656be8ecc553a0b64c2db8e61d9b',1,'AssembleDG::n_quad_points_face()'],['../class_compute_errors_d_g.html#a2b42ee7794a4af335b5b6e32eeb47167',1,'ComputeErrorsDG::n_quad_points_face()']]],
+  ['nref_370',['nref',['../class_compute_errors_d_g.html#a8e3959abd404cf3c39535dd15ca53095',1,'ComputeErrorsDG']]]
 ];
