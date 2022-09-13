@@ -314,98 +314,100 @@ $(document).ready(function(){initNavTree('model___d_g__t_8hpp_source.html',''); 
 <div class="line"><a name="l00247"></a><span class="lineno">  247</span>&#160; </div>
 <div class="line"><a name="l00248"></a><span class="lineno">  248</span>&#160;  <span class="comment">// Initialization of the BDFHandler</span></div>
 <div class="line"><a name="l00249"></a><span class="lineno">  249</span>&#160;  bdf_handler.initialize(this-&gt;prm_bdf_order, sol_init);</div>
-<div class="line"><a name="l00250"></a><span class="lineno">  250</span>&#160;}</div>
-<div class="line"><a name="l00251"></a><span class="lineno">  251</span>&#160; </div>
-<div class="line"><a name="l00252"></a><span class="lineno">  252</span>&#160;<span class="keyword">template</span> &lt;<span class="keyword">class</span> basis&gt;</div>
-<div class="line"><a name="l00253"></a><span class="lineno">  253</span>&#160;<span class="keywordtype">void</span></div>
-<div class="line"><a name="l00254"></a><span class="lineno"><a class="line" href="class_model_d_g__t.html#a8ab14b91dd762063984a445cabfb4782">  254</a></span>&#160;<a class="code" href="class_model_d_g__t.html#a8ab14b91dd762063984a445cabfb4782">ModelDG_t&lt;basis&gt;::intermediate_error_print</a>(</div>
-<div class="line"><a name="l00255"></a><span class="lineno">  255</span>&#160;  <span class="keyword">const</span> lifex::LinAlg::MPI::Vector                    &amp;solution_owned,</div>
-<div class="line"><a name="l00256"></a><span class="lineno">  256</span>&#160;  <span class="keyword">const</span> lifex::LinAlg::MPI::Vector                    &amp;solution_ex_owned,</div>
-<div class="line"><a name="l00257"></a><span class="lineno">  257</span>&#160;  <span class="keyword">const</span> std::shared_ptr&lt;dealii::Function&lt;lifex::dim&gt;&gt; &amp;u_ex,</div>
-<div class="line"><a name="l00258"></a><span class="lineno">  258</span>&#160;  <span class="keyword">const</span> <span class="keywordtype">char</span>                                          *solution_name)</div>
-<div class="line"><a name="l00259"></a><span class="lineno">  259</span>&#160;{</div>
-<div class="line"><a name="l00260"></a><span class="lineno">  260</span>&#160;  AssertThrow(u_ex != <span class="keyword">nullptr</span>,</div>
-<div class="line"><a name="l00261"></a><span class="lineno">  261</span>&#160;              dealii::StandardExceptions::ExcMessage(</div>
-<div class="line"><a name="l00262"></a><span class="lineno">  262</span>&#160;                <span class="stringliteral">&quot;Not valid pointer to the exact solution.&quot;</span>));</div>
-<div class="line"><a name="l00263"></a><span class="lineno">  263</span>&#160; </div>
-<div class="line"><a name="l00264"></a><span class="lineno">  264</span>&#160;  AssertThrow(solution_owned.size() == solution_ex_owned.size(),</div>
-<div class="line"><a name="l00265"></a><span class="lineno">  265</span>&#160;              dealii::StandardExceptions::ExcMessage(</div>
-<div class="line"><a name="l00266"></a><span class="lineno">  266</span>&#160;                <span class="stringliteral">&quot;The exact solution vector and the approximate solution vector &quot;</span></div>
-<div class="line"><a name="l00267"></a><span class="lineno">  267</span>&#160;                <span class="stringliteral">&quot;must have the same length.&quot;</span>));</div>
-<div class="line"><a name="l00268"></a><span class="lineno">  268</span>&#160; </div>
-<div class="line"><a name="l00269"></a><span class="lineno">  269</span>&#160;  lifex::LinAlg::MPI::Vector error_owned =</div>
-<div class="line"><a name="l00270"></a><span class="lineno">  270</span>&#160;    this-&gt;conversion_to_fem(solution_owned);</div>
-<div class="line"><a name="l00271"></a><span class="lineno">  271</span>&#160;  error_owned -= this-&gt;conversion_to_fem(solution_ex_owned);</div>
-<div class="line"><a name="l00272"></a><span class="lineno">  272</span>&#160; </div>
-<div class="line"><a name="l00273"></a><span class="lineno">  273</span>&#160;  pcerr &lt;&lt; solution_name &lt;&lt; <span class="stringliteral">&quot;:&quot;</span></div>
-<div class="line"><a name="l00274"></a><span class="lineno">  274</span>&#160;        &lt;&lt; <span class="stringliteral">&quot;\tL-inf error norm: &quot;</span> &lt;&lt; error_owned.linfty_norm() &lt;&lt; std::endl;</div>
-<div class="line"><a name="l00275"></a><span class="lineno">  275</span>&#160;}</div>
-<div class="line"><a name="l00276"></a><span class="lineno">  276</span>&#160; </div>
-<div class="line"><a name="l00277"></a><span class="lineno">  277</span>&#160;<span class="keyword">template</span> &lt;<span class="keyword">class</span> basis&gt;</div>
-<div class="line"><a name="l00278"></a><span class="lineno">  278</span>&#160;<span class="keywordtype">void</span></div>
-<div class="line"><a name="l00279"></a><span class="lineno"><a class="line" href="class_model_d_g__t.html#aa3c2a4a4c5610d93616e04a3ae542786">  279</a></span>&#160;<a class="code" href="class_model_d_g__t.html#aa3c2a4a4c5610d93616e04a3ae542786">ModelDG_t&lt;basis&gt;::update_time</a>()</div>
-<div class="line"><a name="l00280"></a><span class="lineno">  280</span>&#160;{</div>
-<div class="line"><a name="l00281"></a><span class="lineno">  281</span>&#160;  <span class="comment">// Update time for all the known analytical functions.</span></div>
-<div class="line"><a name="l00282"></a><span class="lineno">  282</span>&#160;  this-&gt;u_ex-&gt;set_time(this-&gt;time);</div>
-<div class="line"><a name="l00283"></a><span class="lineno">  283</span>&#160;  this-&gt;f_ex-&gt;set_time(this-&gt;time);</div>
-<div class="line"><a name="l00284"></a><span class="lineno">  284</span>&#160;  this-&gt;g_n-&gt;set_time(this-&gt;time);</div>
-<div class="line"><a name="l00285"></a><span class="lineno">  285</span>&#160;  this-&gt;grad_u_ex-&gt;set_time(this-&gt;time);</div>
-<div class="line"><a name="l00286"></a><span class="lineno">  286</span>&#160; </div>
-<div class="line"><a name="l00287"></a><span class="lineno">  287</span>&#160;  bdf_handler.time_advance(this-&gt;solution_owned, <span class="keyword">true</span>);</div>
-<div class="line"><a name="l00288"></a><span class="lineno">  288</span>&#160;  this-&gt;solution_bdf = bdf_handler.get_sol_bdf();</div>
-<div class="line"><a name="l00289"></a><span class="lineno">  289</span>&#160; </div>
-<div class="line"><a name="l00290"></a><span class="lineno">  290</span>&#160;  <span class="comment">// Update solution_ex_owned from the updated u_ex.</span></div>
-<div class="line"><a name="l00291"></a><span class="lineno">  291</span>&#160;  this-&gt;discretize_analytical_solution(this-&gt;u_ex, this-&gt;solution_ex_owned);</div>
-<div class="line"><a name="l00292"></a><span class="lineno">  292</span>&#160;}</div>
-<div class="line"><a name="l00293"></a><span class="lineno">  293</span>&#160; </div>
-<div class="line"><a name="l00294"></a><span class="lineno">  294</span>&#160;<span class="keyword">template</span> &lt;<span class="keyword">class</span> basis&gt;</div>
-<div class="line"><a name="l00295"></a><span class="lineno">  295</span>&#160;<span class="keywordtype">void</span></div>
-<div class="line"><a name="l00296"></a><span class="lineno"><a class="line" href="class_model_d_g__t.html#a76f7e0c6606c3bcbe59a33a7910b3c11">  296</a></span>&#160;<a class="code" href="class_model_d_g__t.html#a76f7e0c6606c3bcbe59a33a7910b3c11">ModelDG_t&lt;basis&gt;::run</a>()</div>
-<div class="line"><a name="l00297"></a><span class="lineno">  297</span>&#160;{</div>
-<div class="line"><a name="l00298"></a><span class="lineno">  298</span>&#160;  this-&gt;create_mesh();</div>
-<div class="line"><a name="l00299"></a><span class="lineno">  299</span>&#160;  this-&gt;setup_system();</div>
-<div class="line"><a name="l00300"></a><span class="lineno">  300</span>&#160;  this-&gt;initialize_solution(this-&gt;solution_owned, this-&gt;solution);</div>
-<div class="line"><a name="l00301"></a><span class="lineno">  301</span>&#160;  this-&gt;initialize_solution(this-&gt;solution_ex_owned, this-&gt;solution_ex);</div>
-<div class="line"><a name="l00302"></a><span class="lineno">  302</span>&#160;  this-&gt;time_initialization();</div>
-<div class="line"><a name="l00303"></a><span class="lineno">  303</span>&#160; </div>
-<div class="line"><a name="l00304"></a><span class="lineno">  304</span>&#160;  <span class="keywordflow">while</span> (this-&gt;time &lt; this-&gt;prm_time_final)</div>
-<div class="line"><a name="l00305"></a><span class="lineno">  305</span>&#160;    {</div>
-<div class="line"><a name="l00306"></a><span class="lineno">  306</span>&#160;      time += prm_time_step;</div>
-<div class="line"><a name="l00307"></a><span class="lineno">  307</span>&#160;      ++timestep_number;</div>
-<div class="line"><a name="l00308"></a><span class="lineno">  308</span>&#160; </div>
-<div class="line"><a name="l00309"></a><span class="lineno">  309</span>&#160;      pcout &lt;&lt; <span class="stringliteral">&quot;Time step &quot;</span> &lt;&lt; std::setw(6) &lt;&lt; timestep_number</div>
-<div class="line"><a name="l00310"></a><span class="lineno">  310</span>&#160;            &lt;&lt; <span class="stringliteral">&quot; at t = &quot;</span> &lt;&lt; std::setw(8) &lt;&lt; std::fixed &lt;&lt; std::setprecision(6)</div>
-<div class="line"><a name="l00311"></a><span class="lineno">  311</span>&#160;            &lt;&lt; time &lt;&lt; std::endl;</div>
-<div class="line"><a name="l00312"></a><span class="lineno">  312</span>&#160; </div>
-<div class="line"><a name="l00313"></a><span class="lineno">  313</span>&#160;      this-&gt;update_time();</div>
-<div class="line"><a name="l00314"></a><span class="lineno">  314</span>&#160;      this-&gt;solution_ext = bdf_handler.get_sol_extrapolation();</div>
-<div class="line"><a name="l00315"></a><span class="lineno">  315</span>&#160; </div>
-<div class="line"><a name="l00316"></a><span class="lineno">  316</span>&#160;      this-&gt;assemble_system();</div>
+<div class="line"><a name="l00250"></a><span class="lineno">  250</span>&#160; </div>
+<div class="line"><a name="l00251"></a><span class="lineno">  251</span>&#160;  solution_bdf = bdf_handler.get_sol_bdf();</div>
+<div class="line"><a name="l00252"></a><span class="lineno">  252</span>&#160;}</div>
+<div class="line"><a name="l00253"></a><span class="lineno">  253</span>&#160; </div>
+<div class="line"><a name="l00254"></a><span class="lineno">  254</span>&#160;<span class="keyword">template</span> &lt;<span class="keyword">class</span> basis&gt;</div>
+<div class="line"><a name="l00255"></a><span class="lineno">  255</span>&#160;<span class="keywordtype">void</span></div>
+<div class="line"><a name="l00256"></a><span class="lineno"><a class="line" href="class_model_d_g__t.html#a8ab14b91dd762063984a445cabfb4782">  256</a></span>&#160;<a class="code" href="class_model_d_g__t.html#a8ab14b91dd762063984a445cabfb4782">ModelDG_t&lt;basis&gt;::intermediate_error_print</a>(</div>
+<div class="line"><a name="l00257"></a><span class="lineno">  257</span>&#160;  <span class="keyword">const</span> lifex::LinAlg::MPI::Vector                    &amp;solution_owned,</div>
+<div class="line"><a name="l00258"></a><span class="lineno">  258</span>&#160;  <span class="keyword">const</span> lifex::LinAlg::MPI::Vector                    &amp;solution_ex_owned,</div>
+<div class="line"><a name="l00259"></a><span class="lineno">  259</span>&#160;  <span class="keyword">const</span> std::shared_ptr&lt;dealii::Function&lt;lifex::dim&gt;&gt; &amp;u_ex,</div>
+<div class="line"><a name="l00260"></a><span class="lineno">  260</span>&#160;  <span class="keyword">const</span> <span class="keywordtype">char</span>                                          *solution_name)</div>
+<div class="line"><a name="l00261"></a><span class="lineno">  261</span>&#160;{</div>
+<div class="line"><a name="l00262"></a><span class="lineno">  262</span>&#160;  AssertThrow(u_ex != <span class="keyword">nullptr</span>,</div>
+<div class="line"><a name="l00263"></a><span class="lineno">  263</span>&#160;              dealii::StandardExceptions::ExcMessage(</div>
+<div class="line"><a name="l00264"></a><span class="lineno">  264</span>&#160;                <span class="stringliteral">&quot;Not valid pointer to the exact solution.&quot;</span>));</div>
+<div class="line"><a name="l00265"></a><span class="lineno">  265</span>&#160; </div>
+<div class="line"><a name="l00266"></a><span class="lineno">  266</span>&#160;  AssertThrow(solution_owned.size() == solution_ex_owned.size(),</div>
+<div class="line"><a name="l00267"></a><span class="lineno">  267</span>&#160;              dealii::StandardExceptions::ExcMessage(</div>
+<div class="line"><a name="l00268"></a><span class="lineno">  268</span>&#160;                <span class="stringliteral">&quot;The exact solution vector and the approximate solution vector &quot;</span></div>
+<div class="line"><a name="l00269"></a><span class="lineno">  269</span>&#160;                <span class="stringliteral">&quot;must have the same length.&quot;</span>));</div>
+<div class="line"><a name="l00270"></a><span class="lineno">  270</span>&#160; </div>
+<div class="line"><a name="l00271"></a><span class="lineno">  271</span>&#160;  lifex::LinAlg::MPI::Vector error_owned =</div>
+<div class="line"><a name="l00272"></a><span class="lineno">  272</span>&#160;    this-&gt;conversion_to_fem(solution_owned);</div>
+<div class="line"><a name="l00273"></a><span class="lineno">  273</span>&#160;  error_owned -= this-&gt;conversion_to_fem(solution_ex_owned);</div>
+<div class="line"><a name="l00274"></a><span class="lineno">  274</span>&#160; </div>
+<div class="line"><a name="l00275"></a><span class="lineno">  275</span>&#160;  pcerr &lt;&lt; solution_name &lt;&lt; <span class="stringliteral">&quot;:&quot;</span></div>
+<div class="line"><a name="l00276"></a><span class="lineno">  276</span>&#160;        &lt;&lt; <span class="stringliteral">&quot;\tL-inf error norm: &quot;</span> &lt;&lt; error_owned.linfty_norm() &lt;&lt; std::endl;</div>
+<div class="line"><a name="l00277"></a><span class="lineno">  277</span>&#160;}</div>
+<div class="line"><a name="l00278"></a><span class="lineno">  278</span>&#160; </div>
+<div class="line"><a name="l00279"></a><span class="lineno">  279</span>&#160;<span class="keyword">template</span> &lt;<span class="keyword">class</span> basis&gt;</div>
+<div class="line"><a name="l00280"></a><span class="lineno">  280</span>&#160;<span class="keywordtype">void</span></div>
+<div class="line"><a name="l00281"></a><span class="lineno"><a class="line" href="class_model_d_g__t.html#aa3c2a4a4c5610d93616e04a3ae542786">  281</a></span>&#160;<a class="code" href="class_model_d_g__t.html#aa3c2a4a4c5610d93616e04a3ae542786">ModelDG_t&lt;basis&gt;::update_time</a>()</div>
+<div class="line"><a name="l00282"></a><span class="lineno">  282</span>&#160;{</div>
+<div class="line"><a name="l00283"></a><span class="lineno">  283</span>&#160;  <span class="comment">// Update time for all the known analytical functions.</span></div>
+<div class="line"><a name="l00284"></a><span class="lineno">  284</span>&#160;  this-&gt;u_ex-&gt;set_time(this-&gt;time);</div>
+<div class="line"><a name="l00285"></a><span class="lineno">  285</span>&#160;  this-&gt;f_ex-&gt;set_time(this-&gt;time);</div>
+<div class="line"><a name="l00286"></a><span class="lineno">  286</span>&#160;  this-&gt;g_n-&gt;set_time(this-&gt;time);</div>
+<div class="line"><a name="l00287"></a><span class="lineno">  287</span>&#160;  this-&gt;grad_u_ex-&gt;set_time(this-&gt;time);</div>
+<div class="line"><a name="l00288"></a><span class="lineno">  288</span>&#160; </div>
+<div class="line"><a name="l00289"></a><span class="lineno">  289</span>&#160;  bdf_handler.time_advance(this-&gt;solution_owned, <span class="keyword">true</span>);</div>
+<div class="line"><a name="l00290"></a><span class="lineno">  290</span>&#160;  this-&gt;solution_bdf = bdf_handler.get_sol_bdf();</div>
+<div class="line"><a name="l00291"></a><span class="lineno">  291</span>&#160; </div>
+<div class="line"><a name="l00292"></a><span class="lineno">  292</span>&#160;  <span class="comment">// Update solution_ex_owned from the updated u_ex.</span></div>
+<div class="line"><a name="l00293"></a><span class="lineno">  293</span>&#160;  this-&gt;discretize_analytical_solution(this-&gt;u_ex, this-&gt;solution_ex_owned);</div>
+<div class="line"><a name="l00294"></a><span class="lineno">  294</span>&#160;}</div>
+<div class="line"><a name="l00295"></a><span class="lineno">  295</span>&#160; </div>
+<div class="line"><a name="l00296"></a><span class="lineno">  296</span>&#160;<span class="keyword">template</span> &lt;<span class="keyword">class</span> basis&gt;</div>
+<div class="line"><a name="l00297"></a><span class="lineno">  297</span>&#160;<span class="keywordtype">void</span></div>
+<div class="line"><a name="l00298"></a><span class="lineno"><a class="line" href="class_model_d_g__t.html#a76f7e0c6606c3bcbe59a33a7910b3c11">  298</a></span>&#160;<a class="code" href="class_model_d_g__t.html#a76f7e0c6606c3bcbe59a33a7910b3c11">ModelDG_t&lt;basis&gt;::run</a>()</div>
+<div class="line"><a name="l00299"></a><span class="lineno">  299</span>&#160;{</div>
+<div class="line"><a name="l00300"></a><span class="lineno">  300</span>&#160;  this-&gt;create_mesh();</div>
+<div class="line"><a name="l00301"></a><span class="lineno">  301</span>&#160;  this-&gt;setup_system();</div>
+<div class="line"><a name="l00302"></a><span class="lineno">  302</span>&#160;  this-&gt;initialize_solution(this-&gt;solution_owned, this-&gt;solution);</div>
+<div class="line"><a name="l00303"></a><span class="lineno">  303</span>&#160;  this-&gt;initialize_solution(this-&gt;solution_ex_owned, this-&gt;solution_ex);</div>
+<div class="line"><a name="l00304"></a><span class="lineno">  304</span>&#160;  this-&gt;time_initialization();</div>
+<div class="line"><a name="l00305"></a><span class="lineno">  305</span>&#160; </div>
+<div class="line"><a name="l00306"></a><span class="lineno">  306</span>&#160;  <span class="keywordflow">while</span> (this-&gt;time &lt; this-&gt;prm_time_final)</div>
+<div class="line"><a name="l00307"></a><span class="lineno">  307</span>&#160;    {</div>
+<div class="line"><a name="l00308"></a><span class="lineno">  308</span>&#160;      time += prm_time_step;</div>
+<div class="line"><a name="l00309"></a><span class="lineno">  309</span>&#160;      ++timestep_number;</div>
+<div class="line"><a name="l00310"></a><span class="lineno">  310</span>&#160; </div>
+<div class="line"><a name="l00311"></a><span class="lineno">  311</span>&#160;      pcout &lt;&lt; <span class="stringliteral">&quot;Time step &quot;</span> &lt;&lt; std::setw(6) &lt;&lt; timestep_number</div>
+<div class="line"><a name="l00312"></a><span class="lineno">  312</span>&#160;            &lt;&lt; <span class="stringliteral">&quot; at t = &quot;</span> &lt;&lt; std::setw(8) &lt;&lt; std::fixed &lt;&lt; std::setprecision(6)</div>
+<div class="line"><a name="l00313"></a><span class="lineno">  313</span>&#160;            &lt;&lt; time &lt;&lt; std::endl;</div>
+<div class="line"><a name="l00314"></a><span class="lineno">  314</span>&#160; </div>
+<div class="line"><a name="l00315"></a><span class="lineno">  315</span>&#160;      this-&gt;update_time();</div>
+<div class="line"><a name="l00316"></a><span class="lineno">  316</span>&#160;      this-&gt;solution_ext = bdf_handler.get_sol_extrapolation();</div>
 <div class="line"><a name="l00317"></a><span class="lineno">  317</span>&#160; </div>
-<div class="line"><a name="l00318"></a><span class="lineno">  318</span>&#160;      <span class="comment">// Initial guess.</span></div>
-<div class="line"><a name="l00319"></a><span class="lineno">  319</span>&#160;      this-&gt;solution_owned = this-&gt;solution_ext;</div>
-<div class="line"><a name="l00320"></a><span class="lineno">  320</span>&#160;      this-&gt;solve_system();</div>
-<div class="line"><a name="l00321"></a><span class="lineno">  321</span>&#160; </div>
-<div class="line"><a name="l00322"></a><span class="lineno">  322</span>&#160;      this-&gt;intermediate_error_print(this-&gt;solution_owned,</div>
-<div class="line"><a name="l00323"></a><span class="lineno">  323</span>&#160;                                     this-&gt;solution_ex_owned,</div>
-<div class="line"><a name="l00324"></a><span class="lineno">  324</span>&#160;                                     this-&gt;u_ex);</div>
-<div class="line"><a name="l00325"></a><span class="lineno">  325</span>&#160;    }</div>
-<div class="line"><a name="l00326"></a><span class="lineno">  326</span>&#160; </div>
-<div class="line"><a name="l00327"></a><span class="lineno">  327</span>&#160;  this-&gt;compute_errors(this-&gt;solution_owned,</div>
-<div class="line"><a name="l00328"></a><span class="lineno">  328</span>&#160;                       this-&gt;solution_ex_owned,</div>
-<div class="line"><a name="l00329"></a><span class="lineno">  329</span>&#160;                       this-&gt;u_ex,</div>
-<div class="line"><a name="l00330"></a><span class="lineno">  330</span>&#160;                       this-&gt;grad_u_ex);</div>
-<div class="line"><a name="l00331"></a><span class="lineno">  331</span>&#160; </div>
-<div class="line"><a name="l00332"></a><span class="lineno">  332</span>&#160; </div>
-<div class="line"><a name="l00333"></a><span class="lineno">  333</span>&#160;  <span class="comment">// Generation of the graphical output.</span></div>
-<div class="line"><a name="l00334"></a><span class="lineno">  334</span>&#160;  this-&gt;solution_ex = this-&gt;solution_ex_owned;</div>
-<div class="line"><a name="l00335"></a><span class="lineno">  335</span>&#160;  this-&gt;conversion_to_fem(this-&gt;solution_ex);</div>
-<div class="line"><a name="l00336"></a><span class="lineno">  336</span>&#160;  this-&gt;solution = this-&gt;solution_owned;</div>
-<div class="line"><a name="l00337"></a><span class="lineno">  337</span>&#160;  this-&gt;conversion_to_fem(this-&gt;solution);</div>
-<div class="line"><a name="l00338"></a><span class="lineno">  338</span>&#160;  this-&gt;output_results();</div>
-<div class="line"><a name="l00339"></a><span class="lineno">  339</span>&#160;}</div>
-<div class="line"><a name="l00340"></a><span class="lineno">  340</span>&#160; </div>
-<div class="line"><a name="l00341"></a><span class="lineno">  341</span>&#160;<span class="preprocessor">#endif </span><span class="comment">/* MODEL_DG_T_HPP_*/</span><span class="preprocessor"></span></div>
+<div class="line"><a name="l00318"></a><span class="lineno">  318</span>&#160;      this-&gt;assemble_system();</div>
+<div class="line"><a name="l00319"></a><span class="lineno">  319</span>&#160; </div>
+<div class="line"><a name="l00320"></a><span class="lineno">  320</span>&#160;      <span class="comment">// Initial guess.</span></div>
+<div class="line"><a name="l00321"></a><span class="lineno">  321</span>&#160;      this-&gt;solution_owned = this-&gt;solution_ext;</div>
+<div class="line"><a name="l00322"></a><span class="lineno">  322</span>&#160;      this-&gt;solve_system();</div>
+<div class="line"><a name="l00323"></a><span class="lineno">  323</span>&#160; </div>
+<div class="line"><a name="l00324"></a><span class="lineno">  324</span>&#160;      this-&gt;intermediate_error_print(this-&gt;solution_owned,</div>
+<div class="line"><a name="l00325"></a><span class="lineno">  325</span>&#160;                                     this-&gt;solution_ex_owned,</div>
+<div class="line"><a name="l00326"></a><span class="lineno">  326</span>&#160;                                     this-&gt;u_ex);</div>
+<div class="line"><a name="l00327"></a><span class="lineno">  327</span>&#160;    }</div>
+<div class="line"><a name="l00328"></a><span class="lineno">  328</span>&#160; </div>
+<div class="line"><a name="l00329"></a><span class="lineno">  329</span>&#160;  this-&gt;compute_errors(this-&gt;solution_owned,</div>
+<div class="line"><a name="l00330"></a><span class="lineno">  330</span>&#160;                       this-&gt;solution_ex_owned,</div>
+<div class="line"><a name="l00331"></a><span class="lineno">  331</span>&#160;                       this-&gt;u_ex,</div>
+<div class="line"><a name="l00332"></a><span class="lineno">  332</span>&#160;                       this-&gt;grad_u_ex);</div>
+<div class="line"><a name="l00333"></a><span class="lineno">  333</span>&#160; </div>
+<div class="line"><a name="l00334"></a><span class="lineno">  334</span>&#160; </div>
+<div class="line"><a name="l00335"></a><span class="lineno">  335</span>&#160;  <span class="comment">// Generation of the graphical output.</span></div>
+<div class="line"><a name="l00336"></a><span class="lineno">  336</span>&#160;  this-&gt;solution_ex = this-&gt;solution_ex_owned;</div>
+<div class="line"><a name="l00337"></a><span class="lineno">  337</span>&#160;  this-&gt;conversion_to_fem(this-&gt;solution_ex);</div>
+<div class="line"><a name="l00338"></a><span class="lineno">  338</span>&#160;  this-&gt;solution = this-&gt;solution_owned;</div>
+<div class="line"><a name="l00339"></a><span class="lineno">  339</span>&#160;  this-&gt;conversion_to_fem(this-&gt;solution);</div>
+<div class="line"><a name="l00340"></a><span class="lineno">  340</span>&#160;  this-&gt;output_results();</div>
+<div class="line"><a name="l00341"></a><span class="lineno">  341</span>&#160;}</div>
+<div class="line"><a name="l00342"></a><span class="lineno">  342</span>&#160; </div>
+<div class="line"><a name="l00343"></a><span class="lineno">  343</span>&#160;<span class="preprocessor">#endif </span><span class="comment">/* MODEL_DG_T_HPP_*/</span><span class="preprocessor"></span></div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->
 <div class="ttc" id="aclass_model_d_g__t_html_a8ede985225f89813cba7b1f9f281c70e"><div class="ttname"><a href="class_model_d_g__t.html#a8ede985225f89813cba7b1f9f281c70e">ModelDG_t::timestep_number</a></div><div class="ttdeci">unsigned int timestep_number</div><div class="ttdoc">Current time-step number.</div><div class="ttdef"><b>Definition:</b> <a href="model___d_g__t_8hpp_source.html#l00123">model_DG_t.hpp:123</a></div></div>
@@ -419,11 +421,11 @@ $(document).ready(function(){initNavTree('model___d_g__t_8hpp_source.html',''); 
 <div class="ttc" id="aclass_model_d_g_html_accac8220153472beba5510186db6d907"><div class="ttname"><a href="class_model_d_g.html#accac8220153472beba5510186db6d907">ModelDG::solution_ex_owned</a></div><div class="ttdeci">lifex::LinAlg::MPI::Vector solution_ex_owned</div><div class="ttdoc">Distributed exact solution vector, without ghost entries.</div><div class="ttdef"><b>Definition:</b> <a href="model___d_g_8hpp_source.html#l00246">model_DG.hpp:246</a></div></div>
 <div class="ttc" id="aclass_model_d_g__t_html_a0c665200b52702718b9d9f6752a4486d"><div class="ttname"><a href="class_model_d_g__t.html#a0c665200b52702718b9d9f6752a4486d">ModelDG_t::prm_time_step</a></div><div class="ttdeci">double prm_time_step</div><div class="ttdoc">Time-step amplitude.</div><div class="ttdef"><b>Definition:</b> <a href="model___d_g__t_8hpp_source.html#l00117">model_DG_t.hpp:117</a></div></div>
 <div class="ttc" id="aclass_model_d_g__t_html_a60bf1d5452f74a490eeb6faf1ff31dcf"><div class="ttname"><a href="class_model_d_g__t.html#a60bf1d5452f74a490eeb6faf1ff31dcf">ModelDG_t::parse_parameters</a></div><div class="ttdeci">virtual void parse_parameters(lifex::ParamHandler &amp;params) override</div><div class="ttdoc">Override to parse additional parameters.</div><div class="ttdef"><b>Definition:</b> <a href="model___d_g__t_8hpp_source.html#l00194">model_DG_t.hpp:194</a></div></div>
-<div class="ttc" id="aclass_model_d_g__t_html_a8ab14b91dd762063984a445cabfb4782"><div class="ttname"><a href="class_model_d_g__t.html#a8ab14b91dd762063984a445cabfb4782">ModelDG_t::intermediate_error_print</a></div><div class="ttdeci">virtual void intermediate_error_print(const lifex::LinAlg::MPI::Vector &amp;solution_owned, const lifex::LinAlg::MPI::Vector &amp;solution_ex_owned, const std::shared_ptr&lt; dealii::Function&lt; lifex::dim &gt;&gt; &amp;u_ex, const char *solution_name=(char *)&quot;u&quot;)</div><div class="ttdoc">Computation of the  error at an intermediate time-step.</div><div class="ttdef"><b>Definition:</b> <a href="model___d_g__t_8hpp_source.html#l00254">model_DG_t.hpp:254</a></div></div>
+<div class="ttc" id="aclass_model_d_g__t_html_a8ab14b91dd762063984a445cabfb4782"><div class="ttname"><a href="class_model_d_g__t.html#a8ab14b91dd762063984a445cabfb4782">ModelDG_t::intermediate_error_print</a></div><div class="ttdeci">virtual void intermediate_error_print(const lifex::LinAlg::MPI::Vector &amp;solution_owned, const lifex::LinAlg::MPI::Vector &amp;solution_ex_owned, const std::shared_ptr&lt; dealii::Function&lt; lifex::dim &gt;&gt; &amp;u_ex, const char *solution_name=(char *)&quot;u&quot;)</div><div class="ttdoc">Computation of the  error at an intermediate time-step.</div><div class="ttdef"><b>Definition:</b> <a href="model___d_g__t_8hpp_source.html#l00256">model_DG_t.hpp:256</a></div></div>
 <div class="ttc" id="aclass_model_d_g__t_html_aff47e8a4d84aa25891c3ea4b6b33ef3b"><div class="ttname"><a href="class_model_d_g__t.html#aff47e8a4d84aa25891c3ea4b6b33ef3b">ModelDG_t::~ModelDG_t</a></div><div class="ttdeci">virtual ~ModelDG_t()=default</div><div class="ttdoc">Destructor.</div></div>
 <div class="ttc" id="aassemble___d_g_8hpp_html"><div class="ttname"><a href="assemble___d_g_8hpp.html">assemble_DG.hpp</a></div></div>
 <div class="ttc" id="aclass_model_d_g__t_html_a55d2736dacf787a8b5873abc2ac35cd4"><div class="ttname"><a href="class_model_d_g__t.html#a55d2736dacf787a8b5873abc2ac35cd4">ModelDG_t::prm_time_init</a></div><div class="ttdeci">double prm_time_init</div><div class="ttdoc">Initial time.</div><div class="ttdef"><b>Definition:</b> <a href="model___d_g__t_8hpp_source.html#l00113">model_DG_t.hpp:113</a></div></div>
-<div class="ttc" id="aclass_model_d_g__t_html_a76f7e0c6606c3bcbe59a33a7910b3c11"><div class="ttname"><a href="class_model_d_g__t.html#a76f7e0c6606c3bcbe59a33a7910b3c11">ModelDG_t::run</a></div><div class="ttdeci">void run() override</div><div class="ttdoc">Override for the simulation run.</div><div class="ttdef"><b>Definition:</b> <a href="model___d_g__t_8hpp_source.html#l00296">model_DG_t.hpp:296</a></div></div>
+<div class="ttc" id="aclass_model_d_g__t_html_a76f7e0c6606c3bcbe59a33a7910b3c11"><div class="ttname"><a href="class_model_d_g__t.html#a76f7e0c6606c3bcbe59a33a7910b3c11">ModelDG_t::run</a></div><div class="ttdeci">void run() override</div><div class="ttdoc">Override for the simulation run.</div><div class="ttdef"><b>Definition:</b> <a href="model___d_g__t_8hpp_source.html#l00298">model_DG_t.hpp:298</a></div></div>
 <div class="ttc" id="aclass_model_d_g__t_html"><div class="ttname"><a href="class_model_d_g__t.html">ModelDG_t</a></div><div class="ttdoc">Class representing the resolution of time-dependent problems using discontinuous Galerkin methods.</div><div class="ttdef"><b>Definition:</b> <a href="model___d_g__t_8hpp_source.html#l00061">model_DG_t.hpp:61</a></div></div>
 <div class="ttc" id="aclass_model_d_g_html_accaba75423f87904b052d9dfce04f0c6"><div class="ttname"><a href="class_model_d_g.html#accaba75423f87904b052d9dfce04f0c6">ModelDG::u_ex</a></div><div class="ttdeci">std::shared_ptr&lt; lifex::utils::FunctionDirichlet &gt; u_ex</div><div class="ttdoc">Pointer to exact solution function.</div><div class="ttdef"><b>Definition:</b> <a href="model___d_g_8hpp_source.html#l00250">model_DG.hpp:250</a></div></div>
 <div class="ttc" id="aclass_model_d_g__t_html_a7b3fdfed1bc7e284bf4959841116a11b"><div class="ttname"><a href="class_model_d_g__t.html#a7b3fdfed1bc7e284bf4959841116a11b">ModelDG_t::prm_bdf_order</a></div><div class="ttdeci">unsigned int prm_bdf_order</div><div class="ttdoc">BDF order.</div><div class="ttdef"><b>Definition:</b> <a href="model___d_g__t_8hpp_source.html#l00119">model_DG_t.hpp:119</a></div></div>
@@ -436,7 +438,7 @@ $(document).ready(function(){initNavTree('model___d_g__t_8hpp_source.html',''); 
 <div class="ttc" id="aclass_model_d_g__t_html_a18ccdbfdbbdf26ebe0842ff27b6855e2"><div class="ttname"><a href="class_model_d_g__t.html#a18ccdbfdbbdf26ebe0842ff27b6855e2">ModelDG_t::solution_bdf</a></div><div class="ttdeci">lifex::LinAlg::MPI::Vector solution_bdf</div><div class="ttdoc">BDF solution, with ghost entries.</div><div class="ttdef"><b>Definition:</b> <a href="model___d_g__t_8hpp_source.html#l00127">model_DG_t.hpp:127</a></div></div>
 <div class="ttc" id="aclass_model_d_g__t_html_abcb7550b8f791f052730d1175c62424f"><div class="ttname"><a href="class_model_d_g__t.html#abcb7550b8f791f052730d1175c62424f">ModelDG_t::time_initialization</a></div><div class="ttdeci">virtual void time_initialization()</div><div class="ttdoc">Setup for the time-dependent problems at the initial time-step.</div><div class="ttdef"><b>Definition:</b> <a href="model___d_g__t_8hpp_source.html#l00233">model_DG_t.hpp:233</a></div></div>
 <div class="ttc" id="a_d_u_b_values_8hpp_html"><div class="ttname"><a href="_d_u_b_values_8hpp.html">DUBValues.hpp</a></div></div>
-<div class="ttc" id="aclass_model_d_g__t_html_aa3c2a4a4c5610d93616e04a3ae542786"><div class="ttname"><a href="class_model_d_g__t.html#aa3c2a4a4c5610d93616e04a3ae542786">ModelDG_t::update_time</a></div><div class="ttdeci">virtual void update_time()</div><div class="ttdoc">To perform the time increment.</div><div class="ttdef"><b>Definition:</b> <a href="model___d_g__t_8hpp_source.html#l00279">model_DG_t.hpp:279</a></div></div>
+<div class="ttc" id="aclass_model_d_g__t_html_aa3c2a4a4c5610d93616e04a3ae542786"><div class="ttname"><a href="class_model_d_g__t.html#aa3c2a4a4c5610d93616e04a3ae542786">ModelDG_t::update_time</a></div><div class="ttdeci">virtual void update_time()</div><div class="ttdoc">To perform the time increment.</div><div class="ttdef"><b>Definition:</b> <a href="model___d_g__t_8hpp_source.html#l00281">model_DG_t.hpp:281</a></div></div>
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
