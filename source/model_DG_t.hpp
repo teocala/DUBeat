@@ -247,6 +247,8 @@ ModelDG_t<basis>::time_initialization()
 
   // Initialization of the BDFHandler
   bdf_handler.initialize(this->prm_bdf_order, sol_init);
+
+  solution_bdf = bdf_handler.get_sol_bdf();
 }
 
 template <class basis>
