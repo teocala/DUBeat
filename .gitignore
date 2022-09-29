@@ -1,0 +1,7 @@
+# Build folders.
+*build*
+*BUILD*
+*debug*
+*DEBUG*
+*clang-format*
+

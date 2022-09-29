@@ -69,8 +69,9 @@ namespace DUBeat::models
             const unsigned int /*component*/ = 0) const override
       {
         if (lifex::dim == 2)
-          return std::sin(2 * M_PI * p[0]) * std::sin(2 * M_PI * p[1]) *
-                 std::exp(-5 * this->get_time());
+          return 0;
+        /*std::sin(2 * M_PI * p[0]) * std::sin(2 * M_PI * p[1]) *
+                 std::exp(-5 * this->get_time());*/
         else
           return std::sin(2 * M_PI * p[0] + M_PI / 4) *
                  std::sin(2 * M_PI * p[1] + M_PI / 4) *
@@ -131,7 +132,11 @@ namespace DUBeat::models
             const unsigned int /*component*/ = 0) const override
       {
         if (lifex::dim == 2)
-          return std::sin(2 * M_PI * p[0]) * std::sin(2 * M_PI * p[1]) *
+          return 500 * 1e3 * (this->get_time() < 2e-3) *
+                 (this->get_time() > 1e-3) * (p[0] > 0.45) * (p[0] < 0.55) *
+                 (p[1] > 0.45) * (p[1] < 0.55);
+
+        /*std::sin(2 * M_PI * p[0]) * std::sin(2 * M_PI * p[1]) *
                  std::exp(-5 * this->get_time()) *
                  (-ChiM * Cm * 5 + Sigma * 8 * pow(M_PI, 2) +
                   ChiM * kappa *
@@ -141,9 +146,13 @@ namespace DUBeat::models
                     (std::sin(2 * M_PI * p[0]) * std::sin(2 * M_PI * p[1]) *
                        std::exp(-5 * this->get_time()) -
                      1) +
-                  ChiM * (epsilon / (epsilon * gamma - 5)));
+                  ChiM * (epsilon / (epsilon * gamma - 5)));*/
         else
-          return std::sin(2 * M_PI * p[0] + M_PI / 4) *
+          return 500 * 1e3 * (this->get_time() < 2e-3) *
+                 (this->get_time() > 1e-3) * (p[0] > 45e-4) * (p[0] < 55e-4) *
+                 (p[1] > 45e-4) * (p[1] < 55e-4) * (p[2] > 45e-4) *
+                 (p[2] < 55e-4);
+        /*std::sin(2 * M_PI * p[0] + M_PI / 4) *
                  std::sin(2 * M_PI * p[1] + M_PI / 4) *
                  std::sin(2 * M_PI * p[2] + M_PI / 4) *
                  std::exp(-5 * this->get_time()) *
@@ -159,7 +168,7 @@ namespace DUBeat::models
                        std::sin(2 * M_PI * p[2] + M_PI / 4) *
                        std::exp(-5 * this->get_time()) -
                      1) +
-                  ChiM * (epsilon / (epsilon * gamma - 5)));
+                  ChiM * (epsilon / (epsilon * gamma - 5)));*/
       }
     };
 
@@ -185,23 +194,21 @@ namespace DUBeat::models
             const unsigned int /*component*/ = 0) const override
       {
         if (lifex::dim == 2)
-          return Sigma *
+          return 0;
+        /*Sigma *
                  (-2 * M_PI * std::sin(2 * M_PI * p[0]) *
                     std::cos(2 * M_PI * p[1]) *
-                    std::exp(-5 * this->get_time()) * (std::abs(p[1]) < 1e-10) +
-                  2 * M_PI * std::cos(2 * M_PI * p[0]) *
-                    std::sin(2 * M_PI * p[1]) *
-                    std::exp(-5 * this->get_time()) *
-                    (std::abs(p[0] - 1) < 1e-10) +
-                  2 * M_PI * std::sin(2 * M_PI * p[0]) *
-                    std::cos(2 * M_PI * p[1]) *
-                    std::exp(-5 * this->get_time()) *
-                    (std::abs(p[1] - 1) < 1e-10) -
-                  2 * M_PI * std::cos(2 * M_PI * p[0]) *
-                    std::sin(2 * M_PI * p[1]) *
-                    std::exp(-5 * this->get_time()) * (std::abs(p[0]) < 1e-10));
+                    std::exp(-5 * this->get_time()) * (std::abs(p[1]) <
+           1e-10) + 2 * M_PI * std::cos(2 * M_PI * p[0]) * std::sin(2 * M_PI
+           * p[1]) * std::exp(-5 * this->get_time()) * (std::abs(p[0] - 1) <
+           1e-10) + 2 * M_PI * std::sin(2 * M_PI * p[0]) * std::cos(2 * M_PI
+           * p[1]) * std::exp(-5 * this->get_time()) * (std::abs(p[1] - 1) <
+           1e-10) - 2 * M_PI * std::cos(2 * M_PI * p[0]) * std::sin(2 * M_PI
+           * p[1]) * std::exp(-5 * this->get_time()) * (std::abs(p[0]) <
+           1e-10));*/
         else
-          return Sigma *
+          return 0;
+        /*Sigma *
                  (2 * M_PI * std::cos(2 * M_PI * p[0] + M_PI / 4) *
                     std::sin(2 * M_PI * p[1] + M_PI / 4) *
                     std::sin(2 * M_PI * p[2] + M_PI / 4) *
@@ -228,7 +235,8 @@ namespace DUBeat::models
                   2 * M_PI * std::sin(2 * M_PI * p[0] + M_PI / 4) *
                     std::sin(2 * M_PI * p[1] + M_PI / 4) *
                     std::cos(2 * M_PI * p[2] + M_PI / 4) *
-                    std::exp(-5 * this->get_time()) * (std::abs(p[2]) < 1e-10));
+                    std::exp(-5 * this->get_time()) * (std::abs(p[2]) <
+           1e-10));*/
       }
     };
 
@@ -306,8 +314,9 @@ namespace DUBeat::models
             const unsigned int /*component*/ = 0) const override
       {
         if (lifex::dim == 2)
-          return epsilon / (epsilon * gamma - 5) * std::sin(2 * M_PI * p[0]) *
-                 std::sin(2 * M_PI * p[1]) * std::exp(-5 * this->get_time());
+          return 0;
+        /*epsilon / (epsilon * gamma - 5) * std::sin(2 * M_PI * p[0]) *
+                 std::sin(2 * M_PI * p[1]) * std::exp(-5 * this->get_time());*/
         else
           return epsilon / (epsilon * gamma - 5) * std::sin(2 * M_PI * p[0]) *
                  std::sin(2 * M_PI * p[1]) * std::sin(2 * M_PI * p[2]) *
@@ -668,6 +677,8 @@ namespace DUBeat::models
 
     time_initialization();
 
+    this->output_results();
+
     while (this->time < this->prm_time_final)
       {
         this->time += this->prm_time_step;
@@ -694,6 +705,7 @@ namespace DUBeat::models
                                        this->solution_ex_owned_w,
                                        this->w_ex,
                                        "w");
+        this->output_results();
       }
 
 

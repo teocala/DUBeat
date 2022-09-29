@@ -41,8 +41,9 @@ main(int argc, char **argv)
     {
       // Choose the model from the models folder and the basis from:
       // Dubiner basis:    DUBValues<lifex::dim>
-      // FEM basis:        dealii::FE_SimplexDGP<lifex::dim>
-      DUBeat::models::LaplaceDG<DUBValues<lifex::dim>> model;
+      // FEM basis :  dealii::FE_SimplexDGP<lifex::dim>
+
+      DUBeat::models::MonodomainFHNDG<dealii::FE_SimplexDGP<lifex::dim>> model;
 
       model.main_run_generate();
     }

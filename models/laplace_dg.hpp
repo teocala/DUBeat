@@ -189,6 +189,9 @@ namespace DUBeat::models
     // simple capital letters. We refer here to the DG_Assemble methods for
     // their definition.
 
+
+    // DEFINIZIONE MATRICI X SCHEMA DG
+
     // See DG_Assemble::local_V().
     dealii::FullMatrix<double> V(this->dofs_per_cell, this->dofs_per_cell);
     // See DG_Assemble::local_SC().

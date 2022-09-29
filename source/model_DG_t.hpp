@@ -100,10 +100,18 @@ protected:
   /// Computation of the @f$L^\infty@f$ error at an intermediate time-step.
   virtual void
   intermediate_error_print(
-    const lifex::LinAlg::MPI::Vector                    &solution_owned,
-    const lifex::LinAlg::MPI::Vector                    &solution_ex_owned,
+    const lifex::LinAlg::MPI::Vector &                   solution_owned,
+    const lifex::LinAlg::MPI::Vector &                   solution_ex_owned,
     const std::shared_ptr<dealii::Function<lifex::dim>> &u_ex,
     const char *solution_name = (char *)"u");
+
+  /// Output of results. Note that, since it exploits dubiner_to_fem from
+  /// DUB_FEM_handler.hpp, if the polynomial order chosen to solve the model is
+  /// @f$>2@f$, the FE space considered for the output will be of order at
+  /// most 2. This leads to an output vector which correspondent visualization
+  /// might be less refined. See DUB_FEM_handler.hpp for more details.
+  void
+  output_results() override;
 
   /// Override for the simulation run.
   void
@@ -254,10 +262,10 @@ ModelDG_t<basis>::time_initialization()
 template <class basis>
 void
 ModelDG_t<basis>::intermediate_error_print(
-  const lifex::LinAlg::MPI::Vector                    &solution_owned,
-  const lifex::LinAlg::MPI::Vector                    &solution_ex_owned,
+  const lifex::LinAlg::MPI::Vector &                   solution_owned,
+  const lifex::LinAlg::MPI::Vector &                   solution_ex_owned,
   const std::shared_ptr<dealii::Function<lifex::dim>> &u_ex,
-  const char                                          *solution_name)
+  const char *                                         solution_name)
 {
   AssertThrow(u_ex != nullptr,
               dealii::StandardExceptions::ExcMessage(
@@ -303,6 +311,8 @@ ModelDG_t<basis>::run()
   this->initialize_solution(this->solution_ex_owned, this->solution_ex);
   this->time_initialization();
 
+  output_results();
+
   while (this->time < this->prm_time_final)
     {
       time += prm_time_step;
@@ -324,6 +334,7 @@ ModelDG_t<basis>::run()
       this->intermediate_error_print(this->solution_owned,
                                      this->solution_ex_owned,
                                      this->u_ex);
+      output_results();
     }
 
   this->compute_errors(this->solution_owned,
@@ -337,7 +348,37 @@ ModelDG_t<basis>::run()
   this->conversion_to_fem(this->solution_ex);
   this->solution = this->solution_owned;
   this->conversion_to_fem(this->solution);
-  this->output_results();
+}
+
+
+template <class basis>
+void
+ModelDG_t<basis>::output_results()
+{
+  lifex::DataOut<lifex::dim> data_out;
+
+  // To output results, we need the deal.II DoFHandler instead of the DUBeat
+  // DGDoFHandler since we are required here to use deal.II functions. On the
+  // other hand, the deal.II DofHandler is limited to the 2nd order polynomials.
+  const unsigned int output_fe_degree =
+    (this->prm_fe_degree < 3) ? this->prm_fe_degree : 2;
+
+  dealii::FE_SimplexDGP<lifex::dim> fe(output_fe_degree);
+  dealii::DoFHandler<lifex::dim>    dof_handler_fem;
+  dof_handler_fem.reinit(this->triangulation->get());
+  dof_handler_fem.distribute_dofs(fe);
+
+  data_out.attach_dof_handler(dof_handler_fem);
+  data_out.add_data_vector(dof_handler_fem, this->solution, "u");
+  data_out.build_patches();
+
+  // data_out.add_data_vector(dof_handler_fem, this->solution_ex, "u_ex");
+  // data_out.build_patches();
+
+  lifex::utils::dataout_write_hdf5(
+    data_out, "solution", timestep_number, 0, time);
+
+  data_out.clear();
 }
 
 #endif /* MODEL_DG_T_HPP_*/
