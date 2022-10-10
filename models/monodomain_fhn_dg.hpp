@@ -65,9 +65,8 @@ namespace DUBeat::models
             const unsigned int /*component*/ = 0) const override
       {
         if (lifex::dim == 2)
-          return 0;
-        /*std::sin(2 * M_PI * p[0]) * std::sin(2 * M_PI * p[1]) *
-                 std::exp(-5 * this->get_time());*/
+          return std::sin(2 * M_PI * p[0]) * std::sin(2 * M_PI * p[1]) *
+                 std::exp(-5 * this->get_time());
         else
           return 0;
         /*std::sin(2 * M_PI * p[0] + M_PI / 4) *
@@ -129,10 +128,7 @@ namespace DUBeat::models
             const unsigned int /*component*/ = 0) const override
       {
         if (lifex::dim == 2)
-          return 500 * 1e3 * (this->get_time() < 2e-3) *
-                 (this->get_time() > 1e-3) * (p[0] > 0.495) * (p[0] < 0.505) *
-                 (p[1] > 0.495) * (p[1] < 0.505);
-        /*std::sin(2 * M_PI * p[0]) * std::sin(2 * M_PI * p[1]) *
+          return std::sin(2 * M_PI * p[0]) * std::sin(2 * M_PI * p[1]) *
                  std::exp(-5 * this->get_time()) *
                  (-ChiM * Cm * 5 + Sigma * 8 * pow(M_PI, 2) +
                   ChiM * kappa *
@@ -142,8 +138,7 @@ namespace DUBeat::models
                     (std::sin(2 * M_PI * p[0]) * std::sin(2 * M_PI * p[1]) *
                        std::exp(-5 * this->get_time()) -
                      1) +
-                  ChiM * (epsilon / (epsilon * gamma - 5)));*/
-
+                  ChiM * (epsilon / (epsilon * gamma - 5)));
         /*500 * 1e3 * (this->get_time() < 2e-3) *
                  (this->get_time() > 1e-3) * (p[0] > 0.45) * (p[0] < 0.55) *
                  (p[1] > 0.45) * (p[1] < 0.550);*/
@@ -194,8 +189,7 @@ namespace DUBeat::models
             const unsigned int /*component*/ = 0) const override
       {
         if (lifex::dim == 2)
-          return 0;
-        /*Sigma *
+          return Sigma *
                  (-2 * M_PI * std::sin(2 * M_PI * p[0]) *
                     std::cos(2 * M_PI * p[1]) *
                     std::exp(-5 * this->get_time()) * (std::abs(p[1]) < 1e-10) +
@@ -209,8 +203,7 @@ namespace DUBeat::models
                     (std::abs(p[1] - 1) < 1e-10) -
                   2 * M_PI * std::cos(2 * M_PI * p[0]) *
                     std::sin(2 * M_PI * p[1]) *
-                    std::exp(-5 * this->get_time()) * (std::abs(p[0]) <
-           1e-10));*/
+                    std::exp(-5 * this->get_time()) * (std::abs(p[0]) < 1e-10));
         else
           return 0;
         /*Sigma *
@@ -319,9 +312,8 @@ namespace DUBeat::models
             const unsigned int /*component*/ = 0) const override
       {
         if (lifex::dim == 2)
-          return 0;
-        /*epsilon / (epsilon * gamma - 5) * std::sin(2 * M_PI * p[0]) *
-                 std::sin(2 * M_PI * p[1]) * std::exp(-5 * this->get_time());*/
+          return epsilon / (epsilon * gamma - 5) * std::sin(2 * M_PI * p[0]) *
+                 std::sin(2 * M_PI * p[1]) * std::exp(-5 * this->get_time());
         else
           return 0;
         /*epsilon / (epsilon * gamma - 5) * std::sin(2 * M_PI * p[0]) *
@@ -463,7 +455,7 @@ namespace DUBeat::models
   public:
     /// Constructor.
     MonodomainFHNDG<basis>()
-      : ModelDG_t<basis>("Monodomain Fitzhugh-Nagumo")
+      : ModelDG_t<basis>("MonodomainFitzhugh-Nagumo")
     {}
 
   private:
@@ -753,7 +745,11 @@ namespace DUBeat::models
     this->conversion_to_fem(this->solution_ex);
     this->solution = this->solution_owned;
     this->conversion_to_fem(this->solution);
-    this->output_results();
+
+    if (flag_error)
+      {
+        this->output_results();
+      }
   }
 
   template <class basis>

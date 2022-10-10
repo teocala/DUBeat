@@ -77,7 +77,7 @@ public:
                          const unsigned int         local_dofs,
                          const DoFHandlerDG<basis> &dof_hand,
                          const unsigned int         nref_,
-                         const std::string         &title)
+                         const std::string &        title)
     : dof_handler(dof_hand)
     , n_quad_points(static_cast<int>(std::pow(degree + 2, lifex::dim)))
     , n_quad_points_face(static_cast<int>(std::pow(degree + 2, lifex::dim - 1)))
@@ -105,8 +105,8 @@ public:
 
   /// Reinitialization with new computed and exact solutions.
   void
-  reinit(const lifex::LinAlg::MPI::Vector                    &sol_owned,
-         const lifex::LinAlg::MPI::Vector                    &sol_ex_owned,
+  reinit(const lifex::LinAlg::MPI::Vector &                   sol_owned,
+         const lifex::LinAlg::MPI::Vector &                   sol_ex_owned,
          const std::shared_ptr<dealii::Function<lifex::dim>> &u_ex_input,
          const std::shared_ptr<dealii::Function<lifex::dim>> &grad_u_ex_input,
          const char *solution_name_input);
@@ -209,11 +209,11 @@ private:
 template <class basis>
 void
 ComputeErrorsDG<basis>::reinit(
-  const lifex::LinAlg::MPI::Vector                    &sol_owned,
-  const lifex::LinAlg::MPI::Vector                    &sol_ex_owned,
+  const lifex::LinAlg::MPI::Vector &                   sol_owned,
+  const lifex::LinAlg::MPI::Vector &                   sol_ex_owned,
   const std::shared_ptr<dealii::Function<lifex::dim>> &u_ex_input,
   const std::shared_ptr<dealii::Function<lifex::dim>> &grad_u_ex_input,
-  const char                                          *solution_name_input)
+  const char *                                         solution_name_input)
 {
   solution_owned    = sol_owned;
   solution_ex_owned = sol_ex_owned;
@@ -541,12 +541,12 @@ ComputeErrorsDG<basis>::initialize_datafile() const
 
   const std::string date = get_date();
 
-  outdata << "nref" << '\t' << "l_inf" << '\t' << "l_2" << '\t' << "h_1" << '\t'
-          << "DG" << '\t' << "date" << std::endl;
+  outdata << "nref," << '\t' << "l_inf," << '\t' << "l_2," << '\t' << "h_1,"
+          << '\t' << "DG," << std::endl;
 
   for (unsigned int i = 1; i <= 5; ++i)
-    outdata << i << '\t' << "x" << '\t' << "x" << '\t' << "x" << '\t' << "x"
-            << '\t' << date << std::endl;
+    outdata << i << '\t' << "x," << '\t' << "x," << '\t' << "x," << '\t' << "x,"
+            << std::endl;
 
   outdata.close();
 }
@@ -601,8 +601,9 @@ ComputeErrorsDG<basis>::update_datafile() const
       std::getline(indata, line);
 
       if (line[0] == n_ref_c)
-        outdata << nref << '\t' << errors[0] << '\t' << errors[1] << '\t'
-                << errors[2] << '\t' << errors[3] << '\t' << date << std::endl;
+        outdata << nref << "," << '\t' << errors[0] << "," << '\t' << errors[1]
+                << "," << '\t' << errors[2] << "," << '\t' << errors[3] << ","
+                << std::endl;
       else
         outdata << line << std::endl;
     }
