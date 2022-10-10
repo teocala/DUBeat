@@ -1,18 +1,14 @@
 /********************************************************************************
   Copyright (C) 2022 by the DUBeat authors.
-
   This file is part of DUBeat.
-
   DUBeat is free software; you can redistribute it and/or modify
   it under the terms of the GNU Lesser General Public License as published by
   the Free Software Foundation, either version 3 of the License, or
   (at your option) any later version.
-
   DUBeat is distributed in the hope that it will be useful,
   but WITHOUT ANY WARRANTY; without even the implied warranty of
   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
   Lesser General Public License for more details.
-
   You should have received a copy of the GNU Lesser General Public License
   along with DUBeat.  If not, see <http://www.gnu.org/licenses/>.
 ********************************************************************************/
@@ -73,10 +69,11 @@ namespace DUBeat::models
         /*std::sin(2 * M_PI * p[0]) * std::sin(2 * M_PI * p[1]) *
                  std::exp(-5 * this->get_time());*/
         else
-          return std::sin(2 * M_PI * p[0] + M_PI / 4) *
+          return 0;
+        /*std::sin(2 * M_PI * p[0] + M_PI / 4) *
                  std::sin(2 * M_PI * p[1] + M_PI / 4) *
                  std::sin(2 * M_PI * p[2] + M_PI / 4) *
-                 std::exp(-5 * this->get_time());
+                 std::exp(-5 * this->get_time());*/
       }
     };
 
@@ -133,9 +130,8 @@ namespace DUBeat::models
       {
         if (lifex::dim == 2)
           return 500 * 1e3 * (this->get_time() < 2e-3) *
-                 (this->get_time() > 1e-3) * (p[0] > 0.45) * (p[0] < 0.55) *
-                 (p[1] > 0.45) * (p[1] < 0.55);
-
+                 (this->get_time() > 1e-3) * (p[0] > 0.495) * (p[0] < 0.505) *
+                 (p[1] > 0.495) * (p[1] < 0.505);
         /*std::sin(2 * M_PI * p[0]) * std::sin(2 * M_PI * p[1]) *
                  std::exp(-5 * this->get_time()) *
                  (-ChiM * Cm * 5 + Sigma * 8 * pow(M_PI, 2) +
@@ -147,11 +143,15 @@ namespace DUBeat::models
                        std::exp(-5 * this->get_time()) -
                      1) +
                   ChiM * (epsilon / (epsilon * gamma - 5)));*/
+
+        /*500 * 1e3 * (this->get_time() < 2e-3) *
+                 (this->get_time() > 1e-3) * (p[0] > 0.45) * (p[0] < 0.55) *
+                 (p[1] > 0.45) * (p[1] < 0.550);*/
         else
           return 500 * 1e3 * (this->get_time() < 2e-3) *
-                 (this->get_time() > 1e-3) * (p[0] > 45e-4) * (p[0] < 55e-4) *
-                 (p[1] > 45e-4) * (p[1] < 55e-4) * (p[2] > 45e-4) *
-                 (p[2] < 55e-4);
+                 (this->get_time() > 1e-3) * (p[0] > 0.45) * (p[0] < 0.55) *
+                 (p[1] > 0.45) * (p[1] < 0.550) * (p[2] > 0.45) *
+                 (p[2] < 0.550);
         /*std::sin(2 * M_PI * p[0] + M_PI / 4) *
                  std::sin(2 * M_PI * p[1] + M_PI / 4) *
                  std::sin(2 * M_PI * p[2] + M_PI / 4) *
@@ -198,13 +198,18 @@ namespace DUBeat::models
         /*Sigma *
                  (-2 * M_PI * std::sin(2 * M_PI * p[0]) *
                     std::cos(2 * M_PI * p[1]) *
-                    std::exp(-5 * this->get_time()) * (std::abs(p[1]) <
-           1e-10) + 2 * M_PI * std::cos(2 * M_PI * p[0]) * std::sin(2 * M_PI
-           * p[1]) * std::exp(-5 * this->get_time()) * (std::abs(p[0] - 1) <
-           1e-10) + 2 * M_PI * std::sin(2 * M_PI * p[0]) * std::cos(2 * M_PI
-           * p[1]) * std::exp(-5 * this->get_time()) * (std::abs(p[1] - 1) <
-           1e-10) - 2 * M_PI * std::cos(2 * M_PI * p[0]) * std::sin(2 * M_PI
-           * p[1]) * std::exp(-5 * this->get_time()) * (std::abs(p[0]) <
+                    std::exp(-5 * this->get_time()) * (std::abs(p[1]) < 1e-10) +
+                  2 * M_PI * std::cos(2 * M_PI * p[0]) *
+                    std::sin(2 * M_PI * p[1]) *
+                    std::exp(-5 * this->get_time()) *
+                    (std::abs(p[0] - 1) < 1e-10) +
+                  2 * M_PI * std::sin(2 * M_PI * p[0]) *
+                    std::cos(2 * M_PI * p[1]) *
+                    std::exp(-5 * this->get_time()) *
+                    (std::abs(p[1] - 1) < 1e-10) -
+                  2 * M_PI * std::cos(2 * M_PI * p[0]) *
+                    std::sin(2 * M_PI * p[1]) *
+                    std::exp(-5 * this->get_time()) * (std::abs(p[0]) <
            1e-10));*/
         else
           return 0;
@@ -318,9 +323,10 @@ namespace DUBeat::models
         /*epsilon / (epsilon * gamma - 5) * std::sin(2 * M_PI * p[0]) *
                  std::sin(2 * M_PI * p[1]) * std::exp(-5 * this->get_time());*/
         else
-          return epsilon / (epsilon * gamma - 5) * std::sin(2 * M_PI * p[0]) *
+          return 0;
+        /*epsilon / (epsilon * gamma - 5) * std::sin(2 * M_PI * p[0]) *
                  std::sin(2 * M_PI * p[1]) * std::sin(2 * M_PI * p[2]) *
-                 std::exp(-5 * this->get_time());
+                 std::exp(-5 * this->get_time());*/
       }
     };
 
@@ -475,6 +481,8 @@ namespace DUBeat::models
     double gamma;
     /// ODe parameter.
     double a;
+    /// boolean computation for the errors
+    bool flag_error;
     /// Solution gating variable, without ghost entries.
     lifex::LinAlg::MPI::Vector solution_owned_w;
     /// Solution gating variable, with ghost entries.
@@ -611,6 +619,15 @@ namespace DUBeat::models
                            "Parameter for Fitzhugh Nagumo model.");
     }
     params.leave_subsection();
+
+    params.enter_subsection("Output results");
+    {
+      params.declare_entry("Boolean for computation_error",
+                           "false",
+                           dealii::Patterns::Bool(),
+                           "Boolean for output");
+    }
+    params.leave_subsection();
   }
 
   template <class basis>
@@ -661,6 +678,12 @@ namespace DUBeat::models
     gamma   = params.get_double("gamma");
     a       = params.get_double("a");
     params.leave_subsection();
+
+    params.enter_subsection("Output results");
+    {
+      flag_error = params.get_bool("Boolean for computation_error");
+    }
+    params.leave_subsection();
   }
 
   template <class basis>
@@ -705,20 +728,25 @@ namespace DUBeat::models
                                        this->solution_ex_owned_w,
                                        this->w_ex,
                                        "w");
-        this->output_results();
+        if (!flag_error)
+          {
+            this->output_results();
+          }
       }
 
-
-    this->compute_errors(this->solution_owned,
-                         this->solution_ex_owned,
-                         this->u_ex,
-                         this->grad_u_ex,
-                         "u");
-    this->compute_errors(this->solution_owned_w,
-                         this->solution_ex_owned_w,
-                         this->w_ex,
-                         this->grad_w_ex,
-                         "w");
+    if (flag_error)
+      {
+        this->compute_errors(this->solution_owned,
+                             this->solution_ex_owned,
+                             this->u_ex,
+                             this->grad_u_ex,
+                             "u");
+        this->compute_errors(this->solution_owned_w,
+                             this->solution_ex_owned_w,
+                             this->w_ex,
+                             this->grad_w_ex,
+                             "w");
+      }
 
     // Generation of the graphical output.
     this->solution_ex = this->solution_ex_owned;

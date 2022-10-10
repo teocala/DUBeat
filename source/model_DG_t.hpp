@@ -1,18 +1,15 @@
+
 /********************************************************************************
   Copyright (C) 2022 by the DUBeat authors.
-
   This file is part of DUBeat.
-
   DUBeat is free software; you can redistribute it and/or modify
   it under the terms of the GNU Lesser General Public License as published by
   the Free Software Foundation, either version 3 of the License, or
   (at your option) any later version.
-
   DUBeat is distributed in the hope that it will be useful,
   but WITHOUT ANY WARRANTY; without even the implied warranty of
   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
   Lesser General Public License for more details.
-
   You should have received a copy of the GNU Lesser General Public License
   along with DUBeat.  If not, see <http://www.gnu.org/licenses/>.
 ********************************************************************************/
@@ -97,14 +94,6 @@ protected:
   virtual void
   update_time();
 
-  /// Computation of the @f$L^\infty@f$ error at an intermediate time-step.
-  virtual void
-  intermediate_error_print(
-    const lifex::LinAlg::MPI::Vector &                   solution_owned,
-    const lifex::LinAlg::MPI::Vector &                   solution_ex_owned,
-    const std::shared_ptr<dealii::Function<lifex::dim>> &u_ex,
-    const char *solution_name = (char *)"u");
-
   /// Output of results. Note that, since it exploits dubiner_to_fem from
   /// DUB_FEM_handler.hpp, if the polynomial order chosen to solve the model is
   /// @f$>2@f$, the FE space considered for the output will be of order at
@@ -112,6 +101,14 @@ protected:
   /// might be less refined. See DUB_FEM_handler.hpp for more details.
   void
   output_results() override;
+
+  /// Computation of the @f$L^\infty@f$ error at an intermediate time-step.
+  virtual void
+  intermediate_error_print(
+    const lifex::LinAlg::MPI::Vector &                   solution_owned,
+    const lifex::LinAlg::MPI::Vector &                   solution_ex_owned,
+    const std::shared_ptr<dealii::Function<lifex::dim>> &u_ex,
+    const char *solution_name = (char *)"u");
 
   /// Override for the simulation run.
   void
@@ -311,6 +308,7 @@ ModelDG_t<basis>::run()
   this->initialize_solution(this->solution_ex_owned, this->solution_ex);
   this->time_initialization();
 
+
   output_results();
 
   while (this->time < this->prm_time_final)
@@ -334,6 +332,7 @@ ModelDG_t<basis>::run()
       this->intermediate_error_print(this->solution_owned,
                                      this->solution_ex_owned,
                                      this->u_ex);
+
       output_results();
     }
 

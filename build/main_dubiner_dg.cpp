@@ -43,7 +43,7 @@ main(int argc, char **argv)
       // Dubiner basis:    DUBValues<lifex::dim>
       // FEM basis :  dealii::FE_SimplexDGP<lifex::dim>
 
-      DUBeat::models::MonodomainFHNDG<dealii::FE_SimplexDGP<lifex::dim>> model;
+      DUBeat::models::MonodomainFHNDG<DUBValues<lifex::dim>> model;
 
       model.main_run_generate();
     }
