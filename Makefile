@@ -49,7 +49,7 @@ DOXYFILE = ./Doxyfile
 INDENT = ./extra/indent
 
 #==========================
-.PHONY = all doc clean distclean
+.PHONY = all doc clean distclean 3RDPARTY
 
 .DEFAULT_GOAL = all
 
@@ -61,6 +61,9 @@ check_lifex:
 
 end_print:
 	@echo "\nDUBeat version 1.0.0: compilation completed\n"
+
+3RDPARTY:
+	@cd 3rdparty; make
 
 clean:
 	@$(RM) -f $(EXEC) $(OBJS)
