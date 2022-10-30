@@ -129,7 +129,7 @@ public:
   double 
   eval_on_point(const lifex::LinAlg::MPI::Vector &u, 
                 const std::vector<unsigned int> &dof_indices, 
-                const dealii::Point<lifex::dim> point) const
+                const dealii::Point<lifex::dim> point) const;
 
   /// To check if a point is inside the reference cell, needed in other methods.
   bool
@@ -478,7 +478,7 @@ DUBFEMHandler<basis>::eval_on_point(
   double eval = 0;
 
   for (unsigned int i = 0; i < this->dofs_per_cell; ++i)
-    eval += u[dof_indices[i]]*this->shape_value(point);
+    eval += u[dof_indices[i]]*this->shape_value(i, point);
 
   return eval;
 }

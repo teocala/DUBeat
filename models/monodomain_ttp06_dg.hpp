@@ -32,24 +32,24 @@
 #include <memory>
 #include <vector>
 
-#include "source/DUBValues.hpp"
-#include "source/DUB_FEM_handler.hpp"
-#include "source/QGaussLegendreSimplex.hpp"
+#include "../source/DUBValues.hpp"
+#include "../source/DUB_FEM_handler.hpp"
+#include "../source/QGaussLegendreSimplex.hpp"
 #include "source/core_model.hpp"
-#include "source/face_handler_DG.hpp"
+#include "../source/face_handler_DG.hpp"
 #include "source/geometry/mesh_handler.hpp"
 #include "source/helpers/applied_current.hpp"
 #include "source/helpers/ischemic_region.hpp"
 #include "source/init.hpp"
 #include "source/io/data_writer.hpp"
-#include "../source/ttp06_DG.hpp"
-#include "source/model_DG.hpp"
-#include "source/model_DG_t.hpp"
+#include "../source/model_DG.hpp"
+#include "../source/model_DG_t.hpp"
 #include "source/numerics/bc_handler.hpp"
 #include "source/numerics/linear_solver_handler.hpp"
 #include "source/numerics/preconditioner_handler.hpp"
 #include "source/numerics/tools.hpp"
-#include "source/volume_handler_DG.hpp"
+#include "../source/volume_handler_DG.hpp"
+#include "../3rdparty/lifex-dev_0d/source/ttp06.hpp"
 
 namespace DUBeat::models {
 namespace monodomain_ttp06_DG {
@@ -508,8 +508,6 @@ template <class basis> void MonodomainTTP06DG<basis>::run() {
   this->conversion_to_fem(this->solution, mesh_path_fem, fe_degree,
                           this->scaling_factor);
   this->output_results();
-  //output_activation_time();
-  //activation_time_specific();
 }
 
 template <class basis> void MonodomainTTP06DG<basis>::assemble_system() {
@@ -635,7 +633,7 @@ template <class basis> void MonodomainTTP06DG<basis>::assemble_ionic() {
         unsigned int i = n_cell*n_quad_points+q; // To represent the n_cells x n_quadrature matrix as a vector.
 
         auto[w, n_iter] = ionic_model->solve_time_step_0d(u_nodal, bdf_handler_w.get_alpha, bdf_handler_w.get_sol_bdf[i], bdf_handler_w.get_sol_extrapolation[i], 0, I_app->value(vol_handler.quadrature_real(q)));
-        bdf_handler.time_advance(w);
+        bdf_handler_w.time_advance(w);
         double Iion = ionic_model->Iion(u_nodal,u_nodal,w,0);
 
         det = 1 / determinant(vol_handler.get_jacobian_inverse());
