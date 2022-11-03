@@ -29,15 +29,15 @@
  * @author Giulia Gualtieri <giulia.gualtieri@mail.polimi.it>.
  */
 
-#ifndef LIFEX_PHYSICS_IONIC_HPP_
-#define LIFEX_PHYSICS_IONIC_HPP_
+#ifndef LIFEX_PHYSICS_IONIC_HPP_0D
+#define LIFEX_PHYSICS_IONIC_HPP_0D
 
-#include "core/source/core_model.hpp"
-#include "core/source/generic_factory.hpp"
+#include "source/core_model.hpp"
+#include "source/generic_factory.hpp"
 
-#include "core/source/io/csv_writer.hpp"
+#include "source/io/csv_writer.hpp"
 
-#include "core/source/numerics/time_handler.hpp"
+#include "source/numerics/time_handler.hpp"
 
 #include <map>
 #include <memory>
@@ -45,7 +45,9 @@
 #include <utility>
 #include <vector>
 
-namespace lifex
+using namespace lifex;
+
+namespace lifex0d
 {
   /**
    * @brief Abstract class implementing a ionic model.
@@ -352,6 +354,6 @@ namespace lifex
     double prm_time_step;
   };
 
-} // namespace lifex
+} // namespace lifex0d
 
-#endif /* LIFEX_PHYSICS_IONIC_HPP_ */
+#endif /* LIFEX_PHYSICS_IONIC_HPP_0D */

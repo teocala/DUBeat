@@ -35,7 +35,7 @@
 # build directory
 DIR =./build
 # get all files *.cpp
-SRCS=$(wildcard $(DIR)/*.cpp)
+SRCS=$(wildcard $(DIR)/*.cpp) $(wildcard ./3rdparty/*/*.cpp)
 # get the corresponding object file
 OBJS = $(SRCS:.cpp=.o)
 # get all headers in the working directory

@@ -24,11 +24,11 @@
  * @author Francesco Regazzoni <francesco.regazzoni@polimi.it>.
  */
 
-#include "core/source/numerics/numbers.hpp"
+#include "source/numerics/numbers.hpp"
 
-#include "source/ttp06.hpp"
+#include "ttp06.hpp"
 
-namespace lifex
+namespace lifex0d
 {
   TTP06::TTP06(const std::string &subsection)
     : Ionic(18, subsection + " / " + label)
@@ -812,4 +812,4 @@ namespace lifex
   template void
   TTP06::compute_currents<>(const double_AD &       VV,
                             CurrentType<double_AD> &currents);
-} // namespace lifex
+} // namespace lifex0d

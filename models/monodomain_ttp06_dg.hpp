@@ -49,7 +49,7 @@
 #include "source/numerics/preconditioner_handler.hpp"
 #include "source/numerics/tools.hpp"
 #include "../source/volume_handler_DG.hpp"
-#include "../3rdparty/lifex-dev_0d/source/ttp06.hpp"
+#include "../3rdparty/lifex-dev_0d/ttp06.hpp"
 
 namespace DUBeat::models {
 namespace monodomain_ttp06_DG {
@@ -194,7 +194,7 @@ public:
   MonodomainTTP06DG<basis>()
       : ModelDG_t<basis>("Monodomain TTP06"), Sigma(),
         ionic_model(std::make_shared<lifex0d::TTP06>(
-            "Monodomain TTP06 / Ionic model", false)),
+            "Monodomain TTP06 / Ionic model")),
         I_app(std::make_shared<lifex::AppliedCurrent>(
             "Monodomain TTP06 / Applied current")) {
     this->u_ex = std::make_shared<monodomain_ttp06_DG::ExactSolution>();
@@ -227,7 +227,7 @@ private:
   /// Applied current
   std::shared_ptr<lifex::AppliedCurrent> I_app;
   /// Additional BDF handler for the gating variables.
-  lifex::utils::BDFHandler<std::vector<std::vector<double>> bdf_handler_w;
+  lifex::utils::BDFHandler<std::vector<std::vector<double>>> bdf_handler_w;
   /// Mesh file path.
   std::string mesh_path;
   /// Distributed right hand side vector associated with the ionic current.
@@ -442,12 +442,19 @@ template <class basis> void MonodomainTTP06DG<basis>::run() {
 
   this->time_initialization();
   std::vector<std::vector<double>> w;
-  for (unsigned int i = 0; i < this->triangulation->n_active_cells(),n_quad_points; ++i)
-    for (unsigned int j = 0; j < 17; ++j)
-      w[i][j] = ionic_model->setup_initial_conditions()[j];
-  bdf_handler_w.initialize(this->prm_bdf_order, w);
+  const int n_quad_points = std::pow(this->prm_fe_degree+2, lifex::dim);
+  unsigned int quad_point_i = 0;
+  for (const auto &cell : this->dof_handler.active_cell_iterators())
+    for (unsigned int i = 0; i < this->prm_fe_degree+2; ++i)
+      for (unsigned int j = 0; j < 17; ++j)
+      {
+        w[quad_point_i][j] = ionic_model->setup_initial_conditions()[j];
+        ++quad_point_i;
+      }
+  const std::vector<std::vector<std::vector<double>>> w_init(this->prm_bdf_order, w);
+  bdf_handler_w.initialize(this->prm_bdf_order, w_init);
 
-  dealii::IndexSet owned_dofs = dof_handler.locally_owned_dofs();
+  dealii::IndexSet owned_dofs = this->dof_handler.locally_owned_dofs();
   dealii::IndexSet relevant_dofs = owned_dofs;
   rhs_ionic.reinit(owned_dofs, this->mpi_comm);
 
@@ -477,12 +484,12 @@ template <class basis> void MonodomainTTP06DG<basis>::run() {
     this->rhs += rhs_ionic;
 
     if (this->timestep_number % 25 == 0) {
-      this->conversion_to_fem(this->solution, mesh_path_fem, fe_degree,
+      this->conversion_to_fem(this->solution, mesh_path, this->prm_fe_degree,
                               this->scaling_factor);
 
       std::string filename = "solution" + std::to_string(this->time);
       lifex::DataOut<lifex::dim> data_out;
-      data_out.add_data_vector(dof_handler_fem, this->solution, "u");
+      data_out.add_data_vector(this->dof_handler, this->solution, "u");
       data_out.build_patches();
       lifex::utils::dataout_write_hdf5(data_out, filename, false);
 
@@ -502,10 +509,10 @@ template <class basis> void MonodomainTTP06DG<basis>::run() {
                        this->u_ex, this->grad_u_ex, "u");
 
   this->solution_ex = this->solution_ex_owned;
-  this->conversion_to_fem(this->solution_ex, mesh_path_fem, fe_degree,
+  this->conversion_to_fem(this->solution_ex, mesh_path, this->prm_fe_degree,
                           this->scaling_factor);
   this->solution = this->solution_owned;
-  this->conversion_to_fem(this->solution, mesh_path_fem, fe_degree,
+  this->conversion_to_fem(this->solution, mesh_path, this->prm_fe_degree,
                           this->scaling_factor);
   this->output_results();
 }
@@ -618,29 +625,32 @@ template <class basis> void MonodomainTTP06DG<basis>::assemble_ionic() {
   double det = 0;
   rhs_ionic = 0;
 
-  std::vector<unsigned int> dof_indices(dofs_per_cell);
+  std::vector<unsigned int> dof_indices(this->dofs_per_cell);
+  dealii::Vector<double> cell_rhs_ttp06(this->dofs_per_cell);
+  VolumeHandlerDG<lifex::dim> vol_handler(this->prm_fe_degree);
+  const int n_quad_points = std::pow(this->prm_fe_degree+2, lifex::dim);
   unsigned int n_cell = 0;
+  std::vector<std::vector<double>> w_vec;
 
-  for (const auto &cell : dof_handler.active_cell_iterators()) {
+  for (const auto &cell : this->dof_handler.active_cell_iterators()) {
     if (cell->is_locally_owned()) {
       vol_handler.reinit(cell);
-      dof_indices = dof_handler.get_dof_indices(cell);
+      dof_indices = this->dof_handler.get_dof_indices(cell);
       cell_rhs_ttp06 = 0;
 
       for (unsigned int q = 0; q < n_quad_points; ++q)
       {
-        double u_nodal = dub_fem_values->eval_on_point(this->sol_owned, dof_indices, vol_handler.quadrature_ref(q));
+        double u_nodal = this->dub_fem_values->eval_on_point(this->solution_owned, dof_indices, vol_handler.quadrature_ref(q));
         unsigned int i = n_cell*n_quad_points+q; // To represent the n_cells x n_quadrature matrix as a vector.
 
-        auto[w, n_iter] = ionic_model->solve_time_step_0d(u_nodal, bdf_handler_w.get_alpha, bdf_handler_w.get_sol_bdf[i], bdf_handler_w.get_sol_extrapolation[i], 0, I_app->value(vol_handler.quadrature_real(q)));
-        bdf_handler_w.time_advance(w);
-        double Iion = ionic_model->Iion(u_nodal,u_nodal,w,0);
+        auto w = ionic_model->solve_time_step_0d(u_nodal, bdf_handler_w.get_alpha(), bdf_handler_w.get_sol_bdf()[i], bdf_handler_w.get_sol_extrapolation()[i], 0, I_app->value(vol_handler.quadrature_real(q)));
+        double Iion = ionic_model->Iion(u_nodal,u_nodal,w.first,0).first;
 
         det = 1 / determinant(vol_handler.get_jacobian_inverse());
-        dof_indices = dof_handler_fem.get_dof_indices(cell);
+        dof_indices = this->dof_handler.get_dof_indices(cell);
+        w_vec[n_cell] = w.first;
 
-
-        for (unsigned int i = 0; i < dofs_per_cell; ++i) {
+        for (unsigned int i = 0; i < this->dofs_per_cell; ++i) {
             cell_rhs_ttp06(i) +=
                 Iion *
                 this->dub_fem_values->shape_value(i, vol_handler.quadrature_ref(q)) *
@@ -654,6 +664,7 @@ template <class basis> void MonodomainTTP06DG<basis>::assemble_ionic() {
     n_cell++;
   }
   rhs_ionic.compress(lifex::VectorOperation::add);
+  bdf_handler_w.time_advance(w_vec);
 }
 
 

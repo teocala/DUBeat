@@ -28,15 +28,15 @@
  * @author Giulia Gualtieri <giulia.gualtieri@mail.polimi.it>.
  */
 
-#include "core/source/numerics/numbers.hpp"
+#include "source/numerics/numbers.hpp"
 
-#include "source/ionic.hpp"
+#include "ionic.hpp"
 
 #include <algorithm>
 #include <limits>
 #include <set>
 
-namespace lifex
+namespace lifex0d
 {
   Ionic::Ionic(const size_t &     n_variables_,
                const std::string &subsection)

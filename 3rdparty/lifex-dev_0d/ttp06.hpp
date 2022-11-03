@@ -24,10 +24,10 @@
  * @author Francesco Regazzoni <francesco.regazzoni@polimi.it>.
  */
 
-#ifndef LIFEX_IONIC_TTP06_HPP_
-#define LIFEX_IONIC_TTP06_HPP_
+#ifndef LIFEX_IONIC_TTP06_HPP_0d
+#define LIFEX_IONIC_TTP06_HPP_0d
 
-#include "source/ionic.hpp"
+#include "ionic.hpp"
 
 #include <string>
 #include <utility>
@@ -46,7 +46,7 @@ namespace lifex0d
    * http://dx.doi.org/10.1038/ncomms11437
    *
    */
-  class TTP06 : public Ionic
+  class TTP06 : public lifex0d::Ionic
   {
   public:
     /// This class needs to access the value of prm_implicit_Iion.
@@ -210,11 +210,6 @@ namespace lifex0d
       dConc; ///< Derivatives of the concentration equations.
   };
 
-  LIFEX_REGISTER_CHILD_INTO_FACTORY(Ionic,
-                                    TTP06,
-                                    TTP06::label,
-                                    const std::string &);
+} // namespace lifex0d
 
-} // namespace lifex
-
-#endif /* LIFEX_IONIC_TTP06_HPP_ */
+#endif /* LIFEX_IONIC_TTP06_HPP_0d */
