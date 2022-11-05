@@ -643,17 +643,18 @@ void
 ModelDG<basis>::conversion_to_fem(lifex::LinAlg::MPI::Vector &sol_owned,
                                   const std::string           fem_file_path,
                                   const unsigned int          degree_fem,
-                                  const double                scaling_factor) const
+                                  const double scaling_factor) const
 {
   return;
 }
 
 template <>
 void
-ModelDG<DUBValues<lifex::dim>>::conversion_to_fem(lifex::LinAlg::MPI::Vector &sol_owned,
-                                  const std::string           fem_file_path,
-                                  const unsigned int          degree_fem,
-                                  const double                scaling_factor) const
+ModelDG<DUBValues<lifex::dim>>::conversion_to_fem(
+  lifex::LinAlg::MPI::Vector &sol_owned,
+  const std::string           fem_file_path,
+  const unsigned int          degree_fem,
+  const double                scaling_factor) const
 {
   sol_owned = dub_fem_values->dubiner_to_fem(sol_owned,
                                              fem_file_path,
@@ -707,17 +708,18 @@ void
 ModelDG<basis>::conversion_to_dub(lifex::LinAlg::MPI::Vector &sol_owned,
                                   const std::string           fem_file_path,
                                   const unsigned int          degree_fem,
-                                  const double                scaling_factor) const
+                                  const double scaling_factor) const
 {
   return;
 }
 
 template <>
 void
-ModelDG<DUBValues<lifex::dim>>::conversion_to_dub(lifex::LinAlg::MPI::Vector &sol_owned,
-                                  const std::string           fem_file_path,
-                                  const unsigned int          degree_fem,
-                                  const double                scaling_factor) const
+ModelDG<DUBValues<lifex::dim>>::conversion_to_dub(
+  lifex::LinAlg::MPI::Vector &sol_owned,
+  const std::string           fem_file_path,
+  const unsigned int          degree_fem,
+  const double                scaling_factor) const
 {
   sol_owned = dub_fem_values->fem_to_dubiner(sol_owned,
                                              fem_file_path,

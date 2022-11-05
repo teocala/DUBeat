@@ -28,18 +28,17 @@
  * @author Giulia Gualtieri <giulia.gualtieri@mail.polimi.it>.
  */
 
-#include "source/numerics/numbers.hpp"
-
 #include "ionic.hpp"
 
 #include <algorithm>
 #include <limits>
 #include <set>
 
+#include "source/numerics/numbers.hpp"
+
 namespace lifex0d
 {
-  Ionic::Ionic(const size_t &     n_variables_,
-               const std::string &subsection)
+  Ionic::Ionic(const size_t &n_variables_, const std::string &subsection)
     : CoreModel(subsection)
     , QuadratureEvaluationFEMScalar()
     , n_variables(n_variables_)
@@ -239,7 +238,7 @@ namespace lifex0d
   {
     double              dIion_du_val;
     double              Iion_val;
-    const double &      alpha_bdf = bdf_handler_0d[0].get_alpha();
+    const double       &alpha_bdf = bdf_handler_0d[0].get_alpha();
     std::vector<double> ww_bdf(n_variables);
     std::vector<double> ww_ext(n_variables);
 
@@ -409,4 +408,4 @@ namespace lifex0d
     csv_writer.write_line();
   }
 
-} // namespace lifex
+} // namespace lifex0d

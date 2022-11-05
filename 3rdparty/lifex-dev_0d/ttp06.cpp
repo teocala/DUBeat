@@ -24,9 +24,9 @@
  * @author Francesco Regazzoni <francesco.regazzoni@polimi.it>.
  */
 
-#include "source/numerics/numbers.hpp"
-
 #include "ttp06.hpp"
+
+#include "source/numerics/numbers.hpp"
 
 namespace lifex0d
 {
@@ -432,12 +432,12 @@ namespace lifex0d
   }
 
   std::pair<std::vector<double>, unsigned int>
-  TTP06::solve_time_step_0d(const double &             u,
-                            const double &             alpha_bdf,
+  TTP06::solve_time_step_0d(const double              &u,
+                            const double              &alpha_bdf,
                             const std::vector<double> &w_bdf,
                             const std::vector<double> &w_ext,
-                            const double &             cell_type,
-                            const double &             Iapp)
+                            const double              &cell_type,
+                            const double              &Iapp)
   {
     for (unsigned int j = 0; j < n_variables; ++j)
       {
@@ -503,7 +503,7 @@ namespace lifex0d
 
   template <class NumberType>
   void
-  TTP06::compute_currents(const NumberType &       VV,
+  TTP06::compute_currents(const NumberType        &VV,
                           CurrentType<NumberType> &currents)
   {
     // NB: the output is in mV/ms !
@@ -528,8 +528,8 @@ namespace lifex0d
     NumberType rec_ipK = 1.0 / (1.0 + std::exp((25 - V_mV) / 5.98));
 
     // Compute currents
-    currents[0] = prm_Gkr * std::sqrt(prm_Ko / 5.4) * ww_ext[3] * ww_ext[4] *
-                  (V_mV - Ek);
+    currents[0] =
+      prm_Gkr * std::sqrt(prm_Ko / 5.4) * ww_ext[3] * ww_ext[4] * (V_mV - Ek);
 
     currents[1] = Gks * ww_ext[5] * ww_ext[5] * (V_mV - Eks);
 
@@ -759,8 +759,8 @@ namespace lifex0d
   }
 
   std::pair<double, double>
-  TTP06::Iion(const double &             u,
-              const double &             u_old,
+  TTP06::Iion(const double              &u,
+              const double              &u_old,
               const std::vector<double> &w,
               const double & /*cell_type*/)
   {
@@ -805,11 +805,10 @@ namespace lifex0d
 
   /// Explicit instantiation.
   template void
-  TTP06::compute_currents<>(const double &       VV,
-                            CurrentType<double> &currents);
+  TTP06::compute_currents<>(const double &VV, CurrentType<double> &currents);
 
   /// Explicit instantiation.
   template void
-  TTP06::compute_currents<>(const double_AD &       VV,
+  TTP06::compute_currents<>(const double_AD        &VV,
                             CurrentType<double_AD> &currents);
 } // namespace lifex0d

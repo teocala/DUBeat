@@ -32,18 +32,16 @@
 #ifndef LIFEX_PHYSICS_IONIC_HPP_0D
 #define LIFEX_PHYSICS_IONIC_HPP_0D
 
-#include "source/core_model.hpp"
-#include "source/generic_factory.hpp"
-
-#include "source/io/csv_writer.hpp"
-
-#include "source/numerics/time_handler.hpp"
-
 #include <map>
 #include <memory>
 #include <string>
 #include <utility>
 #include <vector>
+
+#include "source/core_model.hpp"
+#include "source/generic_factory.hpp"
+#include "source/io/csv_writer.hpp"
+#include "source/numerics/time_handler.hpp"
 
 using namespace lifex;
 
@@ -118,16 +116,14 @@ namespace lifex0d
   {
   public:
     /// Alias for the generic ionic model factory.
-    using IonicFactory =
-      GenericFactory<Ionic, const std::string &>;
+    using IonicFactory = GenericFactory<Ionic, const std::string &>;
 
     /**
      * Constructor.
      * @param[in] n_variables_ Total number of ionic and gating variables.
      * @param[in] subsection   Parameter subsection.
      */
-    Ionic(const size_t &     n_variables_,
-          const std::string &subsection);
+    Ionic(const size_t &n_variables_, const std::string &subsection);
 
     /// Virtual destructor.
     virtual ~Ionic() = default;
@@ -184,12 +180,12 @@ namespace lifex0d
      * @return The pair [state variables at current time step, number of iterations needed to solve].
      */
     virtual std::pair<std::vector<double>, unsigned int>
-    solve_time_step_0d(const double &             u,
-                       const double &             alpha_bdf,
+    solve_time_step_0d(const double              &u,
+                       const double              &alpha_bdf,
                        const std::vector<double> &w_bdf,
                        const std::vector<double> &w_ext,
-                       const double &             cell_type,
-                       const double &             Iapp) = 0;
+                       const double              &cell_type,
+                       const double              &Iapp) = 0;
 
     /**
      * Solves a time step of the ionic model and of the electrophysiology model
@@ -212,10 +208,10 @@ namespace lifex0d
      * @f$\frac{\partial I_\mathrm{ion}}{\partial u}(u, \mathbf{w})@f$.
      */
     virtual std::pair<double, double>
-    Iion(const double &             u,
-         const double &             u_ext,
+    Iion(const double              &u,
+         const double              &u_ext,
          const std::vector<double> &w,
-         const double &             cell_type) = 0;
+         const double              &cell_type) = 0;
 
     /// Run a 0D stimulation, computing the evolution of both transmembrane
     /// potential and ionic variables at a single point.
@@ -317,7 +313,7 @@ namespace lifex0d
     iterations_log_string(const unsigned int &n_iter) = 0;
 
     utils::CSVWriter csv_writer;
-    
+
     double time_step; ///< Current time step.
     double time;      ///< Current time.
 
@@ -331,7 +327,7 @@ namespace lifex0d
       w_bdf_0d; ///< BDF combination of state variables at
                 ///< previous timesteps, for 0D simulations
     std::vector<std::shared_ptr<const double>>
-           w_ext_0d; ///< BDF extrapolation of state variables, for 0D simulations
+      w_ext_0d; ///< BDF extrapolation of state variables, for 0D simulations
     double calcium_0d; ///< Calcium concentration for 0D simulations
 
 

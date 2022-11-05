@@ -124,12 +124,12 @@ public:
     lifex::LinAlg::MPI::Vector                           dub_solution,
     const std::shared_ptr<dealii::Function<lifex::dim>> &u_analytical) const;
 
-  
+
   /// Evaluation of the discretized function on one point inside a cell.
-  double 
-  eval_on_point(const lifex::LinAlg::MPI::Vector &u, 
-                const std::vector<unsigned int> &dof_indices, 
-                const dealii::Point<lifex::dim> point) const;
+  double
+  eval_on_point(const lifex::LinAlg::MPI::Vector &u,
+                const std::vector<unsigned int>  &dof_indices,
+                const dealii::Point<lifex::dim>   point) const;
 
   /// To check if a point is inside the reference cell, needed in other methods.
   bool
@@ -473,12 +473,14 @@ DUBFEMHandler<basis>::analytical_to_dubiner(
 template <class basis>
 double
 DUBFEMHandler<basis>::eval_on_point(
-  const lifex::LinAlg::MPI::Vector &u, const std::vector<unsigned int> &dof_indices, const dealii::Point<lifex::dim> point) const
+  const lifex::LinAlg::MPI::Vector &u,
+  const std::vector<unsigned int>  &dof_indices,
+  const dealii::Point<lifex::dim>   point) const
 {
   double eval = 0;
 
   for (unsigned int i = 0; i < this->dofs_per_cell; ++i)
-    eval += u[dof_indices[i]]*this->shape_value(i, point);
+    eval += u[dof_indices[i]] * this->shape_value(i, point);
 
   return eval;
 }

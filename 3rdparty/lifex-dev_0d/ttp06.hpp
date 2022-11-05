@@ -27,12 +27,12 @@
 #ifndef LIFEX_IONIC_TTP06_HPP_0d
 #define LIFEX_IONIC_TTP06_HPP_0d
 
-#include "ionic.hpp"
-
 #include <string>
 #include <utility>
 #include <variant>
 #include <vector>
+
+#include "ionic.hpp"
 
 namespace lifex0d
 {
@@ -81,20 +81,20 @@ namespace lifex0d
 
     /// Solve 0D time step, given the transmembrane potential.
     virtual std::pair<std::vector<double>, unsigned int>
-    solve_time_step_0d(const double &             u,
-                       const double &             alpha_bdf,
+    solve_time_step_0d(const double              &u,
+                       const double              &alpha_bdf,
                        const std::vector<double> &w_bdf,
                        const std::vector<double> &w_ext,
-                       const double &             cell_type,
-                       const double &             Iapp) override;
+                       const double              &cell_type,
+                       const double              &Iapp) override;
 
     /// Evaluate the ionic current given the transmembrane potential and the
     /// ionic model variables.
     virtual std::pair<double, double>
-    Iion(const double &             u,
-         const double &             u_old,
+    Iion(const double              &u,
+         const double              &u_old,
          const std::vector<double> &w,
-         const double &             cell_type) override;
+         const double              &cell_type) override;
 
     /// @copydoc Ionic::get_repolarization_upper_threshold
     virtual double
@@ -123,8 +123,7 @@ namespace lifex0d
     /// Compute all the currents of the model.
     template <class NumberType>
     void
-    compute_currents(const NumberType &       VV,
-                     CurrentType<NumberType> &currents);
+    compute_currents(const NumberType &VV, CurrentType<NumberType> &currents);
 
     /// Compute the derivatives of the concentration variables of the model.
     void
