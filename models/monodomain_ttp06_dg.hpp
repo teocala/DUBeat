@@ -308,6 +308,20 @@ void MonodomainTTP06DG<basis>::declare_parameters(
   }
   params.leave_subsection();
 
+  params.enter_subsection("Mesh and space discretization");
+  {
+    params.declare_entry(
+    "Number of refinements",
+    "2",
+    dealii::Patterns::Integer(0),
+    "Number of global mesh refinement steps applied to initial grid.");
+    params.declare_entry("FE space degree",
+                         "1",
+                         dealii::Patterns::Integer(1),
+                         "Degree of the FE space.");
+  }
+  params.leave_subsection();
+
   params.enter_subsection("Discontinuous Galerkin");
   {
     params.declare_entry(
@@ -389,6 +403,11 @@ void MonodomainTTP06DG<basis>::parse_parameters(lifex::ParamHandler &params) {
   this->scaling_factor = params.get_double("Scaling factor");
   params.leave_subsection();
 
+  // Extra parameters.
+  params.enter_subsection("Mesh and space discretization");
+  this->prm_fe_degree     = params.get_integer("FE space degree");
+  params.leave_subsection();
+
   params.enter_subsection("Discontinuous Galerkin");
   this->prm_penalty_coeff = params.get_double("Penalty coefficient");
   AssertThrow(
@@ -443,14 +462,16 @@ template <class basis> void MonodomainTTP06DG<basis>::run() {
   this->time_initialization();
   std::vector<std::vector<double>> w;
   const int n_quad_points = std::pow(this->prm_fe_degree+2, lifex::dim);
-  unsigned int quad_point_i = 0;
+
   for (const auto &cell : this->dof_handler.active_cell_iterators())
-    for (unsigned int i = 0; i < this->prm_fe_degree+2; ++i)
-      for (unsigned int j = 0; j < 17; ++j)
-      {
-        w[quad_point_i][j] = ionic_model->setup_initial_conditions()[j];
-        ++quad_point_i;
-      }
+  {
+    for (unsigned int i = 0; i < n_quad_points; ++i)
+    {
+      std::vector<double> w_quad(17);
+      w_quad = ionic_model->setup_initial_conditions();
+      w.push_back(w_quad);
+    }
+  }
   const std::vector<std::vector<std::vector<double>>> w_init(this->prm_bdf_order, w);
   bdf_handler_w.initialize(this->prm_bdf_order, w_init);
 
@@ -620,7 +641,6 @@ template <class basis> void MonodomainTTP06DG<basis>::assemble_system() {
 }
 
 template <class basis> void MonodomainTTP06DG<basis>::assemble_ionic() {
-  ionic_model->init();
 
   double det = 0;
   rhs_ionic = 0;
@@ -630,7 +650,7 @@ template <class basis> void MonodomainTTP06DG<basis>::assemble_ionic() {
   VolumeHandlerDG<lifex::dim> vol_handler(this->prm_fe_degree);
   const int n_quad_points = std::pow(this->prm_fe_degree+2, lifex::dim);
   unsigned int n_cell = 0;
-  std::vector<std::vector<double>> w_vec;
+  std::vector<std::vector<double>> w_vec(bdf_handler_w.get_sol_bdf());
 
   for (const auto &cell : this->dof_handler.active_cell_iterators()) {
     if (cell->is_locally_owned()) {
