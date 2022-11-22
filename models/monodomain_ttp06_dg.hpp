@@ -233,10 +233,6 @@ namespace DUBeat::models
     dealii::Tensor<2, lifex::dim, double> Sigma;
     /// Membrane capacity.
     double Cm;
-    /// f0 fibers direction.
-    dealii::Tensor<1, lifex::dim, double> f0;
-    /// n0 fibers direction.
-    dealii::Tensor<1, lifex::dim, double> n0;
     /// Transversal conductivity @f$\left[\mathrm{m^2 s^{-1}}\right]@f$.
     double prm_sigma_m_t;
     /// Longitudinal conductivity @f$\left[\mathrm{m^2 s^{-1}}\right]@f$.
@@ -396,20 +392,6 @@ namespace DUBeat::models
     }
     params.leave_subsection();
 
-    std::string default_f0 = {};
-    std::string default_n0 = {};
-
-    if (lifex::dim == 2)
-      {
-        default_f0 = "-1,0";
-        default_n0 = "0,1";
-      }
-    else // dim = 3.
-      {
-        default_f0 = "-1,0,0";
-        default_n0 = "0,0,1";
-      }
-
     params.enter_subsection("Parameters of the model");
     {
       params.declare_entry("ChiM",
@@ -432,14 +414,6 @@ namespace DUBeat::models
                            "0.1125e-4",
                            dealii::Patterns::Double(),
                            "Normal conductivity.");
-      params.declare_entry("f0",
-                           default_f0,
-                           dealii::Patterns::Anything(),
-                           "f0 fibers direction.");
-      params.declare_entry("n0",
-                           default_n0,
-                           dealii::Patterns::Anything(),
-                           "n0 fibers direction.");
     }
     params.leave_subsection();
 
@@ -508,11 +482,6 @@ namespace DUBeat::models
     prm_sigma_m_l = params.get_double("sigma_m_l");
     prm_sigma_m_n = params.get_double("sigma_m_n");
 
-    for (unsigned int i = 0; i < lifex::dim; ++i)
-      {
-        n0[i] = params.get_vector_item<double>("n0", i, lifex::dim, ",");
-        f0[i] = params.get_vector_item<double>("f0", i, lifex::dim, ",");
-      }
     params.leave_subsection();
 
     params.enter_subsection("Activation time");
@@ -580,22 +549,6 @@ namespace DUBeat::models
         this->assemble_ionic();
 
         this->rhs += rhs_ionic;
-
-        if (this->timestep_number % 25 == 0)
-          {
-            this->conversion_to_fem(this->solution,
-                                    mesh_path,
-                                    this->prm_fe_degree,
-                                    this->scaling_factor);
-
-            std::string filename = "solution" + std::to_string(this->time);
-            lifex::DataOut<lifex::dim> data_out;
-            data_out.add_data_vector(this->dof_handler, this->solution, "u");
-            data_out.build_patches();
-            lifex::utils::dataout_write_hdf5(data_out, filename, false);
-
-            data_out.clear();
-          }
 
         // Initial guess.
         this->solution_owned = this->solution_ext;
@@ -790,11 +743,11 @@ namespace DUBeat::models
                 dof_indices   = this->dof_handler.get_dof_indices(cell);
                 w_vec[n_cell] = w.first;
 
-                for (unsigned int i = 0; i < this->dofs_per_cell; ++i)
+                for (unsigned int ii = 0; ii < this->dofs_per_cell; ++ii)
                   {
-                    cell_rhs_ttp06(i) += Iion *
+                    cell_rhs_ttp06(ii) += Iion *
                                          this->dub_fem_values->shape_value(
-                                           i, vol_handler.quadrature_ref(q)) *
+                                           ii, vol_handler.quadrature_ref(q)) *
                                          vol_handler.quadrature_weight(q) * det;
                   }
               }
