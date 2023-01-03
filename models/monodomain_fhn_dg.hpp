@@ -521,11 +521,6 @@ namespace DUBeat::models
     // Extra parameters.
     params.enter_subsection("Mesh and space discretization");
     {
-      params.declare_entry(
-        "Number of refinements",
-        "2",
-        dealii::Patterns::Integer(0),
-        "Number of global mesh refinement steps applied to initial grid.");
       params.declare_entry("FE space degree",
                            "1",
                            dealii::Patterns::Integer(1),
@@ -616,7 +611,6 @@ namespace DUBeat::models
 
     // Extra parameters.
     params.enter_subsection("Mesh and space discretization");
-    this->prm_n_refinements = params.get_integer("Number of refinements");
     this->prm_fe_degree     = params.get_integer("FE space degree");
     params.leave_subsection();
 

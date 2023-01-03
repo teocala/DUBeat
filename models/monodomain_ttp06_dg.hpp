@@ -344,11 +344,6 @@ namespace DUBeat::models
 
     params.enter_subsection("Mesh and space discretization");
     {
-      params.declare_entry(
-        "Number of refinements",
-        "2",
-        dealii::Patterns::Integer(0),
-        "Number of global mesh refinement steps applied to initial grid.");
       params.declare_entry("FE space degree",
                            "1",
                            dealii::Patterns::Integer(1),
@@ -378,7 +373,7 @@ namespace DUBeat::models
                            dealii::Patterns::Double(0),
                            "Initial time.");
       params.declare_entry("Final time",
-                           "0.001",
+                           "0.01",
                            dealii::Patterns::Double(0),
                            "Final time.");
       params.declare_entry("Time step",
@@ -395,11 +390,11 @@ namespace DUBeat::models
     params.enter_subsection("Parameters of the model");
     {
       params.declare_entry("ChiM",
-                           "1e5",
+                           "1",
                            dealii::Patterns::Double(0),
                            "Surface-to-volume ratio of cells parameter.");
       params.declare_entry("Cm",
-                           "1e-2",
+                           "1",
                            dealii::Patterns::Double(0),
                            "Membrane capacity.");
       params.declare_entry("sigma_m_t",
@@ -741,7 +736,7 @@ namespace DUBeat::models
 
                 det = 1 / determinant(vol_handler.get_jacobian_inverse());
                 dof_indices   = this->dof_handler.get_dof_indices(cell);
-                w_vec[n_cell] = w.first;
+                w_vec[i] = w.first;
 
                 for (unsigned int ii = 0; ii < this->dofs_per_cell; ++ii)
                   {
