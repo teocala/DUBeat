@@ -285,17 +285,16 @@ namespace DUBeat::models
     void
     update_time() override;
 
-    /*
+    /// To print value max, min and menium of the potential.
+    void
+    intermediate_error_print() const;
+
     /// Compute the activation time, from lifex library.
     void compute_activation_time();
-
-    /// Output results of activation time computation.
-    void output_activation_time() const;
 
     /// Compute activation time in nine specific points: the eight vertices and
     /// the point at center of the volumetric domain.
     void activation_time_specific() const;
-    */
   };
 
 
@@ -516,6 +515,7 @@ namespace DUBeat::models
 
     dealii::IndexSet owned_dofs    = this->dof_handler.locally_owned_dofs();
     dealii::IndexSet relevant_dofs = owned_dofs;
+
     rhs_ionic.reinit(owned_dofs, this->mpi_comm);
 
     if (prm_activation_time_compute)
@@ -538,8 +538,6 @@ namespace DUBeat::models
 
         this->solution_ext = this->bdf_handler.get_sol_extrapolation();
 
-        // compute_activation_time();
-
         this->assemble_system();
         this->assemble_ionic();
 
@@ -549,10 +547,10 @@ namespace DUBeat::models
         this->solution_owned = this->solution_ext;
         this->solve_system();
 
-        this->intermediate_error_print(this->solution_owned,
-                                       this->solution_ex_owned,
-                                       this->u_ex,
-                                       "u");
+        compute_activation_time();
+
+        intermediate_error_print();
+
         rhs_ionic.reinit(owned_dofs, this->mpi_comm);
       }
 
@@ -573,6 +571,8 @@ namespace DUBeat::models
                             this->prm_fe_degree,
                             this->scaling_factor);
     this->output_results();
+
+    activation_time_specific();
   }
 
   template <class basis>
@@ -754,6 +754,99 @@ namespace DUBeat::models
       }
     rhs_ionic.compress(lifex::VectorOperation::add);
     bdf_handler_w.time_advance(w_vec);
+  }
+
+  template <class basis>
+  void
+  MonodomainTTP06DG<basis>::intermediate_error_print() const
+  {
+    std::cout<<"Max value "<<this->solution.max()<<std::endl;
+    std::cout<<"Min value "<<this->solution.min()<<std::endl;
+    std::cout<<"Mean value "<<this->solution.mean_value()<<std::endl;
+  }
+
+  template <class basis>
+  void MonodomainTTP06DG<basis>::compute_activation_time() {
+    LinAlg::MPI::Vector solution_fem(this->solution);
+    this->conversion_to_fem(solution_fem,
+                            mesh_path,
+                            this->prm_fe_degree,
+                            this->scaling_factor);
+
+  LinAlg::MPI::Vector solution_bdf_fem(this->solution_bdf);
+  this->conversion_to_fem(solution_bdf_fem,
+                          mesh_path,
+                          this->prm_fe_degree,
+                          this->scaling_factor);
+
+    // Compute activation time.
+    if (prm_activation_time_compute) {
+      const double &alpha_bdf = this->bdf_handler.get_alpha();
+      double derivative = 0;
+      for (unsigned int idx = 0; idx < solution_fem.size(); ++idx) {
+        derivative = (alpha_bdf * solution_fem[idx] - solution_bdf_fem[idx]) *
+                     ionic_model->dt_fact / this->prm_time_step;
+
+        if (((idx < solution_fem.size()) &&
+             (derivative > derivative_max_owned[idx])) || // u
+            ((idx >= solution_fem.size()) &&
+             (derivative < derivative_max_owned[idx]))) // u_e
+        {
+          derivative_max_owned[idx] = derivative;
+
+          activation_time_owned[idx] = this->time - this->prm_time_step;
+        }
+      }
+
+      activation_time_owned.compress(lifex::VectorOperation::insert);
+      activation_time = activation_time_owned;
+    }
+  }
+
+  template <class basis>
+  void MonodomainTTP06DG<basis>::activation_time_specific() const {
+    if (!prm_activation_time_compute)
+      return;
+
+    std::vector<dealii::Point<lifex::dim>> points;
+    points.push_back(dealii::Point<lifex::dim>(0.0, 0.0, 0.0));
+    points.push_back(dealii::Point<lifex::dim>(0.0, 0.007, 0.0));
+    points.push_back(dealii::Point<lifex::dim>(0.02, 0.0, 0.0));
+    points.push_back(dealii::Point<lifex::dim>(0.02, 0.007, 0.0));
+    points.push_back(dealii::Point<lifex::dim>(0.0, 0.0, 0.003));
+    points.push_back(dealii::Point<lifex::dim>(0.0, 0.007, 0.003));
+    points.push_back(dealii::Point<lifex::dim>(0.02, 0.0, 0.003));
+    points.push_back(dealii::Point<lifex::dim>(0.02, 0.007, 0.003));
+    points.push_back(dealii::Point<lifex::dim>(0.01, 0.0035, 0.0015));
+
+    const dealii::FE_SimplexDGP<lifex::dim> fe_dg(this->prm_fe_degree);
+    const std::unique_ptr<dealii::MappingFE<lifex::dim>> mapping(
+        std::make_unique<dealii::MappingFE<lifex::dim>>(fe_dg));
+
+    std::vector<unsigned int> dof_indices(this->dofs_per_cell);
+
+    for (const auto &P : points) {
+      double activation_time_point = 0;
+
+      for (const auto &cell : this->dof_handler.active_cell_iterators()) {
+        if (cell->is_locally_owned()) {
+          if (cell->point_inside(P)) {
+            dof_indices = this->dof_handler.get_dof_indices(cell);
+            dealii::Point<lifex::dim> cell_unit =
+                mapping->transform_real_to_unit_cell(cell, P);
+
+            for (unsigned int i = 0; i < this->dofs_per_cell; ++i) {
+              activation_time_point += activation_time[dof_indices[i]] *
+                                       fe_dg.shape_value(i, cell_unit);
+            }
+          }
+        }
+      }
+
+      std::cout << "For the point of coordinates " << P[0] << " " << P[1] << " "
+                << P[2] << " the activation time is " << activation_time_point
+                << " seconds" << std::endl;
+    }
   }
 
 
