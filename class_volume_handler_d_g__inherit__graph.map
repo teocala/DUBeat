@@ -1,5 +1,5 @@
 <map id="VolumeHandlerDG&lt; dim &gt;" name="VolumeHandlerDG&lt; dim &gt;">
-<area shape="rect" id="node1" title="Class for the main operations on a discontinuous Galerkin volume element." alt="" coords="93,5,290,32"/>
-<area shape="rect" id="node2" href="$class_face_handler_d_g.html" title="Class for the main operations on the faces of a discontinuous Galerkin element." alt="" coords="5,87,183,114"/>
-<area shape="rect" id="node3" href="$class_face_handler_d_g.html" title=" " alt="" coords="207,80,373,121"/>
+<area shape="rect" id="node1" title="Class for the main operations on a discontinuous Galerkin volume element." alt="" coords="87,5,285,32"/>
+<area shape="rect" id="node2" href="$class_face_handler_d_g.html" title=" " alt="" coords="5,80,172,121"/>
+<area shape="rect" id="node3" href="$class_face_handler_d_g.html" title="Class for the main operations on the faces of a discontinuous Galerkin element." alt="" coords="196,87,373,114"/>
 </map>

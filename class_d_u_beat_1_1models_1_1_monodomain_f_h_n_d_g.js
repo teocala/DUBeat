@@ -15,6 +15,7 @@ var class_d_u_beat_1_1models_1_1_monodomain_f_h_n_d_g =
     [ "gamma", "class_d_u_beat_1_1models_1_1_monodomain_f_h_n_d_g.html#a583171c31aedc218cca548650842c07c", null ],
     [ "grad_w_ex", "class_d_u_beat_1_1models_1_1_monodomain_f_h_n_d_g.html#a36f30e9e571d794361577e364af5168b", null ],
     [ "kappa", "class_d_u_beat_1_1models_1_1_monodomain_f_h_n_d_g.html#a1722982a54721f08abad720e7549bed4", null ],
+    [ "matrix_t0", "class_d_u_beat_1_1models_1_1_monodomain_f_h_n_d_g.html#af204e8a47cb8ca9eadc3b22e1c3a14fe", null ],
     [ "Sigma", "class_d_u_beat_1_1models_1_1_monodomain_f_h_n_d_g.html#ad493451f550d7a2b2f567e9e0d60dea4", null ],
     [ "solution_bdf_w", "class_d_u_beat_1_1models_1_1_monodomain_f_h_n_d_g.html#a0b46d25e51c5ef5de31002ba464b199b", null ],
     [ "solution_ex_owned_w", "class_d_u_beat_1_1models_1_1_monodomain_f_h_n_d_g.html#a0cfae3a5f59d446f118ff76c3f5eb7a3", null ],

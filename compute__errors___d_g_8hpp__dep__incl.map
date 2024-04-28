@@ -1,8 +1,8 @@
 <map id="source/compute_errors_DG.hpp" name="source/compute_errors_DG.hpp">
-<area shape="rect" id="node1" title=" " alt="" coords="193,5,364,47"/>
-<area shape="rect" id="node2" href="$model___d_g_8hpp.html" title=" " alt="" coords="196,95,361,121"/>
-<area shape="rect" id="node3" href="$model___d_g__t_8hpp.html" title=" " alt="" coords="63,169,241,196"/>
-<area shape="rect" id="node5" href="$monodomain__fhn__dg_8hpp.html" title=" " alt="" coords="185,244,373,285"/>
-<area shape="rect" id="node6" href="$laplace__dg_8hpp.html" title=" " alt="" coords="317,169,489,196"/>
-<area shape="rect" id="node4" href="$heat__dg_8hpp.html" title=" " alt="" coords="5,251,160,278"/>
+<area shape="rect" id="node1" title=" " alt="" coords="130,5,301,47"/>
+<area shape="rect" id="node2" href="$model___d_g_8hpp.html" title=" " alt="" coords="133,95,298,121"/>
+<area shape="rect" id="node3" href="$laplace__dg_8hpp.html" title=" " alt="" coords="5,169,177,196"/>
+<area shape="rect" id="node4" href="$monodomain__fhn__dg_8hpp.html" title=" " alt="" coords="121,244,309,285"/>
+<area shape="rect" id="node5" href="$model___d_g__t_8hpp.html" title=" " alt="" coords="253,169,431,196"/>
+<area shape="rect" id="node6" href="$heat__dg_8hpp.html" title=" " alt="" coords="334,251,489,278"/>
 </map>

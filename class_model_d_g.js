@@ -28,7 +28,7 @@ var class_model_d_g =
     [ "get_dofs_per_cell", "class_model_d_g.html#ad8dce2d3b1b83ff0afe4bbeaed192c58", null ],
     [ "initialize_solution", "class_model_d_g.html#a2a27782f0b9a9b92c743f23d4d99e911", null ],
     [ "make_sparsity_pattern", "class_model_d_g.html#a3a2932a63d4afe1629e8adf9c9fb0121", null ],
-    [ "output_results", "class_model_d_g.html#ab339e87e573ed1902c21b8c4f11839d6", null ],
+    [ "output_results", "class_model_d_g.html#aa7e00e18fee9bc3b3bc3f034673bb6a6", null ],
     [ "parse_parameters", "class_model_d_g.html#af1395aafedeb2fb800db737bf840a2e0", null ],
     [ "run", "class_model_d_g.html#accfd4117bb622c25ce74378e67268235", null ],
     [ "setup_system", "class_model_d_g.html#ae7f28e26aea8fe9aeabde2bc8fa13703", null ],

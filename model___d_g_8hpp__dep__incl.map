@@ -1,7 +1,7 @@
 <map id="source/model_DG.hpp" name="source/model_DG.hpp">
-<area shape="rect" id="node1" title=" " alt="" coords="196,5,361,32"/>
-<area shape="rect" id="node2" href="$model___d_g__t_8hpp.html" title=" " alt="" coords="63,80,241,107"/>
-<area shape="rect" id="node4" href="$monodomain__fhn__dg_8hpp.html" title=" " alt="" coords="185,155,373,196"/>
-<area shape="rect" id="node5" href="$laplace__dg_8hpp.html" title=" " alt="" coords="317,80,489,107"/>
-<area shape="rect" id="node3" href="$heat__dg_8hpp.html" title=" " alt="" coords="5,162,160,189"/>
+<area shape="rect" id="node1" title=" " alt="" coords="133,5,298,32"/>
+<area shape="rect" id="node2" href="$laplace__dg_8hpp.html" title=" " alt="" coords="5,80,177,107"/>
+<area shape="rect" id="node3" href="$monodomain__fhn__dg_8hpp.html" title=" " alt="" coords="121,155,309,196"/>
+<area shape="rect" id="node4" href="$model___d_g__t_8hpp.html" title=" " alt="" coords="253,80,431,107"/>
+<area shape="rect" id="node5" href="$heat__dg_8hpp.html" title=" " alt="" coords="334,162,489,189"/>
 </map>

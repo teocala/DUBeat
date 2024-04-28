@@ -1,6 +1,31 @@
 var annotated_dup =
 [
-    [ "DUBeat", "namespace_d_u_beat.html", "namespace_d_u_beat" ],
+    [ "DUBeat", "namespace_d_u_beat.html", [
+      [ "models", "namespace_d_u_beat_1_1models.html", [
+        [ "heat_DG", "namespace_d_u_beat_1_1models_1_1heat___d_g.html", [
+          [ "ExactSolution", "class_d_u_beat_1_1models_1_1heat___d_g_1_1_exact_solution.html", "class_d_u_beat_1_1models_1_1heat___d_g_1_1_exact_solution" ],
+          [ "RightHandSide", "class_d_u_beat_1_1models_1_1heat___d_g_1_1_right_hand_side.html", "class_d_u_beat_1_1models_1_1heat___d_g_1_1_right_hand_side" ],
+          [ "BCNeumann", "class_d_u_beat_1_1models_1_1heat___d_g_1_1_b_c_neumann.html", "class_d_u_beat_1_1models_1_1heat___d_g_1_1_b_c_neumann" ],
+          [ "GradExactSolution", "class_d_u_beat_1_1models_1_1heat___d_g_1_1_grad_exact_solution.html", "class_d_u_beat_1_1models_1_1heat___d_g_1_1_grad_exact_solution" ]
+        ] ],
+        [ "laplace_DG", "namespace_d_u_beat_1_1models_1_1laplace___d_g.html", [
+          [ "ExactSolution", "class_d_u_beat_1_1models_1_1laplace___d_g_1_1_exact_solution.html", "class_d_u_beat_1_1models_1_1laplace___d_g_1_1_exact_solution" ],
+          [ "RightHandSide", "class_d_u_beat_1_1models_1_1laplace___d_g_1_1_right_hand_side.html", "class_d_u_beat_1_1models_1_1laplace___d_g_1_1_right_hand_side" ],
+          [ "GradExactSolution", "class_d_u_beat_1_1models_1_1laplace___d_g_1_1_grad_exact_solution.html", "class_d_u_beat_1_1models_1_1laplace___d_g_1_1_grad_exact_solution" ]
+        ] ],
+        [ "monodomain_fhn_DG", "namespace_d_u_beat_1_1models_1_1monodomain__fhn___d_g.html", [
+          [ "ExactSolution", "class_d_u_beat_1_1models_1_1monodomain__fhn___d_g_1_1_exact_solution.html", "class_d_u_beat_1_1models_1_1monodomain__fhn___d_g_1_1_exact_solution" ],
+          [ "RightHandSide", "class_d_u_beat_1_1models_1_1monodomain__fhn___d_g_1_1_right_hand_side.html", "class_d_u_beat_1_1models_1_1monodomain__fhn___d_g_1_1_right_hand_side" ],
+          [ "BCNeumann", "class_d_u_beat_1_1models_1_1monodomain__fhn___d_g_1_1_b_c_neumann.html", "class_d_u_beat_1_1models_1_1monodomain__fhn___d_g_1_1_b_c_neumann" ],
+          [ "GradExactSolution", "class_d_u_beat_1_1models_1_1monodomain__fhn___d_g_1_1_grad_exact_solution.html", "class_d_u_beat_1_1models_1_1monodomain__fhn___d_g_1_1_grad_exact_solution" ],
+          [ "ExactSolution_w", "class_d_u_beat_1_1models_1_1monodomain__fhn___d_g_1_1_exact_solution__w.html", "class_d_u_beat_1_1models_1_1monodomain__fhn___d_g_1_1_exact_solution__w" ],
+          [ "GradExactSolution_w", "class_d_u_beat_1_1models_1_1monodomain__fhn___d_g_1_1_grad_exact_solution__w.html", "class_d_u_beat_1_1models_1_1monodomain__fhn___d_g_1_1_grad_exact_solution__w" ]
+        ] ],
+        [ "HeatDG", "class_d_u_beat_1_1models_1_1_heat_d_g.html", "class_d_u_beat_1_1models_1_1_heat_d_g" ],
+        [ "LaplaceDG", "class_d_u_beat_1_1models_1_1_laplace_d_g.html", "class_d_u_beat_1_1models_1_1_laplace_d_g" ],
+        [ "MonodomainFHNDG", "class_d_u_beat_1_1models_1_1_monodomain_f_h_n_d_g.html", "class_d_u_beat_1_1models_1_1_monodomain_f_h_n_d_g" ]
+      ] ]
+    ] ],
     [ "AssembleDG", "class_assemble_d_g.html", "class_assemble_d_g" ],
     [ "ComputeErrorsDG", "class_compute_errors_d_g.html", "class_compute_errors_d_g" ],
     [ "DoFHandlerDG", "class_do_f_handler_d_g.html", "class_do_f_handler_d_g" ],

@@ -1,12 +1,12 @@
 <map id="source/QGaussLegendreSimplex.hpp" name="source/QGaussLegendreSimplex.hpp">
-<area shape="rect" id="node1" title=" " alt="" coords="154,5,414,32"/>
-<area shape="rect" id="node2" href="$volume__handler___d_g_8hpp.html" title=" " alt="" coords="323,80,498,121"/>
-<area shape="rect" id="node10" href="$face__handler___d_g_8hpp.html" title=" " alt="" coords="81,169,234,211"/>
-<area shape="rect" id="node3" href="$_d_u_b___f_e_m__handler_8hpp.html" title=" " alt="" coords="448,177,664,203"/>
-<area shape="rect" id="node4" href="$heat__dg_8hpp.html" title=" " alt="" coords="748,490,903,517"/>
-<area shape="rect" id="node5" href="$assemble___d_g_8hpp.html" title=" " alt="" coords="549,259,736,285"/>
-<area shape="rect" id="node6" href="$model___d_g__t_8hpp.html" title=" " alt="" coords="610,408,787,435"/>
-<area shape="rect" id="node7" href="$monodomain__fhn__dg_8hpp.html" title=" " alt="" coords="241,483,429,524"/>
-<area shape="rect" id="node8" href="$model___d_g_8hpp.html" title=" " alt="" coords="397,333,563,360"/>
-<area shape="rect" id="node9" href="$laplace__dg_8hpp.html" title=" " alt="" coords="274,408,446,435"/>
+<area shape="rect" id="node1" title=" " alt="" coords="263,5,523,32"/>
+<area shape="rect" id="node2" href="$face__handler___d_g_8hpp.html" title=" " alt="" coords="169,169,322,211"/>
+<area shape="rect" id="node9" href="$volume__handler___d_g_8hpp.html" title=" " alt="" coords="454,80,629,121"/>
+<area shape="rect" id="node3" href="$heat__dg_8hpp.html" title=" " alt="" coords="617,490,772,517"/>
+<area shape="rect" id="node4" href="$laplace__dg_8hpp.html" title=" " alt="" coords="485,408,657,435"/>
+<area shape="rect" id="node5" href="$monodomain__fhn__dg_8hpp.html" title=" " alt="" coords="75,483,263,524"/>
+<area shape="rect" id="node6" href="$assemble___d_g_8hpp.html" title=" " alt="" coords="448,259,635,285"/>
+<area shape="rect" id="node7" href="$model___d_g_8hpp.html" title=" " alt="" coords="296,333,461,360"/>
+<area shape="rect" id="node8" href="$model___d_g__t_8hpp.html" title=" " alt="" coords="283,408,461,435"/>
+<area shape="rect" id="node10" href="$_d_u_b___f_e_m__handler_8hpp.html" title=" " alt="" coords="669,177,885,203"/>
 </map>
