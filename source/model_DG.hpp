@@ -158,7 +158,7 @@ protected:
   /// most 2. This leads to an output vector which correspondent visualization
   /// might be less refined. See DUB_FEM_handler.hpp for more details.
   virtual void
-  output_results() const;
+  output_results(std::string output_name = "solution") const;
 
   /// To convert a discretized solution in FEM basis (does nothing if problem is
   /// in DGFEM), in-place version. It exploits dubiner_to_fem from
@@ -577,7 +577,7 @@ ModelDG<basis>::compute_errors(
 
 template <class basis>
 void
-ModelDG<basis>::output_results() const
+ModelDG<basis>::output_results(std::string output_name) const
 {
   lifex::DataOut<lifex::dim> data_out;
 
@@ -594,7 +594,7 @@ ModelDG<basis>::output_results() const
   data_out.build_patches();
   data_out.add_data_vector(dof_handler_fem, solution_ex, "u_ex");
   data_out.build_patches();
-  lifex::utils::dataout_write_hdf5(data_out, "solution", false);
+  lifex::utils::dataout_write_hdf5(data_out, output_name, false);
 
   data_out.clear();
 }
@@ -643,17 +643,18 @@ void
 ModelDG<basis>::conversion_to_fem(lifex::LinAlg::MPI::Vector &sol_owned,
                                   const std::string           fem_file_path,
                                   const unsigned int          degree_fem,
-                                  const double                scaling_factor) const
+                                  const double scaling_factor) const
 {
   return;
 }
 
 template <>
 void
-ModelDG<DUBValues<lifex::dim>>::conversion_to_fem(lifex::LinAlg::MPI::Vector &sol_owned,
-                                  const std::string           fem_file_path,
-                                  const unsigned int          degree_fem,
-                                  const double                scaling_factor) const
+ModelDG<DUBValues<lifex::dim>>::conversion_to_fem(
+  lifex::LinAlg::MPI::Vector &sol_owned,
+  const std::string           fem_file_path,
+  const unsigned int          degree_fem,
+  const double                scaling_factor) const
 {
   sol_owned = dub_fem_values->dubiner_to_fem(sol_owned,
                                              fem_file_path,
@@ -707,17 +708,18 @@ void
 ModelDG<basis>::conversion_to_dub(lifex::LinAlg::MPI::Vector &sol_owned,
                                   const std::string           fem_file_path,
                                   const unsigned int          degree_fem,
-                                  const double                scaling_factor) const
+                                  const double scaling_factor) const
 {
   return;
 }
 
 template <>
 void
-ModelDG<DUBValues<lifex::dim>>::conversion_to_dub(lifex::LinAlg::MPI::Vector &sol_owned,
-                                  const std::string           fem_file_path,
-                                  const unsigned int          degree_fem,
-                                  const double                scaling_factor) const
+ModelDG<DUBValues<lifex::dim>>::conversion_to_dub(
+  lifex::LinAlg::MPI::Vector &sol_owned,
+  const std::string           fem_file_path,
+  const unsigned int          degree_fem,
+  const double                scaling_factor) const
 {
   sol_owned = dub_fem_values->fem_to_dubiner(sol_owned,
                                              fem_file_path,

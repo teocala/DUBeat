@@ -464,7 +464,7 @@ namespace DUBeat::models
     double epsilon;
     /// ODE parameter.
     double gamma;
-    /// ODe parameter.
+    /// ODE parameter.
     double a;
     /// Solution gating variable, without ghost entries.
     lifex::LinAlg::MPI::Vector solution_owned_w;
@@ -484,6 +484,9 @@ namespace DUBeat::models
     lifex::LinAlg::MPI::Vector solution_bdf_w;
     /// BDF extrapolated solution, with ghost entries.
     lifex::LinAlg::MPI::Vector solution_ext_w;
+
+    /// Component of the system matrix that does not depend on time.
+    lifex::LinAlg::MPI::SparseMatrix matrix_t0;
 
     /// Override for declaration of additional parameters.
     virtual void
@@ -795,34 +798,107 @@ namespace DUBeat::models
     // simple capital letters. We refer here to the DG_Assemble methods for
     // their definition.
 
-    // See DG_Assemble::local_V().
-    dealii::FullMatrix<double> V(this->dofs_per_cell, this->dofs_per_cell);
-    // See DG_Assemble::local_M().
-    dealii::FullMatrix<double> M(this->dofs_per_cell, this->dofs_per_cell);
-    // See DG_Assemble::local_SC().
-    dealii::FullMatrix<double> SC(this->dofs_per_cell, this->dofs_per_cell);
-    // See DG_Assemble::local_IC().
-    dealii::FullMatrix<double> IC(this->dofs_per_cell, this->dofs_per_cell);
-    // Transpose of IC.
-    dealii::FullMatrix<double> IC_t(this->dofs_per_cell, this->dofs_per_cell);
-    // See DG_Assemble::local_IN().
-    dealii::FullMatrix<double> IN(this->dofs_per_cell, this->dofs_per_cell);
-    // Transpose of IN.
-    dealii::FullMatrix<double> IN_t(this->dofs_per_cell, this->dofs_per_cell);
-    // See DG_Assemble::local_SN().
-    dealii::FullMatrix<double> SN(this->dofs_per_cell, this->dofs_per_cell);
     // See DG_Assemble::local_non_linear_fitzhugh().
     dealii::FullMatrix<double> C(this->dofs_per_cell, this->dofs_per_cell);
-
-    dealii::Vector<double> cell_rhs(this->dofs_per_cell);
-    dealii::Vector<double> cell_rhs_edge(this->dofs_per_cell);
-    dealii::Vector<double> u0_rhs(this->dofs_per_cell);
-    dealii::Vector<double> w0_rhs(this->dofs_per_cell);
+    dealii::Vector<double>     cell_rhs(this->dofs_per_cell);
+    dealii::Vector<double>     cell_rhs_edge(this->dofs_per_cell);
+    dealii::Vector<double>     u0_rhs(this->dofs_per_cell);
+    dealii::Vector<double>     w0_rhs(this->dofs_per_cell);
     std::vector<lifex::types::global_dof_index> dof_indices(
       this->dofs_per_cell);
 
     dealii::IndexSet owned_dofs = this->dof_handler.locally_owned_dofs();
-    ;
+
+
+    // This part of the LHS matrix is assembled only once and not at each time
+    // step.
+    if (this->timestep_number == 1)
+      {
+        this->matrix_t0.reinit(this->matrix);
+
+        // See DG_Assemble::local_V().
+        dealii::FullMatrix<double> V(this->dofs_per_cell, this->dofs_per_cell);
+        // See DG_Assemble::local_M().
+        dealii::FullMatrix<double> M(this->dofs_per_cell, this->dofs_per_cell);
+        // See DG_Assemble::local_SC().
+        dealii::FullMatrix<double> SC(this->dofs_per_cell, this->dofs_per_cell);
+        // See DG_Assemble::local_IC().
+        dealii::FullMatrix<double> IC(this->dofs_per_cell, this->dofs_per_cell);
+        // Transpose of IC.
+        dealii::FullMatrix<double> IC_t(this->dofs_per_cell,
+                                        this->dofs_per_cell);
+        // See DG_Assemble::local_IN().
+        dealii::FullMatrix<double> IN(this->dofs_per_cell, this->dofs_per_cell);
+        // Transpose of IN.
+        dealii::FullMatrix<double> IN_t(this->dofs_per_cell,
+                                        this->dofs_per_cell);
+        // See DG_Assemble::local_SN().
+        dealii::FullMatrix<double> SN(this->dofs_per_cell, this->dofs_per_cell);
+
+        for (const auto &cell : this->dof_handler.active_cell_iterators())
+          {
+            if (cell->is_locally_owned())
+              {
+                this->assemble->reinit(cell);
+                dof_indices = this->dof_handler.get_dof_indices(cell);
+
+                V = this->assemble->local_V();
+                V *= Sigma;
+                M = this->assemble->local_M();
+                M /= this->prm_time_step;
+                M *= alpha_bdf;
+                M *= ChiM;
+                M *= Cm;
+
+                this->matrix_t0.add(dof_indices, V);
+                this->matrix_t0.add(dof_indices, M);
+
+                for (const auto &edge : cell->face_indices())
+                  {
+                    this->assemble->reinit(cell, edge);
+                    std::vector<lifex::types::global_dof_index>
+                      dof_indices_neigh(this->dofs_per_cell);
+
+                    if (!cell->at_boundary(edge))
+                      {
+                        SC =
+                          this->assemble->local_SC(this->prm_stability_coeff);
+                        SC *= Sigma;
+                        std::tie(IC, IC_t) =
+                          this->assemble->local_IC(this->prm_penalty_coeff);
+                        IC *= Sigma;
+                        IC_t *= Sigma;
+                        this->matrix_t0.add(dof_indices, SC);
+                        this->matrix_t0.add(dof_indices, IC);
+                        this->matrix_t0.add(dof_indices, IC_t);
+
+                        const auto neighcell = cell->neighbor(edge);
+                        dof_indices_neigh =
+                          this->dof_handler.get_dof_indices(neighcell);
+
+                        std::tie(IN, IN_t) =
+                          this->assemble->local_IN(this->prm_penalty_coeff);
+                        IN *= Sigma;
+                        IN_t *= Sigma;
+                        SN =
+                          this->assemble->local_SN(this->prm_stability_coeff);
+                        SN *= Sigma;
+
+                        this->matrix_t0.add(dof_indices, dof_indices_neigh, IN);
+                        this->matrix_t0.add(dof_indices_neigh,
+                                            dof_indices,
+                                            IN_t);
+                        this->matrix_t0.add(dof_indices, dof_indices_neigh, SN);
+                      }
+                  }
+              }
+          }
+        this->matrix_t0.compress(lifex::VectorOperation::add);
+      }
+
+    // The LHS matrix is the sum of matrix_t0 plus the components that depend on
+    // time.
+    this->matrix.copy_from(this->matrix_t0);
 
     for (const auto &cell : this->dof_handler.active_cell_iterators())
       {
@@ -831,79 +907,39 @@ namespace DUBeat::models
             this->assemble->reinit(cell);
             dof_indices = this->dof_handler.get_dof_indices(cell);
 
-            V = this->assemble->local_V();
-            V *= Sigma;
-            M = this->assemble->local_M();
-            M /= this->prm_time_step;
-            M *= alpha_bdf;
-            M *= ChiM;
-            M *= Cm;
             C = this->assemble->local_non_linear_fitzhugh(this->solution_owned,
                                                           a,
                                                           dof_indices);
-            C *= kappa;
-            C *= ChiM;
+            C *= kappa * ChiM;
 
             cell_rhs = this->assemble->local_rhs(this->f_ex);
 
             u0_rhs =
               this->assemble->local_u0_M_rhs(this->solution_bdf, dof_indices);
-            u0_rhs /= this->prm_time_step;
-            u0_rhs *= ChiM;
-            u0_rhs *= Cm;
+            u0_rhs *= Cm * ChiM / this->prm_time_step;
 
             w0_rhs =
               this->assemble->local_w0_M_rhs(solution_owned_w, dof_indices);
-            w0_rhs *= ChiM;
-            w0_rhs *= (-1);
+            w0_rhs *= -ChiM;
 
-            this->matrix.add(dof_indices, V);
-            this->matrix.add(dof_indices, M);
+            if (cell->at_boundary())
+              {
+                for (const auto &edge : cell->face_indices())
+                  {
+                    if (cell->at_boundary(edge))
+                      {
+                        this->assemble->reinit(cell, edge);
+                        cell_rhs_edge =
+                          this->assemble->local_rhs_edge_neumann(this->g_n);
+                        this->rhs.add(dof_indices, cell_rhs_edge);
+                      }
+                  }
+              }
+
             this->matrix.add(dof_indices, C);
             this->rhs.add(dof_indices, cell_rhs);
             this->rhs.add(dof_indices, u0_rhs);
             this->rhs.add(dof_indices, w0_rhs);
-
-            for (const auto &edge : cell->face_indices())
-              {
-                this->assemble->reinit(cell, edge);
-                std::vector<lifex::types::global_dof_index> dof_indices_neigh(
-                  this->dofs_per_cell);
-
-                if (!cell->at_boundary(edge))
-                  {
-                    SC = this->assemble->local_SC(this->prm_stability_coeff);
-                    SC *= Sigma;
-                    std::tie(IC, IC_t) =
-                      this->assemble->local_IC(this->prm_penalty_coeff);
-                    IC *= Sigma;
-                    IC_t *= Sigma;
-                    this->matrix.add(dof_indices, SC);
-                    this->matrix.add(dof_indices, IC);
-                    this->matrix.add(dof_indices, IC_t);
-
-                    const auto neighcell = cell->neighbor(edge);
-                    dof_indices_neigh =
-                      this->dof_handler.get_dof_indices(neighcell);
-
-                    std::tie(IN, IN_t) =
-                      this->assemble->local_IN(this->prm_penalty_coeff);
-                    IN *= Sigma;
-                    IN_t *= Sigma;
-                    SN = this->assemble->local_SN(this->prm_stability_coeff);
-                    SN *= Sigma;
-
-                    this->matrix.add(dof_indices, dof_indices_neigh, IN);
-                    this->matrix.add(dof_indices_neigh, dof_indices, IN_t);
-                    this->matrix.add(dof_indices, dof_indices_neigh, SN);
-                  }
-                else
-                  {
-                    cell_rhs_edge =
-                      this->assemble->local_rhs_edge_neumann(this->g_n);
-                    this->rhs.add(dof_indices, cell_rhs_edge);
-                  }
-              }
           }
       }
 
