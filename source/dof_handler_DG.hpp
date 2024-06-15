@@ -1,5 +1,5 @@
 /********************************************************************************
-  Copyright (C) 2022 by the DUBeat authors.
+  Copyright (C) 2024 by the DUBeat authors.
 
   This file is part of DUBeat.
 
@@ -56,10 +56,10 @@ using active_cell_iterator = typename ActiveSelector::active_cell_iterator;
  * polynomial orders greater than 2. This implementation permits to overcome
  * this issue thanks to the use of an internal dof_map and the definition of
  * Dubiner basis of every order (even >2) from DUBValues. On the other hand, it
- * is not possible to do the same with DGFEM because the basis functions, in
- * this case, come directly from the deal.II FiniteElement classes. From the
- * previous observations, it is so clear that Dubiner basis can be used with
- * every order while DGFEM with order at most 2.
+ * is not possible to do the same with nodal basis functions since they come
+ * directly from the deal.II FiniteElement classes. From the previous
+ * observations, it is then clear that Dubiner basis can be used with every
+ * order while Lagrangian basis with order at most 2.
  */
 template <class basis>
 class DoFHandlerDG : public dealii::DoFHandler<lifex::dim>
@@ -161,8 +161,8 @@ DoFHandlerDG<basis>::n_dofs() const
 }
 
 
-/// Specialized version for DGFEM, it does not use dof_map but exploits instead
-/// the deal.II original distribute_dofs. Limited to order 2.
+/// Specialized version for Lagrangian basis, it does not use dof_map but
+/// exploits instead the deal.II original distribute_dofs. Limited to order 2.
 template <>
 void
 DoFHandlerDG<dealii::FE_SimplexDGP<lifex::dim>>::distribute_dofs(
@@ -203,17 +203,18 @@ DoFHandlerDG<DUBValues<lifex::dim>>::distribute_dofs(
     }
 }
 
-/// Specialized version for DGFEM, it exploits the original distribute_dofs and
-/// so it is limited to space order at most 2.
+/// Specialized version for Lagrangian basis, it exploits the original
+/// distribute_dofs and so it is limited to space order at most 2.
 template <>
 void
 DoFHandlerDG<dealii::FE_SimplexDGP<lifex::dim>>::distribute_dofs(
   const unsigned int degree)
 {
-  AssertThrow(degree,
-              dealii::StandardExceptions::ExcMessage(
-                "deal.II library does not provide yet DGFEM spaces with "
-                "polynomial order > 2."));
+  AssertThrow(
+    degree,
+    dealii::StandardExceptions::ExcMessage(
+      "deal.II library does not provide yet the Lagrangian DG basis with "
+      "polynomial order > 2."));
   dealii::FE_SimplexDGP<lifex::dim> fe(degree);
   this->distribute_dofs(fe);
 }
@@ -244,8 +245,8 @@ DoFHandlerDG<DUBValues<lifex::dim>>::distribute_dofs(const unsigned int degree)
     }
 }
 
-/// Specialized version for DGFEM. Hence, it exploits the original deal.II
-/// methods.
+/// Specialized version for Lagrangian basis. Hence, it exploits the original
+/// deal.II methods.
 template <>
 std::vector<lifex::types::global_dof_index>
 DoFHandlerDG<dealii::FE_SimplexDGP<lifex::dim>>::get_dof_indices(

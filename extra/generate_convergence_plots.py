@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 ## ---------------------------------------------------------------------
-## Copyright (C) 2022 by the DUBeat authors.
+## Copyright (C) 2024 by the DUBeat authors.
 ##
 ## This file is part of DUBeat.
 ##

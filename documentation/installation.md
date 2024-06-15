@@ -7,16 +7,16 @@ Installation and use instructions
 This work originates from a project for the course of *Advanced Programming for Scientific Computing* at *Politecnico di Milano* and it is developed by *Federica Botta* and *Matteo Calafà*.
 
 The library provides the following two methods:
-1. Standard DGFEM.
-2. DG with Dubiner basis.
+1. DG with nodal Lagrangian basis
+2. DG with orthogonal Dubiner basis.
 
 They both work in either 2 or 3 dimensions depending on the lifex configuration (i.e., specifying `lifex::dim`).  
-The Dubiner method can be used with every order while the DGFEM basis degree can be at most 2 due to the current [deal.II][] restrictions.
+The Dubiner method can be used with every order while the Lagrangian basis degree can be at most 2 due to the current [deal.II][] restrictions.
 
 
 ### Dependencies
 The library can be used only on a `linux` machine with [CMake][] ≥ `3.22.1` and [GNU bash][] ≥ `5.1.16`.  
-Then, `DUBeat 1.0.0` relies almost exclusively on the [lifex][] `1.5.0` installation and its dependencies. Check its [download and install][] page to verify you satisfy all the requirements and install it.  
+Then, `DUBeat 1.0.1` relies almost exclusively on the [lifex][] `1.5.0` installation and its dependencies. Check its [download and install][] page to verify you satisfy all the requirements and install it.  
 More precisely, the library has been implemented using the libraries included in the lifex `mk` module, `2022.0` version. This module can be downloaded from [here][] and we refer again to the lifex [download and install][] page for more information. In particular, `DUBeat` uses from this package:
 - [ADOL-C][] = `2.7.2`
 - [Boost][] = `1.76.0`
@@ -37,9 +37,9 @@ In addition to the core libraries, other packages need to be installed for suppl
 
 
 ### Download and install
-1. To download the library, move to the directory where you desire to install `DUBeat 1.0.0` and use the following bash command.
+1. To download the library, move to the directory where you desire to install `DUBeat 1.0.1` and use the following bash command.
   ```bash
-  git clone git@github.com:teocala/DUBeat.git --branch v1.0.0
+  git clone git@github.com:teocala/DUBeat.git --branch v1.0.1
   ```
   Notice that the previous operation requires the SSH key authentication, see the Github [dedicated page][] for more information.
 

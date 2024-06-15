@@ -1,5 +1,5 @@
 ## ---------------------------------------------------------------------
-## Copyright (C) 2022 by the DUBeat authors.
+## Copyright (C) 2024 by the DUBeat authors.
 ##
 ## This file is part of DUBeat.
 ##
@@ -60,7 +60,7 @@ check_lifex:
 	@if [ ! -d $(LIFEX_PATH) ]; then echo "\033[91m\nLIFEX_PATH is not correct, set your local lifex installation path in Makefile.inc\n\033[0m"; fi
 
 end_print:
-	@echo "\nDUBeat version 1.0.0: compilation completed\n"
+	@echo "\nDUBeat version 1.0.1: compilation completed\n"
 
 clean:
 	@$(RM) -f $(EXEC) $(OBJS)
@@ -76,7 +76,7 @@ doc:
 
 indent:
 	@$(INDENT)/indent_all
-	@echo "DUBeat version 1.0.0: indentation completed."
+	@echo "DUBeat version 1.0.1: indentation completed."
 
 $(EXEC): $(OBJS) 
 

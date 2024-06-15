@@ -1,5 +1,5 @@
 /********************************************************************************
-  Copyright (C) 2022 by the DUBeat authors.
+  Copyright (C) 2024 by the DUBeat authors.
 
   This file is part of DUBeat.
 
@@ -394,7 +394,7 @@ namespace DUBeat::models
    * @f]
    * where @f$ I_{ion}(V_m, w)@f$ is defined through the FitzHugh-Nagumo model.
    *
-   * In particular, it can be solved using the DGFEM basis
+   * In particular, it can be solved using the Lagrangian basis
    * (basis=dealii::FE_SimplexDGP<lifex::dim>) or the Dubiner basis
    * (basis=DUBValues<lifex::dim>).
    *

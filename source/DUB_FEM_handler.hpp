@@ -1,5 +1,5 @@
 /********************************************************************************
-  Copyright (C) 2022 by the DUBeat authors.
+  Copyright (C) 2024 by the DUBeat authors.
 
   This file is part of DUBeat.
 
@@ -49,12 +49,12 @@
 
 /**
  * @brief
- * Class used to discretize analytical solutions as linear combinations of DGFEM
- * or Dubiner basis. It also provides conversions for solution vectors with
- * respect to the DGFEM basis to the Dubiner basis and viceversa. This class is
- * necessary, for instance, to discretize initial analytical solutions for
- * time-dependent problems or to obtain solution vectors for contour plots at
- * the end of the system solving.
+ * Class used to discretize analytical solutions as linear combinations of
+ * Lagrangian or Dubiner basis. It also provides conversions for solution
+ * vectors with respect to the Lagrangian basis to the Dubiner basis and
+ * viceversa. This class is necessary, for instance, to discretize initial
+ * analytical solutions for time-dependent problems or to obtain solution
+ * vectors for contour plots at the end of the system solving.
  */
 template <class basis>
 class DUBFEMHandler : public DUBValues<lifex::dim>

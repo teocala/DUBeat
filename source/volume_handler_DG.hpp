@@ -1,5 +1,5 @@
 /********************************************************************************
-  Copyright (C) 2022 by the DUBeat authors.
+  Copyright (C) 2024 by the DUBeat authors.
 
   This file is part of DUBeat.
 
@@ -57,7 +57,7 @@ protected:
   /// Actual DG cell.
   typename dealii::DoFHandler<dim>::active_cell_iterator cell;
 
-  /// Internal DGFEM basis class. This internal member permits to exploit
+  /// Internal Lagrangian basis class. This internal member permits to exploit
   /// useful already implemented operations. Polynomial order is always set to 1
   /// because the class executes only geometric operations not related to the
   /// degrees of freedom.

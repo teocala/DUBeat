@@ -1,5 +1,5 @@
 /********************************************************************************
-  Copyright (C) 2022 by the DUBeat authors.
+  Copyright (C) 2024 by the DUBeat authors.
 
   This file is part of DUBeat.
 
@@ -160,14 +160,15 @@ protected:
   virtual void
   output_results(std::string output_name = "solution") const;
 
-  /// To convert a discretized solution in FEM basis (does nothing if problem is
-  /// in DGFEM), in-place version. It exploits dubiner_to_fem from
-  /// DUB_FEM_handler.hpp so the same considerations as in output_results hold.
+  /// To convert a discretized solution from modal to nodal basis (does nothing
+  /// if problem is already in nodal basis), in-place version. It exploits
+  /// dubiner_to_fem from DUB_FEM_handler.hpp so the same considerations as in
+  /// output_results hold.
   virtual void
   conversion_to_fem(lifex::LinAlg::MPI::Vector &sol_owned);
 
-  /// To convert a discretized solution in FEM basis (does nothing if problem is
-  /// in DGFEM), const version.
+  /// To convert a discretized solution from modal to nodal basis (does nothing
+  /// if problem is already in nodal basis), const version.
   virtual lifex::LinAlg::MPI::Vector
   conversion_to_fem(const lifex::LinAlg::MPI::Vector &sol_owned) const;
 
