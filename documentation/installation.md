@@ -13,6 +13,19 @@ The library provides the following two methods:
 They both work in either 2 or 3 dimensions depending on the lifex configuration (i.e., specifying `lifex::dim`).  
 The Dubiner method can be used with every order while the Lagrangian basis degree can be at most 2 due to the current [deal.II][] restrictions.
 
+### Citation
+If you use `DUBeat` for your research, please cite our arXiv preprint:
+```
+@misc{botta2024highorderdiscontinuousgalerkinmethods,
+      title={High-order Discontinuous {Galerkin} Methods for the Monodomain and Bidomain Models}, 
+      author={Federica Botta and Matteo Calafà and Pasquale C. Africa and Christian Vergara and Paola F. Antonietti},
+      year={2024},
+      eprint={2406.03045},
+      archivePrefix={arXiv},
+      primaryClass={math.NA},
+      url={https://arxiv.org/abs/2406.03045}, 
+}
+```
 
 ### Dependencies
 The library can be used only on a `linux` machine with [CMake][] ≥ `3.22.1` and [GNU bash][] ≥ `5.1.16`.  
