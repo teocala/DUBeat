@@ -14,9 +14,9 @@ They both work in either 2 or 3 dimensions depending on the lifex configuration 
 The Dubiner method can be used with every order while the Lagrangian basis degree can be at most 2 due to the current [deal.II][] restrictions.
 
 ### Citation
-If you use `DUBeat` for your research, please cite our arXiv preprint:
+If you use `DUBeat` for your research, please cite our [arXiv preprint][]:
 ```
-@misc{botta2024highorderdiscontinuousgalerkinmethods,
+@misc{botta2024highorder,
       title={High-order Discontinuous {Galerkin} Methods for the Monodomain and Bidomain Models}, 
       author={Federica Botta and Matteo Calafà and Pasquale C. Africa and Christian Vergara and Paola F. Antonietti},
       year={2024},
@@ -150,3 +150,4 @@ It is very simple to add a new model/problem in `DUBeat`, just follow the next t
 [PETSc]: https://petsc.org/release/
 [TBB]: https://github.com/oneapi-src/oneTBB
 [Trilinos]: https://trilinos.github.io/
+[arXiv preprint]: https://arxiv.org/abs/2406.03045

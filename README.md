@@ -16,9 +16,9 @@ The library provides the following two methods:
 
 Before using the library, read [here][] the installation guidelines and documentation!
 
-In addition, don't forget to cite our arXiv preprint if you use the library for your research:
+In addition, don't forget to cite our [arXiv preprint][] if you use the library for your research:
 ```
-@misc{botta2024highorderdiscontinuousgalerkinmethods,
+@misc{botta2024highorder,
       title={High-order Discontinuous {Galerkin} Methods for the Monodomain and Bidomain Models}, 
       author={Federica Botta and Matteo Calafà and Pasquale C. Africa and Christian Vergara and Paola F. Antonietti},
       year={2024},
@@ -33,3 +33,4 @@ In addition, don't forget to cite our arXiv preprint if you use the library for 
 [lifex]: https://lifex.gitlab.io/
 [here]: https://matteocalafa.com/DUBeat/
 [deal.II]: https://www.dealii.org/
+[arXiv preprint]: https://arxiv.org/abs/2406.03045
