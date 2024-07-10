@@ -1,10 +1,13 @@
------------------------------------------------------------------
-![](./extra/images/title_image.png)
------------------------------------------------------------------
-<p align="left">
-    <a><img src="https://img.shields.io/badge/Version%20-%201.0.1%20-%20%20%230000FF" /></a>
-    <a href="https://matteocalafa.com/DUBeat/"><img src="https://img.shields.io/badge/Documentation%20-%20matteocalafa.com%2FDUBeat%20-%20%231E90FF" /></a>
-    <a href="https://arxiv.org/abs/2406.03045"> <img src="https://img.shields.io/badge/Cite%20-%20arXiv%3A2406.03045%20-%20%2332CD32" /></a>
+<div align="center">
+<img src="https://matteocalafa.com/images/DUBeat-logo.svg" width="500">
+</div><br>
+
+
+<p align="center">
+    <a><img src="https://matteocalafa.com/badges/DUBeat-version.svg" /></a>
+    <a><img src="https://matteocalafa.com/badges/DUBeat-doc.svg" /></a>
+    <a><img src="https://matteocalafa.com/badges/DUBeat-cite.svg" /></a>
+    <a><img src="https://matteocalafa.com/badges/DUBeat-license.svg" /></a>
 </p>
 
 `DUBeat` is a C++ library that exploits [lifex][] and [deal.II][] to provide discontinuous Galerkin methods on simplices and their applications to cardiac electrophysiology.  
