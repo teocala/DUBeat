@@ -1,6 +1,6 @@
 <div align="center">
 <img src="https://matteocalafa.com/images/DUBeat-logo.svg" width="500">
-</div><br>
+</div>
 
 `DUBeat` is a C++ library that exploits [lifex][] and [deal.II][] to provide discontinuous Galerkin methods on simplices and their applications to cardiac electrophysiology.
 This work originates from a project for the course of *Advanced Programming for Scientific Computing* at *Politecnico di Milano* and it is developed by *Federica Botta* and *Matteo Calafà*.
