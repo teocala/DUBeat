@@ -1,0 +1,6 @@
+<map id="DUBeat::models::HeatDG&lt; basis &gt;" name="DUBeat::models::HeatDG&lt; basis &gt;">
+<area shape="rect" id="node1" title="Class to solve the heat equation using the Discontinuous Galerkin method." alt="" coords="5,225,192,265"/>
+<area shape="rect" id="node2" href="$class_model_d_g__t.html" title="Class representing the resolution of time&#45;dependent problems using discontinuous Galerkin methods." alt="" coords="19,152,178,177"/>
+<area shape="rect" id="node3" href="$class_model_d_g.html" title="Class representing the resolution of problems using discontinuous Galerkin methods." alt="" coords="25,79,172,104"/>
+<area shape="rect" id="node4" title=" " alt="" coords="34,5,163,31"/>
+</map>

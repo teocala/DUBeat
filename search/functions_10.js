@@ -1,0 +1,7 @@
+var searchData=
+[
+  ['setup_5fsystem_0',['setup_system',['../class_model_d_g.html#ae7f28e26aea8fe9aeabde2bc8fa13703',1,'ModelDG']]],
+  ['shape_5fgrad_1',['shape_grad',['../class_d_u_b_values.html#afe3beb6f45dbd19a2f621adcad5d90dd',1,'DUBValues::shape_grad(const unsigned int function_no, const dealii::Point&lt; dim &gt; &amp;quadrature_point) const'],['../class_d_u_b_values.html#aa8bdd12e68d7b5cfac9c00dcbca2330b',1,'DUBValues::shape_grad(const unsigned int function_no, const dealii::Point&lt; 2 &gt; &amp;quadrature_point) const'],['../class_d_u_b_values.html#ab88cabaee7e04a5f7fcaaaa8d8169f99',1,'DUBValues::shape_grad(const unsigned int function_no, const dealii::Point&lt; 3 &gt; &amp;quadrature_point) const']]],
+  ['shape_5fvalue_2',['shape_value',['../class_d_u_b_values.html#ab4fff8416d4e6f1069f4e72be206804b',1,'DUBValues::shape_value(const unsigned int function_no, const dealii::Point&lt; dim &gt; &amp;quadrature_point) const'],['../class_d_u_b_values.html#ac2da0ad1d5bfdcd64419597913d6f266',1,'DUBValues::shape_value(const unsigned int function_no, const dealii::Point&lt; 2 &gt; &amp;quadrature_point) const'],['../class_d_u_b_values.html#a6fd5e65e30a328736f46581448f92bb0',1,'DUBValues::shape_value(const unsigned int function_no, const dealii::Point&lt; 3 &gt; &amp;quadrature_point) const']]],
+  ['solve_5fsystem_3',['solve_system',['../class_model_d_g.html#abb5c4d119a3e5c32c9a981de41267286',1,'ModelDG']]]
+];

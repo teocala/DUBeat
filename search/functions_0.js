@@ -1,0 +1,6 @@
+var searchData=
+[
+  ['analytical_5fto_5fdubiner_0',['analytical_to_dubiner',['../class_d_u_b_f_e_m_handler.html#af8d49abb3546dbc727c013f31935e7f1',1,'DUBFEMHandler']]],
+  ['assemble_5fsystem_1',['assemble_system',['../class_d_u_beat_1_1models_1_1_heat_d_g.html#a5d62c1da4f8e5beb8d3b99416e538832',1,'DUBeat::models::HeatDG::assemble_system()'],['../class_d_u_beat_1_1models_1_1_laplace_d_g.html#af5d0e433eb3e65347dd44c686b97584a',1,'DUBeat::models::LaplaceDG::assemble_system()'],['../class_d_u_beat_1_1models_1_1_monodomain_f_h_n_d_g.html#ad98189cb899c2cad1fce7c63b5dd8737',1,'DUBeat::models::MonodomainFHNDG::assemble_system()'],['../class_model_d_g.html#a33594bf597f1d31bce37fe5eb39bcd06',1,'ModelDG::assemble_system()']]],
+  ['assembledg_2',['AssembleDG',['../class_assemble_d_g.html#a749e36aa6bc24f765ffc5f67d7933594',1,'AssembleDG::AssembleDG(const unsigned int degree)'],['../class_assemble_d_g.html#aee05140d18f8c5392d3f33952750517d',1,'AssembleDG::AssembleDG(AssembleDG&lt; basis &gt; &amp;)=default'],['../class_assemble_d_g.html#af2411cdda83136ff7596ca5827a2130a',1,'AssembleDG::AssembleDG(const AssembleDG&lt; basis &gt; &amp;)=default'],['../class_assemble_d_g.html#a2a0e13d3698ca2553aef51506cd79f45',1,'AssembleDG::AssembleDG(AssembleDG&lt; basis &gt; &amp;&amp;)=default']]]
+];

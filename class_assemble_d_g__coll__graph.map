@@ -1,0 +1,8 @@
+<map id="AssembleDG&lt; basis &gt;" name="AssembleDG&lt; basis &gt;">
+<area shape="rect" id="node1" title="Class for the assembly of the main local matrices for discontinuous Galerkin methods." alt="" coords="69,315,240,340"/>
+<area shape="rect" id="node2" href="$class_volume_handler_d_g.html" title=" " alt="" coords="5,197,192,237"/>
+<area shape="rect" id="node3" href="$class_face_handler_d_g.html" title=" " alt="" coords="217,197,383,237"/>
+<area shape="rect" id="node4" href="$class_volume_handler_d_g.html" title="Class for the main operations on a discontinuous Galerkin volume element." alt="" coords="137,102,335,127"/>
+<area shape="rect" id="node5" href="$class_q_gauss_legendre_simplex.html" title=" " alt="" coords="359,95,545,135"/>
+<area shape="rect" id="node6" title=" " alt="" coords="383,5,521,45"/>
+</map>

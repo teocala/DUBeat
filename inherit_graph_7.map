@@ -1,0 +1,12 @@
+<map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
+<area shape="rect" id="node1" title=" " alt="" coords="5,269,120,294"/>
+<area shape="rect" id="node2" href="$class_d_u_beat_1_1models_1_1heat___d_g_1_1_b_c_neumann.html" title="Neumann boundary condition." alt="" coords="197,5,362,45"/>
+<area shape="rect" id="node3" href="$class_d_u_beat_1_1models_1_1heat___d_g_1_1_grad_exact_solution.html" title="Gradient of the exact solution." alt="" coords="191,69,368,109"/>
+<area shape="rect" id="node4" href="$class_d_u_beat_1_1models_1_1heat___d_g_1_1_right_hand_side.html" title="Source term." alt="" coords="197,133,362,173"/>
+<area shape="rect" id="node5" href="$class_d_u_beat_1_1models_1_1laplace___d_g_1_1_grad_exact_solution.html" title="Gradient of the exact solution." alt="" coords="188,197,371,237"/>
+<area shape="rect" id="node6" href="$class_d_u_beat_1_1models_1_1laplace___d_g_1_1_right_hand_side.html" title="Source term." alt="" coords="188,261,371,301"/>
+<area shape="rect" id="node7" href="$class_d_u_beat_1_1models_1_1monodomain__fhn___d_g_1_1_b_c_neumann.html" title="Neumann boundary condition of the trans&#45;membrane potential." alt="" coords="168,325,391,365"/>
+<area shape="rect" id="node8" href="$class_d_u_beat_1_1models_1_1monodomain__fhn___d_g_1_1_grad_exact_solution.html" title="Gradient of the trans&#45;membrane potential." alt="" coords="168,389,391,429"/>
+<area shape="rect" id="node9" href="$class_d_u_beat_1_1models_1_1monodomain__fhn___d_g_1_1_grad_exact_solution__w.html" title="Gradient of the gating variable." alt="" coords="168,453,391,493"/>
+<area shape="rect" id="node10" href="$class_d_u_beat_1_1models_1_1monodomain__fhn___d_g_1_1_right_hand_side.html" title="Source term: applied current." alt="" coords="168,517,391,557"/>
+</map>

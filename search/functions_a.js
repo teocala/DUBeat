@@ -1,0 +1,7 @@
+var searchData=
+[
+  ['make_5fsparsity_5fpattern_0',['make_sparsity_pattern',['../class_model_d_g.html#a3a2932a63d4afe1629e8adf9c9fb0121',1,'ModelDG']]],
+  ['modeldg_1',['ModelDG',['../class_model_d_g.html#a8bfafd5c597e94f86d09e40ece801047',1,'ModelDG::ModelDG(std::string model_name)'],['../class_model_d_g.html#ac761e6fea5379cf16d2a13e2a8f1fdec',1,'ModelDG::ModelDG(ModelDG&lt; basis &gt; &amp;ModelDG)=default'],['../class_model_d_g.html#af1c8f95522be30edef102ed189fc9a6a',1,'ModelDG::ModelDG(const ModelDG&lt; basis &gt; &amp;ModelDG)=default'],['../class_model_d_g.html#a326277f77b76f43343b217cac8e08e5b',1,'ModelDG::ModelDG(ModelDG&lt; basis &gt; &amp;&amp;ModelDG)=default']]],
+  ['modeldg_5ft_2',['ModelDG_t',['../class_model_d_g__t.html#af6b27462992279e8fe0f09b73a824cc4',1,'ModelDG_t::ModelDG_t(std::string model_name)'],['../class_model_d_g__t.html#a33d4e92492e419113b84414baa1718cc',1,'ModelDG_t::ModelDG_t(ModelDG_t&lt; basis &gt; &amp;ModelDG_t)=default'],['../class_model_d_g__t.html#a6fa1fafd5270409ba4d902c6a35679ad',1,'ModelDG_t::ModelDG_t(const ModelDG_t&lt; basis &gt; &amp;ModelDG_t)=default'],['../class_model_d_g__t.html#a275231bc06f1aceab65bf9ac89720897',1,'ModelDG_t::ModelDG_t(ModelDG_t&lt; basis &gt; &amp;&amp;ModelDG_t)=default']]],
+  ['monodomainfhndg_3',['MonodomainFHNDG',['../class_d_u_beat_1_1models_1_1_monodomain_f_h_n_d_g.html#ae3869f557288e210184c59df66c38640',1,'DUBeat::models::MonodomainFHNDG']]]
+];

@@ -1,0 +1,6 @@
+<map id="DUBeat::models::MonodomainFHNDG&lt; basis &gt;" name="DUBeat::models::MonodomainFHNDG&lt; basis &gt;">
+<area shape="rect" id="node1" title="Class to solve the monodomain equation with Fitzhugh&#45;Nagumo ionic model for the cardiac electrophysio..." alt="" coords="5,225,227,265"/>
+<area shape="rect" id="node2" href="$class_model_d_g__t.html" title="Class representing the resolution of time&#45;dependent problems using discontinuous Galerkin methods." alt="" coords="37,152,195,177"/>
+<area shape="rect" id="node3" href="$class_model_d_g.html" title="Class representing the resolution of problems using discontinuous Galerkin methods." alt="" coords="43,79,189,104"/>
+<area shape="rect" id="node4" title=" " alt="" coords="51,5,181,31"/>
+</map>
