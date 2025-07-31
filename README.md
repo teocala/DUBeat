@@ -17,16 +17,17 @@ The library provides the following two methods:
 
 Before using the library, read [here][] the installation guidelines and documentation!
 
-In addition, don't forget to cite our [arXiv preprint][] if you use the library for your research:
+In addition, don't forget to cite our [paper][] if you use the library for your research:
 ```
-@misc{botta2024highorder,
-      title={High-order Discontinuous {Galerkin} Methods for the Monodomain and Bidomain Models}, 
-      author={Federica Botta and Matteo Calafà and Pasquale C. Africa and Christian Vergara and Paola F. Antonietti},
+@article{botta2024highorder,
+      title={High-order discontinuous {Galerkin} methods for the monodomain and bidomain models},
+      author={Botta, Federica and Calaf{\`a}, Matteo and Africa, Pasquale C. and Vergara, Christian and Antonietti, Paola F.},
+      journal={Mathematics in Engineering},
+      volume={6},
+      number={6},
+      pages={726--741},
       year={2024},
-      eprint={2406.03045},
-      archivePrefix={arXiv},
-      primaryClass={math.NA},
-      url={https://arxiv.org/abs/2406.03045}, 
+      doi={10.3934/mine.2024028}
 }
 ```
 
@@ -34,4 +35,4 @@ In addition, don't forget to cite our [arXiv preprint][] if you use the library 
 [lifex]: https://lifex.gitlab.io/
 [here]: https://matteocalafa.com/DUBeat/
 [deal.II]: https://www.dealii.org/
-[arXiv preprint]: https://arxiv.org/abs/2406.03045
+[paper]: https://www.aimspress.com/article/doi/10.3934/mine.2024028
